@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="view_product_template_form_inherit" model="ir.ui.view">
+            <field name="name">product.template.common.form.inherit</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='product_tooltip']" position="after">
+                    <field name="uom_id"/>
+                    <field name="alternate_unit_of_measure"/>
+                    <field name="conversion_rate"/>
+                </xpath>
+
+                <xpath expr="//field[@name='type']" position="before">
+                    <field name="brand"/>
+                    <field name="alternate_item_name"/>
+                </xpath>
+
+                <xpath expr="//field[@name='barcode']" position="after">
+                    <field name="remarks"/>
+                    <field name="product_tag_ids" widget="many2many_tags"/>
+                    <field name="net_weight"/>
+                </xpath>
+               
+            </field>
+        </record>
+
+        
+</odoo>
