@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="sh_pos_theme_responsive.TextInputPopup" t-inherit="point_of_sale.TextInputPopup" t-inherit-mode="extension">
+        <xpath expr="//t[@t-foreach='props.buttons']" position="replace">
+            <div class="sh_popup_button">
+                <t t-foreach="props.buttons" t-as="button" t-key="button_index">
+                    <button t-on-click="() => this.buttonClick(button)" type="button" t-attf-class="btn btn-lg me-2 mb-2 toggle-button {{button.isSelected? 'btn-primary' : 'btn-secondary'}} lh-lg" >
+                        <t t-esc="button.label"/>
+                    </button>
+                </t>
+            </div>
+        </xpath>
+    </t>
+</templates>

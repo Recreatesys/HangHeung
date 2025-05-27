@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="sh_pos_theme_responsive.PartnerList" t-inherit="point_of_sale.PartnerList" t-inherit-mode="extension">
+        <xpath expr="//table[hasclass('table-hover')]" position="attributes">
+            <attribute name="class">table</attribute>
+        </xpath>
+    </t>
+</templates>

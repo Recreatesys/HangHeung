@@ -1,0 +1,2752 @@
+@if $sh_pos_theme_style == "style_4" {
+    @if $sh_pos_body_background_type == "bg_img" {
+        body {
+            &.pos {
+                background: url("/web/image?model=sh.pos.theme.settings&id=1&field=body_background_image")
+                    no-repeat
+                    center
+                    center
+                    fixed !important;
+                background-repeat: no-repeat !important;
+                background-size: cover !important;
+                .pos {
+                    background: linear-gradient(
+                        119deg,
+                        rgba(darken($sh_pos_primary_color, 35%), $alpha: 0.85) 18%,
+                        rgba(darken($sh_pos_gradient_color, 40%), $alpha: 0.8)
+                    ) !important;
+                    .pos-topheader {
+                        background: transparent !important;
+                        border-color: transparent !important;
+                        .pos-leftheader {
+                            .d-flex{
+                                .navbar-menu{
+                                    .btn{
+                                        &.table-free-order-label {
+                                            @include bg_type_image_style_4;
+                                        }
+                                    }
+                                }
+                            }
+                            .overflow-hidden {
+                                .list-plus-btn,.btn {
+                                    @include bg_type_image_style_4;
+                                }
+                                .overflow-hidden {
+                                    .d-flex {
+                                        div {
+                                            .btn {
+                                                border: 0;
+                                                &:not(.active) {
+                                                    @include bg_type_image_style_4;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .pos-rightheader {
+                            .status-buttons {
+                                .d-flex {
+                                    .input-group {
+                                        .form-control {
+                                            @include bg_type_image_style_4;
+                                            input,
+                                            i {
+                                                background: transparent;
+                                                color: #fff;
+                                                &::placeholder {
+                                                    color: #fff;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                .btn {
+                                    @include bg_type_image_style_4;
+                                }
+                            }
+                        }
+                    }
+                    .pos-content {
+                        background: transparent !important;
+                        .splitbill-screen {
+                            background: transparent !important;
+                            .contents {
+                                background: transparent !important;
+                                .top-content {
+                                    background: transparent !important;
+                                    border-color: transparent !important;
+                                    .btn {
+                                        @include bg_type_image_style_4;
+                                    }
+                                }
+                                .main {
+                                    .overflow-auto {
+                                       background: transparent !important;
+                                        .d-flex {
+                                            background: transparent !important;
+                                            .order-container {
+                                                .orderline {
+                                                  @include bg_type_image_style_4;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    .controls {
+                                        .order-info {
+                                            background: transparent !important
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .floor-screen {
+                            background: transparent !important;
+                            .d-flex {
+                                &.border-bottom{
+                                    background: transparent !important;
+                                    border-color: transparent !important;
+                                }
+                                .floor-selector {
+                                    .btn {
+                                        border: 0;
+                                        @include bg_type_image_style_4;
+                                    }
+                                }
+                                .edit-buttons {
+                                    .d-flex {
+                                        background:  transparent !important;
+                                        .btn {
+                                            border: 0;
+                                            @include bg_type_image_style_4;
+                                            &:active {
+                                                @include theme_4_bg_color;
+                                                color: #fff;
+                                            }
+                                        }
+                                    }
+                                    .btn {
+                                        border: 0;
+                                        @include bg_type_image_style_4;
+                                    }
+                                }
+                            }
+                            .overflow-auto {
+                                background: transparent !important;
+                                .floor-map {
+                                    .table{
+                                        .label{
+                                            color: #fff;
+                                        }
+                                    }
+                                    &.floor-grid{
+                                        background-image: linear-gradient(0, #d3d3d360 14%, transparent 14%), linear-gradient(90deg, transparent 90%, #d3d3d35e 70%);
+                                    }
+                                }
+                            }
+                        }
+                        .payment-screen {
+                            background: transparent !important;
+                            .paymentlines-container {
+                                @include bg_type_image_style_4;
+                            }
+                            .paymentmethods-container {
+                                .paymentmethods {
+                                    background: transparent !important;
+                                    .btn {
+                                        @include bg_type_image_style_4;
+                                    }
+                                }
+                            }
+                            .d-flex {
+                                .text-center {
+                                    color: #fff !important;
+                                }
+                                .back-button {
+                                    @include bg_type_image_style_4;
+                                }
+                                .paymentlines-container {
+                                    &.bg-success-subtle {
+                                        background: rgba(#008818, $alpha: 0.15) !important;
+                                        backdrop-filter: blur(7.5px);
+                                    }
+                                    &.bg-danger-subtle {
+                                        background: rgba(#d23f3a, $alpha: 0.15) !important;
+                                        backdrop-filter: blur(7.5px);
+                                    }
+                                }
+                                .paymentlines {
+                                    .paymentline {
+                                        @include bg_type_image_style_4;
+                                        border: 0;
+                                    }
+                                }
+                            }
+                            .payment-buttons {
+                                .d-flex {
+                                    .btn {
+                                        @include bg_type_image_style_4;
+                                        border: 0;
+                                    }
+                                }
+                            }
+                            .main-content {
+                                .left-content {
+                                    .paymentmethods-container {
+                                        .paymentmethods {
+                                            .btn {
+                                                @include bg_type_image_style_4;
+                                                img {
+                                                    &.payment-method-icon {
+                                                        filter: brightness(10);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    .payment-buttons {
+                                        .d-flex {
+                                            .btn {
+                                                @include bg_type_image_style_4;
+                                            }
+                                        }
+                                    }
+                                    .d-flex,
+                                    .numpad {
+                                        .btn {
+                                            border: 0;
+                                            @include bg_type_image_style_4;
+                                            border: 0 !important;
+                                            @include bg_type_image_style_4;
+                                            $o-colors: #a2a2a2, #ee2d2d, #dc8534, #e8bb1d, #5794dd, #9f628f, #db8865,
+                                                #41a9a2, #304be0, #ee2f8a, #61c36e, #9872e6 !default;
+                                            @for $size from 2 through length($o-colors) {
+                                                &.o_colorlist_item_color_transparent_#{$size - 1} {
+                                                    $-bg: adjust-color(
+                                                        nth($o-colors, $size),
+                                                        $lightness: 28%,
+                                                        $saturation: 15%
+                                                    );
+                                                    $-color: adjust-color(
+                                                        nth($o-colors, $size),
+                                                        $lightness: -40%,
+                                                        $saturation: -15%
+                                                    );
+                                                    @include o-print-color($-bg, background-color, bg-opacity);
+                                                    @include o-print-color($-color, color, text-opacity);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                .center-content {
+                                    .payment-summary {
+                                        .text-center {
+                                            color: #fff;
+                                        }
+                                        .paymentlines-container {
+                                            &.bg-success-subtle {
+                                                background: rgba(#008818, $alpha: 0.15) !important;
+                                                backdrop-filter: blur(7.5px);
+                                            }
+                                            &.bg-danger-subtle {
+                                                background: rgba(#d23f3a, $alpha: 0.15) !important;
+                                                backdrop-filter: blur(7.5px);
+                                            }
+                                        }
+                                        .paymentlines {
+                                            .paymentline {
+                                                @include bg_type_image_style_4;
+                                                border: 0 !important;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .product-screen {
+                            .control-buttons {
+                                background: rgba(#e9ecef, $alpha: 0.25) !important;
+                            }
+                            .leftpane {
+                                .sh_pads {
+                                    .subpads {
+                                        .actionpad {
+                                            .d-flex {
+                                                .btn {
+                                                    @include bg_type_image_style_4;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                .d-flex {
+                                    .h-unset {
+                                        i,
+                                        h3 {
+                                            color: #fff;
+                                        }
+                                    }
+                                    .order-container {
+                                        .orderline {
+                                            @include bg_type_image_style_4;
+                                            .d-flex {
+                                                .d-flex {
+                                                    .product-name {
+                                                        .sh_order_line_detail {
+                                                            ul {
+                                                                li {
+                                                                    .qty {
+                                                                        color: #fff !important;
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    .order-summary {
+                                        border-color: transparent !important;
+                                        .d-flex {
+                                            color: #fff !important;
+                                        }
+                                    }
+                                    &.bg-100,
+                                    &.bg-white,
+                                    .order-container{
+                                        background: transparent !important;
+                                    }
+                                }
+                                .pads {
+                                    .subpads {
+                                        .numpad {
+                                            .numpad-button {
+                                                border: 0 !important;
+                                                @include bg_type_image_style_4;
+                                                $o-colors: #a2a2a2, #ee2d2d, #dc8534, #e8bb1d, #5794dd, #9f628f, #db8865,
+                                                    #41a9a2, #304be0, #ee2f8a, #61c36e, #9872e6 !default;
+                                                @for $size from 2 through length($o-colors) {
+                                                    &.o_colorlist_item_color_transparent_#{$size - 1} {
+                                                        $-bg: adjust-color(
+                                                            nth($o-colors, $size),
+                                                            $lightness: 28%,
+                                                            $saturation: 15%
+                                                        );
+                                                        $-color: adjust-color(
+                                                            nth($o-colors, $size),
+                                                            $lightness: -40%,
+                                                            $saturation: -15%
+                                                        );
+                                                        @include o-print-color($-bg, background-color, bg-opacity);
+                                                        @include o-print-color($-color, color, text-opacity);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .actionpad {
+                                            .validation {
+                                                .back-button {
+                                                    border: 0;
+                                                    @include bg_type_image_style_4;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            .rightpane {
+                                .position-relative {
+                                    
+                                    .flex-grow-1 {
+                                        p{
+                                            color: #fff;
+                                        }
+                                    }
+                                    .d-grid {
+                                        .category-button {
+                                            border: 0;
+                                        }
+                                    }
+                                    .product-list {
+                                        .product {
+                                            @include bg_type_image_style_4;
+                                        }
+                                    }
+                                    .sh_product_list_view {
+                                        table {
+                                            tbody {
+                                                tr {
+                                                    td {
+                                                        color: #fff;
+                                                        border: 0;
+                                                        box-shadow: none;
+                                                    }
+                                                    &:nth-child(odd) {
+                                                        background: rgba($sh_odd_row_color, $alpha: 0.19) !important;
+                                                        backdrop-filter: blur(7.5px);
+                                                    }
+                                                    &:nth-child(even) {
+                                                        background: rgba($sh_even_row_color, $alpha: 0.19) !important;
+                                                        backdrop-filter: blur(7.5px);
+                                                    }
+                                                    @if $sh_list_row_hover == "True" {
+                                                        &:hover {
+                                                            background: rgba(
+                                                                $sh_hover_background_color,
+                                                                $alpha: 0.15
+                                                            ) !important;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                .switchpane {
+                                    background: transparent !important;
+                                    border-color: transparent !important;
+                                    .btn {
+                                        @include bg_type_image_style_4;
+                                    }
+                                }
+                            }
+                        }
+                        .ticket-screen {
+                            background: transparent !important;
+                            .screen-full-width {
+                                .leftpane {
+                                    background: transparent !important;
+                                    .text-danger,
+                                    .bg-100 {
+                                        background: transparent !important;
+                                        color: #fff !important;
+                                    }
+                                    .bg-white {
+                                        background: transparent !important;
+                                    }
+                                    .d-flex {
+                                        .order-container {
+                                            .border-opacity-75 {
+                                                border-color: transparent !important;
+                                                color: #fff;
+                                            }
+                                            .orderline {
+                                                @include bg_type_image_style_4;
+                                                &.selected {
+                                                    @include theme_4_bg_color;
+                                                }
+                                                .qty {
+                                                    color: #fff !important;
+                                                }
+                                            }
+                                        }
+                                        .order-summary {
+                                            border-color: transparent !important;
+                                            div {
+                                                color: #fff !important;
+                                            }
+                                        }
+                                    }
+                                    .pads {
+                                        .subpads {
+                                            .numpad {
+                                                .btn {
+                                                    @include bg_type_image_style_4;
+                                                }
+                                            }
+                                        }
+                                        .pads {
+                                            .back-button {
+                                                @include bg_type_image_style_4;
+                                            }
+                                        }
+                                    }
+                                }
+                                .control-buttons {
+                                    background: rgba(#e9ecef, $alpha: 0.25) !important;
+                                }
+                                .rightpane {
+                                    background: transparent !important;
+                                    .controls {
+                                        background: transparent !important;
+                                        .buttons {
+                                            .discard {
+                                                @include bg_type_image_style_4;
+                                                border: 0;
+                                            }
+                                        }
+                                        .pos-search-bar {
+                                            .search {
+                                                .input-group {
+                                                    border: 0;
+                                                    input {
+                                                        @include bg_type_image_style_4;
+                                                    }
+                                                    .filter {
+                                                        @include bg_type_image_style_4;
+                                                        outline: 0;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .item {
+                                            .page {
+                                                color: #fff;
+                                            }
+                                            .page-controls {
+                                                .btn {
+                                                    @include bg_type_image_style_4;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    .orders {
+                                        .order-row {
+                                            .col {
+                                                color: #fff;
+                                            }
+                                            &:nth-child(odd) {
+                                                background: rgba($sh_odd_row_color, $alpha: 0.19) !important;
+                                                backdrop-filter: blur(7.5px);
+                                            }
+                                            &:nth-child(even) {
+                                                background: rgba($sh_even_row_color, $alpha: 0.19) !important;
+                                                backdrop-filter: blur(7.5px);
+                                            }
+                                            @if $sh_list_row_hover == "True" {
+                                                &:hover {
+                                                    background: rgba(
+                                                        $sh_hover_background_color,
+                                                        $alpha: 0.15
+                                                    ) !important;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .main-content {
+                            background: transparent !important;
+                            .center-content {
+                                .paymentlines-container,
+                                .payment-summary {
+                                    background: transparent !important;
+                                    .paymentlines-container {
+                                        &.bg-success-subtle {
+                                            background: lighten(#008818, 68%) !important;
+                                        }
+                                        &.bg-danger-subtle {
+                                            background: lighten(#d23f3a, 35%) !important;
+                                        }
+                                    }
+                                    .paymentlines {
+                                        .paymentline {
+                                            &.selected {
+                                                background: lighten($sh_pos_primary_color, 45%);
+                                                border-color: $sh_pos_primary_color;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .receipt-screen {
+                            background: transparent !important;
+                            .screen-content {
+                                .default-view {
+                                    .actions {
+                                        border-color: transparent !important;
+                                        .o_payment_successful {
+                                            .receipt-options {
+                                                .button {
+                                                    &.btn-secondary {
+                                                        @include bg_type_image_style_4;
+                                                    }
+                                                }
+                                                .d-flex {
+                                                    .d-flex {
+                                                        input {
+                                                            @include bg_type_image_style_4;
+                                                            border: 0 !important;
+                                                            &::placeholder {
+                                                                color: #fff;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    .pos-receipt-container {
+                                        background: transparent !important;
+                                    }
+                                }
+                            }
+                        }
+                        .owl-carousel {
+                            .owl-stage-outer {
+                                background: transparent;
+                                .owl-stage {
+                                    .owl-item {
+                                        .btn {
+                                            @include bg_type_image_style_4;
+                                            div{
+                                                &.text-action{
+                                                    color: #fff !important
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    body {
+        .pos {
+            .pos-topheader {
+                .pos-leftheader {
+                    .d-flex {
+                        .navbar-menu {
+                            .btn {
+                                &.back-button {
+                                    @include theme_4_bg_color;
+                                    color: #fff;
+                                    border: 0;
+                                    img{
+                                        filter: invert(1);
+                                    }
+                                }
+                                &.table-free-order-label {
+                                    border-color: transparent;
+                                    color: #343a40;
+                                    background: #dee2e6;
+                                    &:active {
+                                        @include theme_4_bg_color;
+                                        color: #fff;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .overflow-hidden {
+                        .list-plus-btn {
+                            &:active {
+                                @include theme_4_bg_color;
+                                color: #fff;
+                            }
+                        }
+                        .overflow-hidden {
+                            .d-flex {
+                                div {
+                                    .btn {
+                                        background: #dee2e6;
+                                        &:active {
+                                            @include theme_4_bg_color;
+                                            color: #fff;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .btn {
+                            border: 1px solid #ddd;
+                            background: #fff;
+                            &.active {
+                                @include theme_4_bg_color;
+                                color: #fff;
+                            }
+                            &:active {
+                                border-color: $sh_pos_primary_color;
+                            }
+                        }
+                    }
+                }
+                .pos-rightheader {
+                    .status-buttons {
+                        .d-flex {
+                            .input-group {
+                                .form-control {
+                                    &:hover,&:has(input:focus) {
+                                        border-color: $sh_pos_primary_color;
+                                    }
+                                }
+                            }
+                        }
+                        .btn {
+                            border: 0;
+                            &:active,&.show {
+                                @include theme_4_bg_color;
+                                color: #fff;
+                                i {
+                                    color: #fff;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .pos-content {
+                .splitbill-screen {
+                    .contents {
+                        .top-content {
+                            .btn {
+                                border: 0;
+                                &:active {
+                                    @include theme_4_bg_color;
+                                    color: #fff;
+                                }
+                            }
+                        }
+                        .main {
+                            .overflow-auto {
+                                @include scroll_bar;
+                                &::-webkit-scrollbar-thumb{
+                                    @include theme_4_bg_color;
+                                }
+                                .d-flex {
+                                    .order-container {
+                                        .orderline {
+                                            border: 0;
+                                            &.active {
+                                                @include theme_4_bg_color;
+                                                color: #fff;
+                                                .qty {
+                                                    color: #fff !important;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            .controls {
+                                .order-info {
+                                    .subtotal {
+                                        @include theme_4_bg_color;
+                                        background-clip: text !important;
+                                        text-shadow: none;
+                                        -webkit-text-fill-color: transparent !important;
+                                    }
+                                }
+                                .pay-button {
+                                    .btn {
+                                        @include theme_4_bg_color;
+                                        color: #fff;
+                                        border: 0;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                .floor-screen {
+                    .d-flex {
+                        .floor-selector {
+                            .btn {
+                                border: 0;
+                                background: #dee2e6;
+                                &.active,
+                                &:active {
+                                    @include theme_4_bg_color;
+                                    color: #fff;
+                                }
+                            }
+                        }
+                        .edit-buttons {
+                            .d-flex {
+                                background: #fff !important;
+                                .btn {
+                                    border: 0;
+                                    &:active {
+                                        @include theme_4_bg_color;
+                                        color: #fff;
+                                    }
+                                }
+                            }
+                            .btn {
+                                border: 0;
+                                background: #dee2e6 !important;
+                                &.btn-outline-secondary {
+                                    &:active {
+                                        @include theme_4_bg_color;
+                                        color: #fff;
+                                    }
+                                }
+                                &.btn-primary {
+                                    @include theme_4_bg_color;
+                                    color: #fff;
+                                }
+                            }
+                        }
+                    }
+                }
+                .product-screen {
+                    .leftpane {
+                        @if $sh_cart_position == "left_side" {
+                            border-right-width: 3px !important;
+                            border-image: linear-gradient(to bottom, $sh_pos_primary_color, $sh_pos_gradient_color)
+                                1
+                                100% !important;
+                        }
+                        @if $sh_cart_position == "right_side" {
+                            border-left-width: 3px !important;
+                            border-image: linear-gradient(to bottom, $sh_pos_primary_color, $sh_pos_gradient_color)
+                                1
+                                100% !important;
+                        }
+                        .d-flex {
+                            .d-flex {
+                                .btn {
+                                    &.unbook-table,
+                                    &.book-table{
+                                        @include theme_4_bg_color;
+                                        border: 0;
+                                    }
+                                }
+                            }
+                            .order-container {
+                                &::-webkit-scrollbar-thumb {
+                                    @include theme_4_bg_color;
+                                }
+                                .orderline {
+                                    background: #fff !important;
+                                    border: 0;
+                                    &.selected {
+                                        @include theme_4_bg_color;
+                                        color: #fff;
+                                        span,
+                                        li {
+                                            color: #fff !important;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .pads {
+                            .subpads {
+                                .numpad {
+                                    .btn {
+                                        transition: 0s;
+                                        &.active,&:active {
+                                            @include theme_4_bg_color;
+                                            color: #fff;
+                                        }
+                                    }
+                                }
+                                .actionpad {
+                                    .d-flex {
+                                        .btn {
+                                            &.submit-order {
+                                                @include theme_4_bg_color;
+                                                color: #fff;
+                                                border: 0;
+                                                &.disabled {
+                                                    background: linear-gradient(
+                                                        119deg,
+                                                        lighten($sh_pos_primary_color, 25%) 18%,
+                                                        lighten($sh_pos_gradient_color, 25%)
+                                                    ) !important;
+                                                }
+                                            }
+                                            &.pay-order-button {
+                                                border-color: $sh_pos_primary_color;
+                                            }
+                                            &.btn-primary {
+                                                @include theme_4_bg_color;
+                                                border: 0;
+                                            }
+                                            &.set-partner {
+                                                .text-action {
+                                                    color: $sh_pos_primary_color !important;
+                                                }
+                                            }
+                                            &:hover {
+                                                background: rgba($sh_pos_primary_color, $alpha: 0.06);
+                                            }
+                                            &:active {
+                                                border-color: $sh_pos_primary_color;
+                                                background: rgba($sh_pos_primary_color, $alpha: 0.06);
+                                            }
+                                        }
+                                    }
+                                    .validation {
+                                        .d-flex{
+                                            .btn{
+                                                &.pay-order-button {
+                                                    @include theme_4_bg_color;
+                                                    color: #fff;       
+                                                }
+                                            }
+                                        }
+                                        .back-button {
+                                            &:hover {
+                                                @include theme_4_bg_color;
+                                                color: #fff;
+                                            }
+                                        }
+                                        .pay {
+                                            @include theme_4_bg_color;
+                                            color: #fff;
+                                            border: 0;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .rightpane {
+                        .switchpane {
+                            .btn {
+                                &.btn-primary {
+                                    @include theme_4_bg_color;
+                                    border: 0;
+                                }
+                            }
+                        }
+                        .position-relative {
+                            .product-list {
+                                .product{
+                                    .sh_product_qty{
+                                        @include theme_4_bg_color;
+                                        border: 0;
+                                    }
+                                }
+                            }
+                            .search-more-button {
+                                .btn {
+                                    @include theme_4_bg_color;
+                                    border: 0;
+                                }
+                            }
+                            .product-list {
+                                &::-webkit-scrollbar-thumb {
+                                    @include theme_4_bg_color;
+                                }
+                                .product {
+                                    .product-information-tag {
+                                        width: 30px;
+                                        height: 30px;
+                                        border-width: unset;
+                                        border-style: unset;
+                                        display: flex;
+                                        justify-content: center;
+                                        align-items: center;
+                                        .product-information-tag-logo {
+                                            position: unset;
+                                        }
+                                    }
+                                    $o-colors_type: #ffabab, #f8cea7, #fde697, #c9dff9, #ddb2d2, #fae0d5, #95e4df,
+                                        #a5b2fa, #ffadd4, #c3f0c9, #e75b5b63, #9872e6 !default;
+                                    @for $bg-color from 1 to length($o-colors) {
+                                        &.o_colorlist_item_color_transparent_#{$bg-color} {
+                                            .product-information-tag {
+                                                background-color: nth($o-colors_type, $bg-color);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            .product-reminder {
+                                @include theme_4_bg_color;
+                                div,
+                                span {
+                                    @include theme_4_bg_color;
+                                }
+                            }
+                            .d-grid {
+                                .sh_switch_view_icon {
+                                    .btn {
+                                        width: 100%;
+                                        border: 0;
+                                        background: linear-gradient(
+                                            119deg,
+                                            lighten($sh_pos_primary_color, 25%) 18%,
+                                            lighten($sh_pos_gradient_color, 25%)
+                                        ) !important;
+                                        &.highlight {
+                                            @include theme_4_bg_color;
+                                        }
+                                    }
+                                }
+                            }
+                            .sh_product_list_view {
+                                &::-webkit-scrollbar-thumb {
+                                    @include theme_4_bg_color;
+                                }
+                                table {
+                                    thead {
+                                        @include theme_4_bg_color;
+                                        th {
+                                            color: #fff;
+                                        }
+                                    }                                    
+                                }
+                            }
+                        }
+                    }
+                    .control-buttons {
+                        .control-buttons {
+                            .btn {
+                                &.set-partner {
+                                    .text-action {
+                                        color: $sh_pos_primary_color !important;
+                                    }
+                                }
+                                &:hover {
+                                    @include theme_4_bg_color;
+                                    color: #fff;
+                                    .text-action {
+                                        color: #fff !important;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                .ticket-screen {
+                    .screen-full-width {
+                        .leftpane {
+                            .d-flex {
+                                &.bg-white {
+                                    background: transparent !important;
+                                }
+                            }
+                            .order-container {
+                                &::-webkit-scrollbar-thumb {
+                                    @include theme_4_bg_color;
+                                }
+                                .orderline {
+                                    background: #fff !important;
+                                    border: 0;
+                                    &.selected {
+                                        @include theme_4_bg_color;
+                                        color: #fff;
+                                        .qty {
+                                            color: #fff !important;
+                                        }
+                                    }
+                                }
+                            }
+                            .pads {
+                                .pads {
+                                    .btn {
+                                        border: 0;
+                                        &.back-button {
+                                            &:hover {
+                                                @include theme_4_bg_color;
+                                                color: #fff;
+                                            }
+                                        }
+                                        &.validation {
+                                            @include theme_4_bg_color;
+                                            color: #fff;
+                                        }
+                                    }
+                                }
+                                .subpads {
+                                    .numpad {
+                                        .btn {
+                                            border: 0;
+                                            &.border-primary,&:hover {
+                                                @include theme_4_bg_color;
+                                                color: #fff;
+                                            }
+                                            &:active {
+                                                border-color: $sh_pos_primary_color;
+                                                background: rgba($sh_pos_primary_color, $alpha: 0.06);
+                                            }
+                                        }
+                                    }
+                                    .actionpad {
+                                        .validation {
+                                            .pay {
+                                                @include theme_4_bg_color;
+                                                border: 0;
+                                                color: #fff;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .rightpane {
+                            .controls {
+                                .pos-search-bar {
+                                    .search {
+                                        .input-group {
+                                            &:has(input:focus),&:hover {
+                                                border-color: $sh_pos_primary_color;
+                                            }
+                                            .filter {
+                                                background: #fff;
+                                                border: 0;
+                                                outline: 1px solid $sh_pos_primary_color;
+                                                &:hover {
+                                                    @include theme_4_bg_color;
+                                                    color: #fff;
+                                                    outline-color: transparent;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                .item {
+                                    .page-controls {
+                                        .btn {
+                                            border: 0;
+                                            &:hover {
+                                                @include theme_4_bg_color;
+                                                color: #fff;
+                                            }
+                                        }
+                                    }
+                                }
+                                .buttons {
+                                    .btn {
+                                        color: $sh_pos_primary_color;
+                                        border-color: $sh_pos_primary_color;
+                                        &:hover {
+                                            @include theme_4_bg_color;
+                                            color: #fff;
+                                        }
+                                        &.highlight {
+                                            background: $sh_pos_primary_color;
+                                            color: #fff;
+                                        }
+                                    }
+                                }
+                            }
+                            .orders {
+                                @include scroll_bar;
+                                &::-webkit-scrollbar-thumb,.header-row {
+                                    @include theme_4_bg_color;
+                                }
+                                .order-row {
+                                    &.highlight {
+                                        .col {
+                                            color: $sh_pos_primary_color;
+                                        }
+                                    }
+                                }
+                            }
+                            .switchpane {
+                                .btn {
+                                    border: 0;
+                                    &.btn-primary {
+                                        @include theme_4_bg_color;
+                                        color: #fff;
+                                    }
+                                }
+                            }
+                        }
+                        .control-buttons {
+                            .btn {
+                                &:hover {
+                                    background: $sh_pos_primary_color !important;
+                                    color: #fff !important;
+                                }
+                            }
+                        }
+                    }
+                }
+                .receipt-screen {
+                    .screen-content {
+                        .default-view {
+                            .actions {
+                                .o_payment_successful {
+                                    .receipt-options {
+                                        .d-flex {
+                                            .btn {
+                                                &.print {
+                                                    border: 0;
+                                                    &:focus {
+                                                        @include theme_4_bg_color;
+                                                        color: #ffff;
+                                                    }
+                                                }
+                                            }
+                                            .send-receipt-input {
+                                                input {
+                                                    &:hover, &:focus {
+                                                        border-color: $sh_pos_primary_color !important;
+                                                    }
+                                                }
+                                                .position-absolute {
+                                                    i {
+                                                        color: $sh_pos_primary_color;
+                                                    }
+                                                }
+                                            }
+                                            .sending-receipt-management {
+                                                .btn {
+                                                    background: $sh_pos_primary_color;
+                                                }
+                                            }
+                                            .d-flex {
+                                                .send-receipt-email-input {
+                                                    &:hover,&:focus {
+                                                        border-color: $sh_pos_primary_color !important;
+                                                    }
+                                                }
+                                                div {
+                                                    .btn {
+                                                        @include theme_4_bg_color;
+                                                        border: 0;
+                                                        &[disable] {
+                                                            background: linear-gradient(
+                                                                119deg,
+                                                                lighten($sh_pos_primary_color, 25%) 18%,
+                                                                lighten($sh_pos_gradient_color, 25%)
+                                                            ) !important;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                .validation-buttons {
+                                    .button {
+                                        @include theme_4_bg_color;
+                                        border: 0;
+                                    }
+                                }
+                            }
+                            .pos-receipt-container {
+                                .d-inline-block {
+                                    &::-webkit-scrollbar-thumb {
+                                        @include theme_4_bg_color;
+                                    }
+                                }
+                            }
+                        }
+                        .switchpane {
+                            .btn {
+                                @include theme_4_bg_color;
+                                border: 0;
+                                color: #fff;
+                            }
+                        }
+                    }
+                }
+                .payment-screen {
+                    .paymentlines-container {
+                        .total {
+                            @include theme_4_bg_color;
+                            background-clip: text !important;
+                            text-shadow: none;
+                            -webkit-text-fill-color: transparent !important;
+                        }
+                    }
+                    .payment-buttons {
+                        .d-flex {
+                            .btn {
+                                &.highlight {
+                                    border-color: $sh_pos_primary_color;
+                                    @include theme_4_bg_color;
+                                    color: #fff !important;
+                                    border: 0;
+                                    i {
+                                        color: #fff !important;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .d-flex {
+                        .paymentlines {
+                            .paymentline {
+                                &.selected {
+                                    @include theme_4_bg_color;
+                                    color: #fff;
+                                }
+                            }
+                        }
+                        .btn-primary {
+                            &.secondary {
+                                background: linear-gradient(
+                                    119deg,
+                                    rgba($sh_pos_primary_color, $alpha: 0.5) 18%,
+                                    rgba($sh_pos_gradient_color, $alpha: 0.5)
+                                ) !important;
+                                border: 0;
+                            }
+                            &:not(.secondary) {
+                                border: 0;
+                                @include theme_4_bg_color;
+                            }
+                        }
+                    }
+                    .paymentmethods-container {
+                        .paymentmethods {
+                            .button {
+                                &.paymentmethod {
+                                    border: 0;
+                                    &:hover {
+                                        @include theme_4_bg_color;
+                                        color: #fff;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .main-content {
+                        .left-content {
+                            .paymentmethods-container {
+                                .paymentmethods {
+                                    .button {
+                                        &.paymentmethod {
+                                            border: 0;
+                                            &:hover {
+                                                @include theme_4_bg_color;
+                                                color: #fff;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            .payment-buttons {
+                                .d-flex {
+                                    .button {
+                                        border: 0;
+                                        &:hover,
+                                        &.highlight {
+                                            @include theme_4_bg_color;
+                                            color: #fff !important;
+                                            i {
+                                                color: #fff !important;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            .numpad {
+                                .numpad-button {border: 0;
+                                    @for $i from 1 through 10 {
+                                        &:not(.o_colorlist_item_color_transparent_#{$i}) {
+                                            &:hover,&:active {
+                                                @include theme_4_bg_color;
+                                                color: #fff;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            .flex-row {
+                                .button {
+                                    &.back {border: 0;
+                                        &:hover {
+                                            @include theme_4_bg_color;
+                                            color: #fff;
+                                        }
+                                    }
+                                    &.next {
+                                        background: linear-gradient(
+                                            119deg,
+                                            lighten($sh_pos_primary_color, 25%) 18%,
+                                            lighten($sh_pos_gradient_color, 25%)
+                                        ) !important;
+                                        border: 0;
+                                        &.highlight {
+                                            @include theme_4_bg_color;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .center-content {
+                            border-image: linear-gradient(to bottom, $sh_pos_primary_color, $sh_pos_gradient_color)
+                            1
+                            100% !important;
+                            .paymentlines-container {
+                                .total {
+                                    @include theme_4_bg_color;
+                                    background-clip: text !important;
+                                    text-shadow: none;
+                                    -webkit-text-fill-color: transparent !important;
+                                }
+                            }
+                            .payment-summary {
+                                background: transparent !important;
+                                .paymentlines {
+                                    @include scroll_bar;
+                                    &::-webkit-scrollbar-thumb {
+                                        @include theme_4_bg_color;
+                                    }
+                                    .paymentline {
+                                        background: #fff !important;
+                                        &.selected {
+                                            @include theme_4_bg_color;
+                                            color: #fff;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                .owl-carousel {
+                    .owl-stage-outer {
+                        .owl-stage {
+                            .owl-item {
+                                .btn {
+                                    .text-action{
+                                        color: $sh_pos_primary_color !important;
+                                    }
+                                    &:hover {
+                                        @include theme_4_bg_color;
+                                        color: #fff;
+                                        div {
+                                            color: #fff !important;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .o-main-components-container {
+            .o-overlay-container {
+                .o-overlay-item {
+                    .o_popover {
+                        .o-dropdown-item {
+                            input[type="checkbox"] {
+                                border-color: $sh_pos_primary_color !important;
+                                box-shadow: none;
+                                &:checked {
+                                    background-color: $sh_pos_primary_color !important;
+                                    border-color: $sh_pos_primary_color !important;
+                                }
+                            }
+                        }
+                        .o_dropdown_container {
+                            .px-3 {
+                                .text-primary,
+                                .text-action {
+                                    color: $sh_pos_primary_color !important;
+                                }
+                            }
+                            .o_accordion {
+                                .o_accordion_values {
+                                    .o-checkbox {
+                                        input {
+                                            border-color: $sh_pos_primary_color;
+                                            box-shadow: none;
+                                            &:checked {
+                                                background-color: $sh_pos_primary_color;
+                                                border-color: $sh_pos_primary_color;
+                                            }
+                                        }
+                                    }
+                                    .o_save_favorite {
+                                        @include theme_4_bg_color;
+                                        border: 0;
+                                    }
+                                }
+                            }
+                        }
+                        .pos-burger-menu-items {
+                            .o-dropdown-item {
+                                .badge {
+                                    background: $sh_pos_primary_color !important;
+                                }
+                            }
+                        }
+                    }
+                    .o_dialog {
+                        .modal {
+                            backdrop-filter: blur(7.5px);
+                            .modal-dialog {
+                                .modal-content {
+                                    .modal-header {
+                                        .btn {
+                                            @include theme_4_bg_color;
+                                            color: #fff;
+                                            border: 0;
+                                        }
+                                        .ms-auto {
+                                            .input-group {
+                                                .form-control {
+                                                    &:hover, &:has(input:focus) {
+                                                        border-color: $sh_pos_primary_color;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    .modal-body {
+                                        &::-webkit-scrollbar-thumb {
+                                            @include theme_4_bg_color;
+                                        }
+                                        .o_form_view_container{
+                                            .o_content{
+                                                .o_form_renderer{
+                                                    .o_form_sheet_bg{
+                                                        .o_form_sheet{
+                                                            .o_notebook{
+                                                                .o_notebook_headers{
+                                                                    ul{
+                                                                        li{
+                                                                            .nav-link{
+                                                                                &.active{
+                                                                                   border-top-color: $sh_pos_primary_color;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .o_domain_selector {
+                                            .o_tree_editor {
+                                                .o_tree_editor_node {
+                                                    .o_tree_editor_node {
+                                                        .o_tree_editor_row {
+                                                            .o_tree_editor_condition {
+                                                                .o_tree_editor_editor {
+                                                                    .o_model_field_selector {
+                                                                        &:hover,&:has(.o_model_field_selector_value:focus) {
+                                                                            border-color: $sh_pos_primary_color;
+                                                                        }
+                                                                    }
+                                                                    &:hover,&:has(select, input):focus {
+                                                                        border-color: $sh_pos_primary_color;
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .o_list_view {
+                                            .o_control_panel {
+                                                .o_control_panel_main {
+                                                    .o_control_panel_actions {
+                                                        .o_cp_searchview {
+                                                            .o_searchview {
+                                                                .o_searchview_input_container {
+                                                                    .o_searchview_facet {
+                                                                        .o_searchview_facet_label {
+                                                                            background: $sh_pos_primary_color !important;
+                                                                            .position-absolute {
+                                                                                background: $sh_pos_primary_color !important;
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                                &:has(.o_searchview_input_container input) {
+                                                                    border-color: $sh_pos_primary_color;
+                                                                    + .o_searchview_dropdown_toggler {
+                                                                        border-color: $sh_pos_primary_color;
+                                                                        &.show {
+                                                                            @include theme_4_bg_color;
+                                                                            color: #fff;
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            .o_content {
+                                                table {
+                                                    thead {
+                                                        tr {
+                                                            th {
+                                                                input {
+                                                                    box-shadow: none;
+                                                                    &:checked {
+                                                                        background-color: $sh_pos_gradient_color;
+                                                                        border-color: $sh_pos_gradient_color;
+                                                                        color: #fff;
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    tbody {
+                                                        tr {
+                                                            td {
+                                                                input {
+                                                                    box-shadow: none;
+                                                                    &:checked {
+                                                                        background-color: $sh_pos_primary_color;
+                                                                        border-color: $sh_pos_primary_color;
+                                                                        color: #fff;
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .numpad {
+                                            .numpad-button {
+                                                border: 0;
+                                                &:active {
+                                                    @include theme_4_bg_color;
+                                                    color: #fff;
+                                                }
+                                            }
+                                        }
+                                        .selection-item {
+                                            &.active {
+                                                background: lighten($sh_pos_primary_color, 45%);
+                                                border-color: $sh_pos_primary_color;
+                                                color: #fff;
+                                                i{
+                                                    color: #fff !important;  
+                                                }
+                                            }
+                                            &:active {
+                                                @include theme_4_bg_color;
+                                                border: 0;
+                                                color: #fff;
+                                                i{
+                                                    color: #fff !important;  
+                                                }
+                                            }
+                                            &.selected {
+                                                &.active {
+                                                    @include theme_4_bg_color;
+                                                    border: 0;
+                                                    span,
+                                                    i {
+                                                        color: #fff;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .d-flex {
+                                            .w-50 {
+                                                .btn {
+                                                    @include theme_4_bg_color;
+                                                    color: #fff !important;
+                                                }
+                                            }
+                                            .btn {
+                                                &.active {
+                                                    @include theme_4_bg_color;
+                                                    border: 0;
+                                                    color: #fff;
+                                                }
+                                                &:not(.product){
+                                                    &:active {
+                                                        @include theme_4_bg_color;
+                                                        border: 0;
+                                                        color: #fff;
+                                                    }
+                                                }
+                                            }
+                                            .product-list {
+                                                .m-2{
+                                                    input{
+                                                        &.selected{
+                                                            + .combo-item {
+                                                                box-shadow: 0 0 0 2px  $sh_pos_primary_color;
+                                                            }
+                                                        }
+                                                    }
+                                                    .combo-item{
+                                                        .product{
+                                                            &:active{
+                                                                background: #fff;
+                                                                box-shadow: 0 0 0 2px  $sh_pos_primary_color !important;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        textarea {
+                                            &:hover, &:focus{
+                                                border-color: $sh_pos_primary_color !important;
+                                            }
+                                        }
+                                        .opening-notes-container {
+                                            .opening-notes {
+                                                &:hover,&:focus {
+                                                    border-color: $sh_pos_primary_color !important;
+                                                }
+                                            }
+                                        }
+                                        .o_form_renderer {
+                                            .o_form_sheet_bg {
+                                                .o_form_sheet {
+                                                    .o_group {
+                                                        .o_wrap_field {
+                                                            .o_cell {
+                                                                input,
+                                                                textarea {
+                                                                    &:hover,&:focus {
+                                                                        border-color: $sh_pos_primary_color !important;
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .o_form_view {
+                                            .o_form_view_container {
+                                                .o_content {
+                                                    .o_form_renderer {
+                                                        .o_form_sheet_bg {
+                                                            .o_form_sheet {
+                                                                .o_inner_group {
+                                                                    .o_wrap_field {
+                                                                        .o_cell {
+                                                                            .o_field_widget {
+                                                                                input {
+                                                                                    &:hover,&:focus {
+                                                                                        border-color: $sh_pos_primary_color !important;
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                                .o_group {
+                                                                    input,
+                                                                    select {
+                                                                        &:hover,&:focus {
+                                                                            border-color: $sh_pos_primary_color !important;
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .notes-container {
+                                            .closing-notes-container {
+                                                .closing-notes {
+                                                    &:hover,&:focus {
+                                                        border-color: $sh_pos_primary_color !important;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .mb-3 {
+                                            .list-plus-btn {
+                                                &:active {
+                                                    @include theme_4_bg_color;
+                                                    border-color: $sh_pos_primary_color !important;
+                                                }
+                                            }
+                                            .d-flex {
+                                                .input-group {
+                                                    .form-control {
+                                                        &:hover,&:has(input:focus) {
+                                                            border-color: $sh_pos_primary_color !important;
+                                                        }
+                                                    }
+                                                }
+                                                .btn {
+                                                    &.btn-secondary {
+                                                        border: 0 !important;
+                                                        outline: 1px solid $sh_pos_primary_color;
+                                                        color: $sh_pos_primary_color;
+                                                        .price-extra-cell {
+                                                            .text-bg-info{
+                                                                background: transparent !important;
+                                                                color: $sh_pos_primary_color !important;
+                                                            }
+                                                        }
+                                                        &:hover {
+                                                            @include theme_4_bg_color;
+                                                            outline-color: transparent;
+                                                            color: #fff !important;
+                                                            div{
+                                                                span{
+                                                                    &.text-bg-info{
+                                                                        color: #fff !important;
+                                                                    }
+                                                                    color: #fff !important;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    &.active{
+                                                        color: #fff;
+                                                        .price-extra-cell {
+                                                            span{
+                                                                &.text-bg-info{
+                                                                    color: #fff !important;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .input-amount {
+                                            padding-top: 20px;
+                                            .input-group {
+                                                .input-type {
+                                                    border: 0;
+                                                    &.btn-success {
+                                                        @include theme_4_bg_color;
+                                                    }
+                                                }
+                                            }
+                                            .d-flex {
+                                                .input-group {
+                                                    .form-control {
+                                                        &:hover, &:has(input:focus) {
+                                                            border-color: $sh_pos_primary_color;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .btn {
+                                            &.toggle-button {
+                                                &.btn-secondary {
+                                                    border-color: $sh_pos_primary_color !important;
+                                                    color: $sh_pos_primary_color;
+                                                    &:hover {
+                                                        background: rgba($sh_pos_primary_color, $alpha: 0.06);
+                                                    }
+                                                }
+                                                &.btn-primary {
+                                                    @include theme_4_bg_color;
+                                                    color: #fff;
+                                                }
+                                            }
+                                        }
+                                        .o_form_renderer {
+                                            .o_form_sheet_bg {
+                                                .o_form_sheet {
+                                                    .o_field_widget {
+                                                        .o_horizontal {
+                                                            .o_radio_item {
+                                                                &:hover {
+                                                                    .o_radio_input {
+                                                                        border-color: $sh_pos_primary_color;
+                                                                    }
+                                                                }
+                                                                .o_radio_input {
+                                                                    &:checked {
+                                                                        background-color: $sh_pos_primary_color;
+                                                                        border-color: $sh_pos_primary_color;
+                                                                    }
+                                                                    &:focus {
+                                                                        box-shadow: none;
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .o_form_view {
+                                            .o_form_view_container {
+                                                .o_content {
+                                                    .o_form_renderer {
+                                                        .o_form_sheet_bg {
+                                                            .o_form_statusbar {
+                                                                .o_statusbar_buttons {
+                                                                    .btn {
+                                                                        @include theme_4_bg_color;
+                                                                        border-color: $sh_pos_primary_color;
+                                                                        color: #fff;
+                                                                    }
+                                                                }
+                                                                .o_field_widget {
+                                                                    .o_statusbar_status {
+                                                                        .btn {
+                                                                            &.o_arrow_button_current {
+                                                                                @include theme_4_bg_color;
+                                                                                border-color: $sh_pos_gradient_color;
+                                                                                color: #fff;
+                                                                                &:after,&:before {
+                                                                                    border-left-color: $sh_pos_gradient_color;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                            .o_form_sheet {
+                                                                .oe_title {
+                                                                    input {
+                                                                        &:hover,&:focus {
+                                                                            border-color: $sh_pos_primary_color;
+                                                                        }
+                                                                    }
+                                                                }
+                                                                .o_notebook {
+                                                                    .o_notebook_content {
+                                                                        .tab-pane {
+                                                                            .o_field_widget {
+                                                                                .o_kanban_view {
+                                                                                    .o_x2m_control_panel {
+                                                                                        .o_cp_buttons {
+                                                                                            .btn {
+                                                                                                &.btn-secondary {
+                                                                                                    outline: 1px solid $sh_pos_primary_color !important;
+                                                                                                    background: #fff;
+                                                                                                    &:hover {
+                                                                                                        @include theme_4_bg_color;
+                                                                                                        outline-color: transparent !important;
+                                                                                                        color: #fff;
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .table {
+                                            thead {
+                                                @include theme_4_bg_color;
+                                                tr {
+                                                    th {
+                                                        color: #fff;
+                                                        &:has(.o_optional_columns_dropdown .btn.show){
+                                                            background: lighten($sh_pos_primary_color, 45%);
+                                                            color: #495057;
+                                                        }
+                                                        .o_optional_columns_dropdown {
+                                                            .btn{border: 0;
+                                                                &:hover{
+                                                                    color: #495057;
+                                                                    border-color: transparent;
+                                                                }
+                                                            }
+                                                        }
+                                                        .d-flex{
+                                                            .o_list_sortable_caret{
+                                                                background: transparent !important;
+                                                                color: #fff;
+                                                            }
+                                                        }
+                                                        &.table-active{
+                                                            background-color: transparent !important;
+                                                            .d-flex{
+                                                                .o_list_sortable_caret{
+                                                                    background: transparent !important;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            tbody {
+                                                tr,
+                                                div.partner-info {
+                                                    .d-flex {
+                                                        .btn {
+                                                            &.show {
+                                                                border: 0;
+                                                                color: #fff;
+                                                                @include theme_4_bg_color;
+                                                            }
+                                                        }
+                                                        .unselect-tag-mobile {
+                                                            @include theme_4_bg_color;
+                                                            color: #fff;
+                                                        }
+                                                    }
+                                                    td {background: transparent !important;
+                                                        .btn {
+                                                            &.unselect-tag {
+                                                                border: 0;
+                                                            }
+                                                            &:hover,
+                                                            &.show,
+                                                            &:focus {
+                                                                @include theme_4_bg_color;
+                                                                color: #fff;
+                                                            }
+                                                        }
+                                                    }
+                                                    &.selected,
+                                                    &.bg-primary-subtle {
+                                                        td,
+                                                        div {
+                                                            border-color: transparent;
+                                                            color: $sh_pos_primary_color;
+                                                            font-weight: bold;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        div{
+                                            .attribute{
+                                                div{
+                                                    select{
+                                                        &:hover{
+                                                            border-color: $sh_pos_primary_color;
+                                                        }
+                                                        &:focus{
+                                                            border-color: $sh_pos_primary_color;
+                                                        }
+                                                    }
+                                                }
+                                                .color_attribute_list{
+                                                    .color_attribute_list_item{
+                                                        span{
+                                                            .border-primary{
+                                                                border-color: $sh_pos_primary_color !important;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                .configurator_radio{
+                                                    .d-flex{
+                                                        .attribute-name-cell {
+                                                            input{
+                                                                box-shadow: none;
+                                                                &:checked{
+                                                                    background-color: $sh_pos_primary_color;
+                                                                    border-color: $sh_pos_primary_color;
+                                                                }
+                                                            }
+                                                            &:hover{
+                                                                input{
+                                                                    border-color: $sh_pos_primary_color;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    .modal-footer {
+                                        .btn {
+                                            &.btn-secondary {
+                                                border: 0 !important;
+                                                color: $sh_pos_primary_color;
+                                                outline: 1px solid $sh_pos_primary_color;
+                                                &:hover {
+                                                    outline-color: transparent !important;
+                                                    @include theme_4_bg_color;
+                                                    color: #fff;
+                                                }
+                                            }
+                                            &.btn-primary {
+                                                @include theme_4_bg_color;
+                                                border: 0;
+                                                color: #fff;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@if $sh_pos_button_style == "style_4" {
+    body {
+        .pos {
+            .pos-topheader {
+                .btn {
+                    border-radius: 50px;
+                }
+            }
+            .pos-content {
+                .splitbill-screen {
+                    .contents {
+                        .top-content {
+                            .btn {
+                                border-radius: 50px;
+                            }
+                        }
+                        .main {
+                            .controls {
+                                .pay-button {
+                                    .btn {
+                                        border-radius: 80px;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                .floor-screen {
+                    div {
+                        .btn {
+                            border-radius: 50px !important;
+                        }
+                    }
+                }
+                .product-screen {
+                    .control-buttons {
+                        .control-buttons {
+                            .btn {
+                                border-radius: 50px !important;
+                            }
+                        }
+                    }
+                    .rightpane {
+                        .position-relative {
+                            .search-more-button {
+                                .btn {
+                                    border-radius: 50px;
+                                }
+                            }
+                            .product-list {
+                                .category-button {
+                                    border-radius: 50px !important;
+                                    overflow: unset;
+                                    @for $i from 1 through length($o-colors) {
+                                        &.o_colorlist_item_color_#{$i - 1} {
+                                          &::after {
+                                            $o-colors: #a2a2a2, #ee2d2d, #dc8534, #e8bb1d, #5794dd, #9f628f, #db8865, #41a9a2, #304be0, #ee2f8a,
+                                              #61c36e, #9872e6 !default;
+                                            background : adjust-color(nth($o-colors, $i), $lightness: 28%, $saturation: 15%) !important;
+                                          }
+                                        }
+                                      }
+                                    &::after{
+                                        transform: rotate(0);
+                                        border-radius: 100%;
+                                        width: 30px;
+                                        height: 30px;
+                                        top: 0;
+                                        right: 0;
+                                        left: unset;
+                                    }
+                                }
+                            }
+                        }
+                        .switchpane {
+                            .btn {
+                                border-radius: 50px !important;
+                            }
+                        }
+                    }
+                    .leftpane {
+                        .d-flex {
+                            .d-flex {
+                                .btn {
+                                    &.unbook-table,
+                                    &.book-table{
+                                        border-radius: 50px;
+                                    }
+                                }
+                            }
+                        }
+                        .pads {
+                            .subpads {
+                                .actionpad,
+                                .numpad {
+                                    .btn {
+                                        border-radius: 50px !important;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                .payment-screen {
+                    .paymentmethods-container {
+                        .paymentmethods {
+                            .btn {
+                                border-radius: 50px !important;
+                            }
+                        }
+                    }
+                    .d-flex {
+                        .paymentlines-container {
+                            border-radius: 50px !important;
+                        }
+                        .paymentlines {
+                            .paymentline {
+                                border-radius: 50px !important;
+                            }
+                        }
+                    }
+                    .payment-buttons {
+                        .d-flex {
+                            .btn {
+                                border-radius: 50px !important;
+                            }
+                        }
+                    }
+                    .d-flex {
+                        .btn {
+                            border-radius: 50px !important;
+                        }
+                    }
+                    .main-content {
+                        .left-content {
+                            .paymentmethods-container {
+                                .paymentmethods {
+                                    .button {
+                                        border-radius: 50px;
+                                    }
+                                }
+                            }
+                            .payment-buttons {
+                                .d-flex {
+                                    .button {
+                                        border-radius: 50px;
+                                    }
+                                }
+                            }
+                            .numpad {
+                                .numpad-button {
+                                    border-radius: 50px;
+                                }
+                            }
+                            .d-flex {
+                                .button {
+                                    border-radius: 50px;
+                                }
+                            }
+                        }
+                    }
+                }
+                .ticket-screen {
+                    .screen-full-width {
+                        .control-buttons {
+                            .btn {
+                                border-radius: 50px;
+                            }
+                        }
+                        .leftpane {
+                            .pads {
+                                .pads {
+                                    .btn {
+                                        border-radius: 50px;
+                                    }
+                                }
+                                .subpads {
+                                    .actionpad,
+                                    .numpad {
+                                        .btn {
+                                            border-radius: 50px;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .rightpane {
+                            .switchpane {
+                                .btn {
+                                    border-radius: 50px;
+                                }
+                            }
+                            .controls {
+                                .pos-search-bar {
+                                    .search {
+                                        .input-group {
+                                            border-radius: 50px;
+                                            .form-control {
+                                                border-radius: 50px 0 0 50px;
+                                            }
+                                            .filter {
+                                                border-radius: 0 50px 50px 0;
+                                            }
+                                        }
+                                    }
+                                }
+                                .buttons {
+                                    .btn {
+                                        border-radius: 50px;
+                                    }
+                                }
+                                .item {
+                                    .page-controls {
+                                        .btn {
+                                            border-radius: 50px;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                .control-buttons {
+                    .owl-carousel {
+                        .owl-stage-outer {
+                            .owl-stage {
+                                .owl-item {
+                                    .item {
+                                        .btn {
+                                            border-radius: 50px;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                .receipt-screen {
+                    .screen-content {
+                        .switchpane {
+                            .btn {
+                                border-radius: 50px;
+                            }
+                        }
+                        .default-view {
+                            .actions {
+                                .o_payment_successful {
+                                    .receipt-options {
+                                        .d-flex {
+                                            .d-flex {
+                                                input {
+                                                    border-radius: 50px 0 0 50px !important;
+                                                }
+                                                div {
+                                                    .btn {
+                                                        border-radius: 0 50px 50px 0 !important;
+                                                    }
+                                                }
+                                            }
+                                            .button {
+                                                border-radius: 50px;
+                                            }
+                                        }
+                                    }
+                                }
+                                .validation-buttons {
+                                    .button {
+                                        border-radius: 50px;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                .owl-carousel {
+                    .owl-stage-outer {
+                        .owl-stage {
+                            .owl-item {
+                                .btn {
+                                    border-radius: 50px !important;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .o-main-components-container {
+            .o-overlay-container {
+                .o-overlay-item {
+                    .o_popover {
+                        .o_dropdown_container {
+                            .o_accordion {
+                                .o_accordion_values {
+                                    .o_save_favorite {
+                                        border-radius: 50px;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .o_dialog {
+                        .modal {
+                            .modal-dialog {
+                                .modal-content {
+                                    .modal-header {
+                                        .btn {
+                                            border-radius: 50px !important;
+                                        }
+                                    }
+                                    .modal-body {
+                                        .o_list_view {
+                                            .o_control_panel {
+                                                .o_control_panel_main {
+                                                    .o_control_panel_actions {
+                                                        .o_cp_searchview {
+                                                            .o_searchview {
+                                                                .o_searchview_input_container {
+                                                                    .o_searchview_facet {
+                                                                        .o_searchview_facet_label {
+                                                                            .position-absolute {
+                                                                                border-radius: 50px !important;
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .btn {
+                                            border-radius: 50px !important;
+                                        }
+                                        .o_form_view {
+                                            .o_form_view_container {
+                                                .o_content {
+                                                    .o_form_renderer {
+                                                        .o_form_sheet_bg {
+                                                            .o_form_sheet {
+                                                                .o_notebook {
+                                                                    .o_notebook_content {
+                                                                        .tab-pane {
+                                                                            .o_field_widget {
+                                                                                .o_kanban_view {
+                                                                                    .o_x2m_control_panel {
+                                                                                        .o_cp_buttons {
+                                                                                            .btn {
+                                                                                                border-radius: 50px;
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .table {
+                                            tbody {
+                                                tr {
+                                                    td {
+                                                        .btn {
+                                                            border-radius: 50px;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    .modal-footer {
+                                        .btn {
+                                            border-radius: 50px;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@if $sh_form_element_style == "style_4" {
+    body {
+        .pos {
+            .pos-topheader {
+                .pos-rightheader {
+                    .status-buttons {
+                        .d-flex {
+                            .input-group {
+                                .form-control {
+                                    border-radius: 50px;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .pos-content {
+                .product-screen {
+                    .rightpane {
+                        .position-relative {
+                            .d-grid {
+                                video,.o_crop_overlay {
+                                    border-radius: 50px;
+                                }
+                            }
+                            .product-reminder {
+                                border-radius: 50px;
+                            }
+                        }
+                    }
+                }
+                .receipt-screen {
+                    .screen-content {
+                        .default-view {
+                            .actions {
+                                .o_payment_successful {
+                                    .bg-success-subtle {
+                                        border-radius: 100px !important;
+                                    }
+                                    .receipt-options {
+                                        .d-flex {
+                                            .send-receipt-input {
+                                                input {
+                                                    border-radius: 50px;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                .payment-screen {
+                    .main-content {
+                        .center-content {
+                            .payment-summary {
+                                .paymentlines-container {
+                                    border-radius: 50px !important;
+                                }
+                                .paymentlines {
+                                    .paymentline {
+                                        border-radius: 50px !important;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .d-flex {
+                        .paymentlines {
+                            .paymentline {
+                                border-radius: 50px !important;
+                            }
+                        }
+                    }
+                }
+                .splitbill-screen {
+                    .contents {
+                        .main {
+                            .overflow-auto {
+                                .d-flex {
+                                    .order-container {
+                                        .orderline {
+                                            border-radius: 120px;
+                                            .d-flex{
+                                                .d-flex{
+                                                    .span_product_image{
+                                                        img{
+                                                            border-radius: 100%;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .o-main-components-container {
+            .o-overlay-container {
+                .o-overlay-item {
+                    .o_dialog {
+                        .modal {
+                            .modal-dialog {
+                                .modal-content {
+                                    border-radius: 30px;
+                                    .modal-header {
+                                        .ms-auto {
+                                            .input-group {
+                                                .form-control {
+                                                    border-radius: 50px;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    .modal-body {
+                                        .o_form_view {
+                                            .o_form_view_container {
+                                                .o_content {
+                                                    .o_form_renderer {
+                                                        article ,img {
+                                                            border-radius: 15px;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .o_searchview {
+                                            &.form-control {
+                                                border-radius: 50px 0 0 50px;
+                                            }
+                                            + .o_searchview_dropdown_toggler {
+                                                border-radius: 0 50px 50px 0 !important;
+                                            }
+                                        }
+                                        input,
+                                        select,
+                                        .form-control {
+                                            border-radius: 50px;
+                                        }
+                                        textarea {
+                                            border-radius: 20px !important;
+                                        }
+                                        input[type="radio"],
+                                        input[type="checkbox"] {
+                                            border-radius: 100% !important;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@if $sh_pos_product_style == "style_4" {
+    body {
+        .pos {
+            .pos-content {
+                .product-screen {
+                    .leftpane {
+                        .d-flex {
+                            .order-container {
+                                .orderline {
+                                    border-radius: 50px;
+                                    img{
+                                        border-radius: 50px;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .rightpane {
+                        .position-relative {
+                            .product-list {
+                                .product {
+                                    border-radius: 20px !important;
+                                            .sh_product_qty{
+                                               border-radius: 50px !important;
+                                            }
+                                    .product-information-tag {
+                                        width: 30px;
+                                        height: 30px;
+                                        border-width: unset;
+                                        border-style: unset;
+                                        border-radius: 50px;
+                                        display: flex;
+                                        justify-content: center;
+                                        align-items: center;
+                                        .product-information-tag-logo {
+                                            position: unset;
+                                        }
+                                    }
+                                    $o-colors_type: #ffabab, #f8cea7, #fde697, #c9dff9, #ddb2d2, #fae0d5, #95e4df,
+                                        #a5b2fa, #ffadd4, #c3f0c9, #e75b5b63, #9872e6 !default;
+                                    @for $bg-color from 1 to length($o-colors) {
+                                        &.o_colorlist_item_color_transparent_#{$bg-color} {
+                                            .product-information-tag {
+                                                background-color: nth($o-colors_type, $bg-color);
+                                            }
+                                        }
+                                    }
+                                    .product-img {
+                                        img {
+                                            border-radius: 20px 20px 0 0;
+                                            @if  $sh_display_product_image_name == "image" {
+                                                border-radius: 20px;
+                                            } 
+                                            @include media-breakpoint-only(sm) {
+                                                border-radius: 50px;
+                                            }
+                                            @include media-breakpoint-only(xs) {
+                                                border-radius: 50px;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                .ticket-screen {
+                    .screen-full-width {
+                        .leftpane {
+                            .d-flex {
+                                .order-container {
+                                    .orderline {
+                                        border-radius: 50px;
+                                        img{
+                                            border-radius: 50px;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .o-main-components-container {
+            .o-overlay-container {
+                .o-overlay-item {
+                    .o_dialog {
+                        .modal {
+                            .modal-dialog {
+                                .modal-content {
+                                    .modal-body{
+                                        .d-flex{
+                                            .product-list {
+                                                .m-2{
+                                                    .combo-item {
+                                                        border-radius: 20px !important;
+                                                        .product{
+                                                            border-radius: 20px !important;
+                                                            .sh_product_qty{
+                                                                border-radius: 20px !important;
+                                                            }
+                                                            .product-img {
+                                                                .product-information-tag, img{
+                                                                    border-radius: 50px;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

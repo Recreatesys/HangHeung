@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+	<t t-name="sh_pos_theme_responsive.ProductCard" t-inherit="point_of_sale.ProductCard" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('product-content')]" position="attributes">
+            <attribute name="t-if">(pos.models['sh.pos.theme.settings'] and pos.models['sh.pos.theme.settings'].getAll()[0]) and (pos.models['sh.pos.theme.settings'].getAll()[0].sh_display_product_image_name == 'product_name' or pos.models['sh.pos.theme.settings'].getAll()[0].sh_display_product_image_name == 'image_name')</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('product-img')]" position="attributes">
+            <attribute name="t-if">(pos.models['sh.pos.theme.settings'] and pos.models['sh.pos.theme.settings'].getAll()[0]) and (pos.models['sh.pos.theme.settings'].getAll()[0].sh_display_product_image_name == 'image' or pos.models['sh.pos.theme.settings'].getAll()[0].sh_display_product_image_name == 'image_name')</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('product-information-tag')]" position="before">
+            <t t-if="ui.isSmall and pos.get_order() and pos.get_order().product_with_qty and pos.get_order().product_with_qty[props.productId]">
+				<div class="sh_product_qty">
+                    <t t-esc="pos.get_order().product_with_qty[props.productId]"/>
+                </div>
+            </t>
+        </xpath>
+	</t>
+</templates>
