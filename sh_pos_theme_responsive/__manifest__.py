@@ -2,7 +2,7 @@
 # Part of Softhealer Technologies.
 {
     "name": "Responsive POS Theme",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "category": "Point Of Sale",
     "sequence": 1,
     "license": "OPL-1",

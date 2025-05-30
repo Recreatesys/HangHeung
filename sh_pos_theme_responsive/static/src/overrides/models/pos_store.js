@@ -9,8 +9,8 @@ patch(PosStore.prototype, {
     get_product_image_url(product_id,write_date){
         return `/web/image?model=product.product&field=image_128&id=${product_id}&write_date=${write_date}&unique=1`;
     },
-    async setup(env,{number_buffer,hardware_proxy,barcode_reader,ui,dialog,notification,printer,bus_service,pos_data,action,alert,sound,}) {
-        await super.setup(env,{number_buffer,hardware_proxy,barcode_reader,ui,dialog,notification,printer,bus_service,pos_data,action,alert,sound,});
+    async setup(env,{number_buffer,hardware_proxy,barcode_reader,ui,dialog,notification,printer,bus_service,pos_data,pos_scale,action,alert,}) {
+        await super.setup(env,{number_buffer,hardware_proxy,barcode_reader,ui,dialog,notification,printer,bus_service,pos_data,pos_scale,action,alert,});
         // this.pos = usePos();
         if(this && this.models && this.models['sh.pos.theme.settings'] && this.models['sh.pos.theme.settings'].getAll() && this.models['sh.pos.theme.settings'].getAll()[0] && this.models['sh.pos.theme.settings'].getAll()[0].sh_mobile_start_screen == "cart_screen") {
             this.mobile_pane = "left";
