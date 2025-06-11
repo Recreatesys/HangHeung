@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_pos_omni_print" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.pos.omni.printer</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//setting[@id='pos_other_devices']" position="after">
+                <setting string="Use Omni Print" help="Using Omni Print for receipt/invoice printing" title="Using Omni Print to delegate the print job to a local printer">
+                    <field name="use_omni_print" />
+                    <div class="content-group pos_omni_print_config" invisible="not use_omni_print">
+                        <div class="" invisible="not use_omni_print">
+                            <field name="omni_print_enable_cashdrawer" class="oe_inline"/>
+                            <label string="Open Cash Drawer" for="omni_print_enable_cashdrawer" class="oe_inline o_light_label" />
+                        </div>
+                    </div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>
