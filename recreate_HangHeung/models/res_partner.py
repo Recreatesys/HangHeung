@@ -22,4 +22,7 @@ class ResPartner(models.Model):
         string='Customer Category'
     )
     terms = fields.Char(string='Terms', stored=True)
+    purchase_auto_confirm = fields.Boolean(string="Purchase Auto Confirm")
+    has_moves = fields.Boolean(string="Has Moves")
+
    
