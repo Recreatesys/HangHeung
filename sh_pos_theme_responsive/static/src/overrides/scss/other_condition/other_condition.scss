@@ -20,6 +20,10 @@
     }
     .pos {
         .pos-content {
+            .product-screen {
+                .leftpane { width: 30%; }
+                .rightpane { width: 70%; }
+            }
             .ticket-screen {
                 height: 91% !important;
                 @include media-breakpoint-only(sm){height: 100% !important;}
@@ -39,28 +43,28 @@
             .pos-content {
                 .product-screen {
                     .leftpane{
-                        @include media-breakpoint-only(lg){
-                            width: 30%;
+                        @include media-breakpoint-up(lg){
+                            width: 35%;
                         }
                     }
                     .rightpane{
-                        @include media-breakpoint-only(lg){
-                            width: 50%;
+                        @include media-breakpoint-up(lg){
+                            width: 55%;
                         }
                     }
                     .control-buttons {
                         width: auto !important;
                         background: #e9ecef ;
-                        @include media-breakpoint-only(lg){
+                        @include media-breakpoint-up(lg){
                             &:not(.control-buttons-modal ){
-                                width: 20% !important;
+                                width: 10% !important;
                             }
-                        }
+                        // }
                         // &:not(.control-buttons-modal ){
                         //     .set-partner{
                         //         display: none;
                         //     }
-                        // }
+                        }
                         .btn {
                             &.sh_hide_button {
                                 display: none;
@@ -83,8 +87,8 @@
                                 background: #ffffff !important;
                                 color: #414141;
                                 font-size: 16px;
-                                width: 200.667px;
-                                max-width: 311.667px;
+                                // width: 200.667px;
+                                // max-width: 311.667px;
                                 padding: 10px !important;
                                 line-height: 20px !important;
                                 display: flex;

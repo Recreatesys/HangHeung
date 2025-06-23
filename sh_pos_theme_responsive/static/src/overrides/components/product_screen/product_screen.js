@@ -55,6 +55,9 @@ patch(ProductScreen.prototype, {
             $($('.btn-light.flex-shrink-0')[4]).addClass('910')
             $($('.btn-light.flex-shrink-0')[5]).addClass('125')
         }
+        if(window.innerWidth <= 992){
+            $('.category-list').insertBefore($('.rightpane'));
+        }
         if(this.pos.models['sh.pos.theme.settings'] && this.pos.models['sh.pos.theme.settings'].getAll()[0] && this.pos.models['sh.pos.theme.settings'].getAll()[0].sh_cart_position && this.pos.models['sh.pos.theme.settings'].getAll()[0].sh_cart_position == 'right_side'){
             document.getElementsByClassName('product-screen')[0].insertBefore(document.getElementsByClassName('leftpane')[0],document.getElementsByClassName('rightpane')[0]);
         }
