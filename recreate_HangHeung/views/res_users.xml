@@ -1,0 +1,18 @@
+<odoo>
+    <data>
+
+        <record id="view_users_form_inherit" model="ir.ui.view">
+            <field name="name">Users Form Inherit</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//page[@name='access_rights']/group[1]" position="inside">
+                    <field name="default_receipt_type"/>
+                    <field name="default_dest_address"/>
+                </xpath>
+
+            </field>
+        </record>
+    </data>
+</odoo>

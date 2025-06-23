@@ -16,6 +16,7 @@
                     <field name="customer_credit_limit"/>
                     <field name="crdr_due_days"/>
                     <field name="customer_category_id"/>
+                    <field name="purchase_auto_confirm"/>
                 </xpath>
 
                 <xpath expr="//field[@name='vat']" position="attributes">
