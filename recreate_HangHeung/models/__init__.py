@@ -1,1 +1,1 @@
-from . import res_partner, customer_category, product_template, purchase, res_users
+from . import res_partner, customer_category, product_template, purchase, res_users, stock_picking
