@@ -1,0 +1,21 @@
+<odoo>
+    <data>
+
+        <record id="view_stock_picking_form_inherit" model="ir.ui.view">
+            <field name="name">Stock Picking Form Inherit</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//button[@name='do_print_picking']" position="before">
+
+                    <field name="has_dropship_origin" invisible="1"/>
+                    <field name="dropship_validated" invisible="1"/>
+                    <button name="button_dropship_validate" invisible="state not in ('done') or not has_dropship_origin or dropship_validated" string="Validate Dropship" type="object" class="oe_highlight" groups="stock.group_stock_user" data-hotkey="v"/>
+
+                </xpath>
+
+            </field>
+        </record>
+    </data>
+</odoo>

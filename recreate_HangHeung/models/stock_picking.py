@@ -1,8 +1,9 @@
 from odoo import models, fields, api, _
-from datetime import datetime
 import logging
-from odoo.exceptions import ValidationError
-import re
+from odoo.tools.float_utils import float_is_zero
+from odoo.exceptions import UserError
+from odoo.tools import format_list
+
 
 _logger = logging.getLogger(__name__)
 
@@ -10,28 +11,39 @@ _logger = logging.getLogger(__name__)
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
-    def button_validate(self):
-        res = super(StockPicking, self).button_validate()
 
-        if self.company_id.id == 3 and self.picking_type_id.id == 221:
-            if self.origin:
-                origin_po = self.origin.split('-')[-1].strip()
+    has_dropship_origin = fields.Boolean(string='Has Dropship', default=False, compute="_compute_has_dropship")
+    dropship_validated = fields.Boolean(string='Dropship Validated', default=False)
+
+    def _compute_has_dropship(self):
+        for record in self:
+            if record.origin:
+                origin_po = record.origin.split('-')[-1].strip()
 
                 dropship = self.env['stock.picking'].with_company(2).search([
                     ('origin', '=', origin_po),
                     ('picking_type_id.code', '=', 'dropship')
                 ], limit=1)
 
-                _logger.info(f'Dropship order found: {dropship}')
+                record.has_dropship_origin = bool(dropship)
+            else:
+                record.has_dropship_origin = False
+    
 
-                if dropship:
-                    # Avoid Recursion
-                    self.validate_dropship_order(dropship)
+    def button_dropship_validate(self):
+        if self.origin:
+            origin_po = self.origin.split('-')[-1].strip()
 
-        return res
+            dropship = self.env['stock.picking'].with_company(2).search([
+                ('origin', '=', origin_po),
+                ('picking_type_id.code', '=', 'dropship')
+            ], limit=1)
 
-    def validate_dropship_order(self, dropship):
-        if dropship:
-            if dropship.state not in ['done', 'cancel']:
-                _logger.info(f'Dropship order state before validation: {dropship.state}')
+            if dropship:
                 dropship.button_validate()
+                dropship.message_post(
+                    body=_("The dropship order %s has been successfully validated by %s.") % (dropship.name, self.company_id.name)
+                )
+                self.message_post(body=_("Dropship order %s has been successfully validated") % (dropship.name))
+                self.dropship_validated = True
+                dropship.dropship_validated = True
