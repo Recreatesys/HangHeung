@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template id="template" xml:space="preserve">
+    <t t-name="pos_discount_config.orderline_best_combo_inherit"
+       t-inherit="point_of_sale.Orderline"
+       t-inherit-mode="extension">
+
+        <xpath expr="//div[contains(@class, 'd-flex') and contains(@class, 'flex-column') and contains(@class, 'w-100')]"
+               position="inside">
+            <t t-if="line.customerNote">
+                <div class="text-info small">
+                  Discount Combination : <t t-esc="line.customerNote"/>
+                </div>
+            </t>
+        </xpath>
+    </t>
+</template>
