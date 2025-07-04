@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="ReceiptScreen" t-inherit="point_of_sale.ReceiptScreen" t-inherit-mode="extension" owl="1">
+        <xpath expr="//button[hasclass('print')]" position="before">
+            <div class="buttons sh_buttons_group d-flex">
+                <t t-if="this.pos.config.sh_enable_a3_receipt">
+                    <div class="button print btn btn-lg btn-secondary" t-on-click="printA3Receipt">
+                        <i class="fa fa-print"></i> Print A3 Receipt
+                    </div>
+                </t>
+
+                <t t-if="this.pos.config.sh_enable_a4_receipt">
+                    <div class="button print btn btn-lg btn-secondary" t-on-click="printA4Receipt">
+                        <i class="fa fa-print"></i> Print A4 Receipt
+                    </div>
+                </t>
+
+                <t t-if="this.pos.config.sh_enable_a5_receipt">
+                    <div class="button print btn btn-lg btn-secondary" t-on-click="printA5Receipt">
+                        <i class="fa fa-print"></i> Print A5 Receipt
+                    </div>
+                </t>
+
+            </div>
+        </xpath>
+
+        <xpath expr="//OrderReceipt" position="replace">
+            <t t-if="pos.config.sh_default_receipt == 'a5_size'">
+                <A5OrderReceipt data="pos.orderExportForPrinting(pos.get_order())" formatCurrency="env.utils.formatCurrency" />
+            </t>
+            <t t-elif="pos.config.sh_default_receipt == 'a3_size'">
+                <t t-esc="console.log('xml', pos.config.sh_default_receipt)"/>
+                <A3OrderReceipt data="pos.orderExportForPrinting(pos.get_order())" formatCurrency="env.utils.formatCurrency" />
+            </t>
+            <t t-elif="pos.config.sh_default_receipt == 'a4_size'">
+                <A4OrderReceipt data="pos.orderExportForPrinting(pos.get_order())" formatCurrency="env.utils.formatCurrency" />
+            </t>
+            <t t-else="">
+                <OrderReceipt data="pos.orderExportForPrinting(pos.get_order())" formatCurrency="env.utils.formatCurrency" />
+            </t>
+        </xpath>
+    </t>
+    <!-- <t t-name="ReceiptScreen" t-inherit="point_of_sale.ReprintReceiptScreen" t-inherit-mode="extension">
+        <xpath expr="//OrderReceipt" position="replace">
+            <t t-if="pos.config.sh_default_receipt == 'a5_size'">
+                <A5OrderReceipt data="pos.orderExportForPrinting(props.order)" formatCurrency="env.utils.formatCurrency" />
+            </t>
+            <t t-elif="pos.config.sh_default_receipt == 'a3_size'">
+                <t t-esc="console.log('xml', props.order)"/>
+                <A3OrderReceipt data="pos.orderExportForPrinting(props.order)" formatCurrency="env.utils.formatCurrency" />
+            </t>
+            <t t-elif="pos.config.sh_default_receipt == 'a4_size'">
+                <A4OrderReceipt data="pos.orderExportForPrinting(props.order)" formatCurrency="env.utils.formatCurrency" />
+            </t>
+            <t t-else="">
+                <OrderReceipt data="pos.orderExportForPrinting(props.order)" formatCurrency="env.utils.formatCurrency" />
+            </t>
+        </xpath>
+        <xpath expr="//button[hasclass('print')]" position="before">
+            <div class="buttons sh_buttons_group d-flex mb-3">
+                
+                <t t-if="this.pos.config.sh_enable_a3_receipt">
+                    <div class="button print btn btn-lg btn-secondary" t-on-click="printA3Receipt">
+                        <i class="fa fa-print"></i> Print A3 Receipt
+                    </div>
+                </t>
+
+                <t t-if="this.pos.config.sh_enable_a4_receipt">
+                    <div class="button print btn btn-lg btn-secondary" t-on-click="printA4Receipt">
+                        <i class="fa fa-print"></i> Print A4 Receipt
+                    </div>
+                </t>
+
+                <t t-if="this.pos.config.sh_enable_a5_receipt">
+                    <div class="button print btn btn-lg btn-secondary" t-on-click="printA5Receipt">
+                        <i class="fa fa-print"></i> Print A5 Receipt
+                    </div>
+                </t>
+               
+            </div>
+        </xpath>
+    </t> -->
+</templates>

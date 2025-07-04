@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="Orderline" t-inherit="point_of_sale.Orderline" t-inherit-mode="extension" owl="1">
+        <xpath expr='//div[hasclass("product-name")]' position='inside'>
+            <t t-if='env.services.pos.config.sh_enable_internal_ref'>
+                <div t-if='line.default_code'>
+                    [
+                    <t t-esc='line.default_code' />
+                    ]
+                </div>
+            </t>
+        </xpath>
+    </t>
+    
+    <t t-name="ReceiptHeader" t-inherit="point_of_sale.ReceiptHeader" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('pos-receipt-contact')]" position="inside">
+            <div>
+                <t t-if="env.services.pos.config.sh_pos_receipt_invoice and ( props.data.invoice_number)">
+                    <div>--------------------------------</div>
+                    INV number:
+                    <t t-if="props.data.invoice_number" t-esc="props.data.invoice_number" />
+                    <div>--------------------------------</div>
+                </t>
+            </div>
+            <div class="sh_customer_detail">
+                <t t-if="env.services.pos.config.sh_pos_receipt_customer_detail">
+                    <t t-if="props.data and props.data.partner">
+                        
+                        <t t-if="env.services.pos.config.sh_pos_receipt_customer_name">
+                            <div class="sh_customer_name">
+                                Customer :
+                                <t t-if="props.data.partner.name">
+                                    <t t-esc="props.data.partner.name" />
+                                </t>
+                            </div>
+                        </t>
+                        <t t-if="env.services.pos.config.sh_pos_receipt_customer_address">
+                            <t t-if="props.data.partner.contact_address">
+                                <div class="sh_customer_address">
+                                    Address :
+                                    <t t-esc="props.data.partner.contact_address" />
+                                </div>
+                            </t>
+                        </t>
+                        <t t-if="env.services.pos.config.sh_pos_receipt_customer_mobile">
+                            <t t-if="props.data.partner.mobile">
+                                <div class="sh_customer_mobile">
+                                    Mobile :
+                                    <t t-esc="props.data.partner.mobile" />
+                                </div>
+                            </t>
+                        </t>
+                        <t t-if="env.services.pos.config.sh_pos_vat">
+                            <t t-if="props.data.partner.vat">
+                                <div class="sh_pos_vat">
+                                    <t t-if='env.services.pos.config.sh_pos_vat_name'>
+                                        <t t-esc="env.services.pos.config.sh_pos_vat_name" />
+                                        :
+                                    </t>
+                                    <t t-else=""> Vat : </t>
+                                    <t t-esc="props.data.partner.vat" />
+                                </div>
+                            </t>
+                        </t>
+                        <t t-if="env.services.pos.config.sh_pos_receipt_customer_phone">
+                            <t t-if="props.data.partner.phone">
+                                <div class="sh_customer_mobile">
+                                    Phone :
+                                    <t t-esc="props.data.partner.phone" />
+                                </div>
+                            </t>
+                        </t>
+                        
+                        <t t-if="env.services.pos.config.sh_pos_receipt_customer_email">
+                            <t t-if="props.data.partner.email">
+                                <div class="sh_customer_mobile">
+                                    Email :
+                                    <t t-esc="props.data.partner.email" />
+                                </div>
+                            </t>
+                        </t>
+                    </t>
+                </t>
+            </div>
+        </xpath>
+    </t>
+    <t t-name="ShOrderReceiptSize" t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('after-footer')]" position="after">
+            <div class="">
+                <t t-esc="console.log('xml', props.data)"/>
+                <div class="sh_receipt_footer">
+                    <t t-if="env.services.pos.config.sh_pos_receipt_bacode_qr and env.services.pos.config.sh_pos_receipt_barcode_qr_selection == 'barcode'">
+                        <img t-att-src="'/report/barcode/Code128/'+env.services.pos.get_order().pos_reference" style="width:200px;height:50px" alt="Barcode"/>
+                    </t>
+                    <t t-if="env.services.pos.config.sh_pos_receipt_bacode_qr and env.services.pos.config.sh_pos_receipt_barcode_qr_selection == 'qr'">
+                        <!-- <div style="width: 100%;" id="qr_code" t-att-src="'/report/barcode/QR/'+props.data.name.split(' ')[1]"></div> -->
+                        <img  id="qr_code" t-att-src="'/report/barcode/QR/'+env.services.pos.get_order().pos_reference+'?width=80&amp;height=80'"/>
+                    </t>
+                    
+                </div>
+            </div>
+        </xpath>
+    </t>
+</templates>

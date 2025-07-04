@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sh_pos_receipt_extend_res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.sh_pos_receipt_extend</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <block id="pos_interface_section" position="after">
+                <block title="POS Extended Receipt">
+                    <setting help=" Display Barcode / QrCode in Receipt">
+                        <field name="pos_sh_pos_receipt_bacode_qr" />
+                        <div class="content-group mt16" invisible="not pos_sh_pos_receipt_bacode_qr">
+                            <div>
+                                <field name="pos_sh_pos_receipt_barcode_qr_selection" widget="radio" invisible="not pos_sh_pos_receipt_bacode_qr" />
+                            </div>
+                        </div>
+                    </setting>
+                    <setting help="Display Invoice Number in Receipt">
+                        <field name="pos_sh_pos_receipt_invoice"  />
+                    </setting>
+                    <setting help=" Display Internal Reference in Receipt">
+                        <field name="pos_sh_enable_internal_ref"  />
+                    </setting>
+                    <setting help="Display Order Number in Receipt">
+                        <field name="pos_sh_pos_order_number"  />
+                    </setting>
+                    <setting help="Display Customer Detail in Receipt">
+                        <field name="pos_sh_pos_receipt_customer_detail"  />
+                        <div class="content-group mt16" invisible="not pos_sh_pos_receipt_customer_detail">
+                            <div>
+                                <field name="pos_sh_pos_receipt_customer_name" style="width: 4%;" />
+                                <label for="pos_sh_pos_receipt_customer_name" style="font-weight: normal;" />
+                                <br />
+                                <field name="pos_sh_pos_receipt_customer_address" style="width: 4%;" />
+                                <label for="pos_sh_pos_receipt_customer_address" style="font-weight: normal;" />
+                                <br />
+                                <field name="pos_sh_pos_receipt_customer_mobile" style="width: 4%;" />
+                                <label for="pos_sh_pos_receipt_customer_mobile" style="font-weight: normal;" />
+                                <br />
+                                <field name="pos_sh_pos_receipt_customer_phone" style="width: 4%;" />
+                                <label for="pos_sh_pos_receipt_customer_phone" style="font-weight: normal;" />
+                                <br />
+                                <field name="pos_sh_pos_receipt_customer_email" style="width: 4%;" />
+                                <label for="pos_sh_pos_receipt_customer_email" style="font-weight: normal;" />
+                                <br />
+                                <field name="pos_sh_pos_vat" style="width: 4%;" />
+                                <label for="pos_sh_pos_vat" style="font-weight: normal;" />
+                                <br />
+                                <field name="pos_sh_pos_vat_name" style='width: 20%;' invisible='not pos_sh_pos_vat' placeholder="Vat" />
+                            </div>
+                        </div>
+                    </setting>
+                    <setting help="Enable A3 recipts inside POS interface">
+                        <field name="pos_sh_enable_a3_receipt"  />
+                    </setting>
+                    <setting help=" Enable A4 recipts inside POS interface">
+                        <field name="pos_sh_enable_a4_receipt"  />
+                    </setting>
+                    <setting help=" Enable A5 recipts inside POS interface">
+                        <field name="pos_sh_enable_a5_receipt"  />
+                    </setting>
+                    <setting string="Default Receipt">
+                        <field name="pos_sh_default_receipt" widget="radio"/>
+                    </setting>
+                </block>
+            </block>
+        </field>
+    </record>
+</odoo>

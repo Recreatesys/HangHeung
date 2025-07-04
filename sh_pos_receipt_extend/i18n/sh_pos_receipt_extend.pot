@@ -1,0 +1,429 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* sh_pos_receipt_extend
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 17.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-04-08 05:27+0000\n"
+"PO-Revision-Date: 2024-04-08 05:27+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields.selection,name:sh_pos_receipt_extend.selection__pos_config__sh_default_receipt__a3_size
+msgid "A3 Size"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields.selection,name:sh_pos_receipt_extend.selection__pos_config__sh_default_receipt__a4_size
+msgid "A4 Size"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields.selection,name:sh_pos_receipt_extend.selection__pos_config__sh_default_receipt__a5_size
+msgid "A5 Size"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "Address :"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields.selection,name:sh_pos_receipt_extend.selection__pos_config__sh_pos_receipt_barcode_qr_selection__barcode
+msgid "Barcode"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "CHANGE"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model,name:sh_pos_receipt_extend.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "Customer :"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "DATE"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model_terms:ir.ui.view,arch_db:sh_pos_receipt_extend.sh_pos_receipt_extend_res_config_settings_view_form
+msgid "Default Receipt"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "Description"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "Discounts"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_pos_config__sh_pos_receipt_bacode_qr
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_res_config_settings__pos_sh_pos_receipt_bacode_qr
+msgid "Display Barcode / QrCode"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model_terms:ir.ui.view,arch_db:sh_pos_receipt_extend.sh_pos_receipt_extend_res_config_settings_view_form
+msgid "Display Barcode / QrCode in Receipt"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_pos_config__sh_pos_receipt_customer_address
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_res_config_settings__pos_sh_pos_receipt_customer_address
+msgid "Display Customer Address"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_pos_config__sh_pos_receipt_customer_detail
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_res_config_settings__pos_sh_pos_receipt_customer_detail
+msgid "Display Customer Detail"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model_terms:ir.ui.view,arch_db:sh_pos_receipt_extend.sh_pos_receipt_extend_res_config_settings_view_form
+msgid "Display Customer Detail in Receipt"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_pos_config__sh_pos_receipt_customer_email
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_res_config_settings__pos_sh_pos_receipt_customer_email
+msgid "Display Customer Email"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_pos_config__sh_pos_receipt_customer_mobile
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_res_config_settings__pos_sh_pos_receipt_customer_mobile
+msgid "Display Customer Mobile"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_pos_config__sh_pos_receipt_customer_name
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_res_config_settings__pos_sh_pos_receipt_customer_name
+msgid "Display Customer Name"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_pos_config__sh_pos_receipt_customer_phone
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_res_config_settings__pos_sh_pos_receipt_customer_phone
+msgid "Display Customer Phone"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_pos_config__sh_pos_vat
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_res_config_settings__pos_sh_pos_vat
+msgid "Display Customer Vat"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_pos_config__sh_enable_internal_ref
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_res_config_settings__pos_sh_enable_internal_ref
+msgid "Display Internal Reference"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model_terms:ir.ui.view,arch_db:sh_pos_receipt_extend.sh_pos_receipt_extend_res_config_settings_view_form
+msgid "Display Internal Reference in Receipt"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_pos_config__sh_pos_receipt_invoice
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_res_config_settings__pos_sh_pos_receipt_invoice
+msgid "Display Invoice Number"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model_terms:ir.ui.view,arch_db:sh_pos_receipt_extend.sh_pos_receipt_extend_res_config_settings_view_form
+msgid "Display Invoice Number in Receipt"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_pos_config__sh_pos_order_number
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_res_config_settings__pos_sh_pos_order_number
+msgid "Display Order Number"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model_terms:ir.ui.view,arch_db:sh_pos_receipt_extend.sh_pos_receipt_extend_res_config_settings_view_form
+msgid "Display Order Number in Receipt"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "Email :"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model_terms:ir.ui.view,arch_db:sh_pos_receipt_extend.sh_pos_receipt_extend_res_config_settings_view_form
+msgid "Enable A3 recipts inside POS interface"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model_terms:ir.ui.view,arch_db:sh_pos_receipt_extend.sh_pos_receipt_extend_res_config_settings_view_form
+msgid "Enable A4 recipts inside POS interface"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model_terms:ir.ui.view,arch_db:sh_pos_receipt_extend.sh_pos_receipt_extend_res_config_settings_view_form
+msgid "Enable A5 recipts inside POS interface"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "INV number:"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "Invoice No"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "Logo"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "Mobile :"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "No"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "Order No :"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model_terms:ir.ui.view,arch_db:sh_pos_receipt_extend.sh_pos_receipt_extend_res_config_settings_view_form
+msgid "POS Extended Receipt"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "Phone :"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model,name:sh_pos_receipt_extend.model_pos_config
+msgid "Point of Sale Configuration"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "Price"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/receipt_screen/receipt_screen.xml:0
+#, python-format
+msgid "Print A3 Receipt"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/receipt_screen/receipt_screen.xml:0
+#, python-format
+msgid "Print A4 Receipt"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/receipt_screen/receipt_screen.xml:0
+#, python-format
+msgid "Print A5 Receipt"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields.selection,name:sh_pos_receipt_extend.selection__pos_config__sh_pos_receipt_barcode_qr_selection__qr
+msgid "QrCode"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "Qty"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "Receipt No"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "Served by"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_pos_config__sh_pos_receipt_barcode_qr_selection
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_res_config_settings__pos_sh_pos_receipt_barcode_qr_selection
+msgid "Sh Pos Receipt Barcode Qr Selection"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_pos_config__sh_default_receipt
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_res_config_settings__pos_sh_default_receipt
+msgid "Standard Receipts"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "Tel:"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "Total Amount"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "Total Price"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_pos_config__sh_enable_a3_receipt
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_res_config_settings__pos_sh_enable_a3_receipt
+msgid "Use A3 receipts"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_pos_config__sh_enable_a4_receipt
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_res_config_settings__pos_sh_enable_a4_receipt
+msgid "Use A4 receipts"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_pos_config__sh_enable_a5_receipt
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_res_config_settings__pos_sh_enable_a5_receipt
+msgid "Use A5 receipts"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model_terms:ir.ui.view,arch_db:sh_pos_receipt_extend.sh_pos_receipt_extend_res_config_settings_view_form
+msgid "Vat"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#. odoo-javascript
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#: code:addons/sh_pos_receipt_extend/static/src/overrides/components/order_receipt/order_receipt.xml:0
+#, python-format
+msgid "Vat :"
+msgstr ""
+
+#. module: sh_pos_receipt_extend
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_pos_config__sh_pos_vat_name
+#: model:ir.model.fields,field_description:sh_pos_receipt_extend.field_res_config_settings__pos_sh_pos_vat_name
+msgid "vat name"
+msgstr ""

@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="sh_pos_receipt_extend.A5OrderReceipt">
+        <div class="pos-receipt a5_size_receipt">
+            <div class="sh_a5_receipt_logo_row">
+                <div class="sh_a5_receipt_logo_box">
+                    <img t-attf-src="/web/image?model=res.company&amp;id={{props.data.headerData.company.id}}&amp;field=logo" alt="Logo" class="pos-receipt-logo"/>
+                </div>
+
+                <div class="sh_a5_receipt_details_box">
+                    <t t-if="env.services.pos.config.sh_pos_receipt_invoice and props.data.headerData.invoice_number">
+                        <div class="sh_a5_receipt_details_invoice_number"> Invoice No <t t-esc="props.data.headerData.invoice_number" />
+                        </div>
+                    </t>
+
+                    <div class="sh_a5_receipt_detail_receipt_name"> Receipt No <t t-esc="props.data.name" />
+                    </div>
+                    <div class="sh_a5_receipt_details_receipt_date"> DATE <t t-esc="props.data.date"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sh_a5_receipt_customer_detail_row">
+
+                <div class="sh_a5_receipt_customer_detail_box">
+                    <t t-if="env.services.pos.config.sh_pos_receipt_customer_detail">
+                        <t t-if="props.data.headerData and props.data.headerData.partner">
+                            
+                            <t t-if="env.services.pos.config.sh_pos_receipt_customer_name">
+                                <div class="sh_customer_name">
+                                    Customer :
+                                    <t t-if="props.data.headerData.partner.name">
+                                        <t t-esc="props.data.headerData.partner.name" />
+                                    </t>
+                                </div>
+                            </t>
+                            <t t-if="env.services.pos.config.sh_pos_receipt_customer_address">
+                                <t t-if="props.data.headerData.partner.address">
+                                    <div class="sh_customer_address">
+                                        Address :
+                                        <t t-esc="props.data.headerData.partner.address" />
+                                    </div>
+                                </t>
+                            </t>
+                            <t t-if="env.services.pos.config.sh_pos_receipt_customer_mobile">
+                                <t t-if="props.data.headerData.partner.mobile">
+                                    <div class="sh_customer_mobile">
+                                        Mobile :
+                                        <t t-esc="props.data.headerData.partner.mobile" />
+                                    </div>
+                                </t>
+                            </t>
+                            <t t-if="env.services.pos.config.sh_pos_vat">
+                                <t t-if="props.data.headerData.partner.vat">
+                                    <div class="sh_pos_vat">
+                                        <t t-if='env.services.pos.config.sh_pos_vat_name'>
+                                            <t t-esc="env.services.pos.config.sh_pos_vat_name" />
+                                            :
+                                        </t>
+                                        <t t-else=""> Vat : </t>
+                                        <t t-esc="props.data.headerData.partner.vat" />
+                                    </div>
+                                </t>
+                            </t>
+                            <t t-if="env.services.pos.config.sh_pos_receipt_customer_phone">
+                                <t t-if="props.data.headerData.partner.phone">
+                                    <div class="sh_customer_mobile">
+                                        Phone :
+                                        <t t-esc="props.data.headerData.partner.phone" />
+                                    </div>
+                                </t>
+                            </t>
+    
+                            <t t-if="env.services.pos.config.sh_pos_receipt_customer_email">
+                                <t t-if="props.data.headerData.partner.email">
+                                    <div class="sh_customer_mobile">
+                                        Email :
+                                        <t t-esc="props.data.headerData.partner.email" />
+                                    </div>
+                                </t>
+                            </t>
+                        </t>
+                    </t>
+                </div>
+
+                <div class="sh_receipt_footer sh_a5_receipt_bacode_qr">
+                     <t t-if="env.services.pos.config.sh_pos_receipt_bacode_qr and env.services.pos.config.sh_pos_receipt_barcode_qr_selection == 'barcode'">
+                        <img  id="barcode" t-att-src="'/report/barcode/Code128/'+env.services.pos.get_order().pos_reference+'?width=350&amp;height=80'"/>
+                    </t>
+                    <t t-if="env.services.pos.config.sh_pos_receipt_bacode_qr and env.services.pos.config.sh_pos_receipt_barcode_qr_selection == 'qr'">
+                        <!-- <div style="width: 100%;" id="qr_code" t-att-src="'/report/barcode/QR/'+props.data.name.split(' ')[1]"></div> -->
+                        <img  id="qr_code" t-att-src="'/report/barcode/QR/'+env.services.pos.get_order().pos_reference+'?width=80&amp;height=80'"/>
+                    </t>
+                    <t t-if="props.data.headerData.header">
+                        <t t-esc="props.data.headerData.header" />
+                    </t>
+                </div>
+
+                <div class="pos-receipt-contact sh_a5_receipt_company_contact_address">
+                    <t t-if="props.data.headerData.company.phone">
+                        <div>Tel:<t t-esc="props.data.headerData.company.phone" />
+                        </div>
+                    </t>
+                    <t t-if="props.data.headerData.company.vat">
+                        <div>
+                            <t t-esc="props.data.headerData.company.country?.vat_label || 'Tax ID'"/>
+:                            <t t-esc="props.data.headerData.company.vat" />
+                        </div>
+                    </t>
+                    <t t-if="props.data.headerData.company.email">
+                        <div>
+                            <t t-esc="props.data.headerData.company.email" />
+                        </div>
+                    </t>
+                    <t t-if="props.data.headerData.company.website">
+                        <div>
+                            <t t-esc="props.data.headerData.company.website" />
+                        </div>
+                    </t>
+
+                </div>
+
+            </div>
+
+            <t t-if="props.data.headerData.cashier">
+                <div class="sh_a5_receipt_cashier_box">
+                    <div class="cashier">
+                        <div><t t-esc="props.data.headerData.cashier" />
+                        </div>
+                    </div>
+                </div>
+            </t>
+
+            <table class="sh_a5_receipt_table">
+                <tr class="sh_a5_receipt_table_thead">
+                    <th class="sh_a5_receipt_table_thead_no">No</th>
+                    <th class="sh_a5_receipt_table_thead_des">Description</th>
+                    <th class="sh_a5_receipt_table_thead_qty">Qty</th>
+                    <th class="sh_a5_receipt_table_thead_price">Price</th>
+                    <th class="sh_a5_receipt_table_thead_total_price">Total Price</th>
+                </tr>
+
+                <tbody class="sh_a5_receipt_table_tbody">
+                    <t t-set="sr_no" t-value="0" />
+                    <t t-foreach="props.data.orderlines" t-as="line" t-key="line.id">
+                        <t t-set="sr_no" t-value="sr_no + 1" />
+                        <tr class="sh_a5_receipt_table_tbody_tr">
+                            <td class="sh_a5_receipt_table_tbody_td">
+                                <t t-esc="sr_no"></t>
+                            </td>
+                            <td class="sh_a5_receipt_table_tbody_td sh_a5_receipt_table_tbody_td_left">
+                                <t t-esc="line.productName" />
+                                <t t-if='env.services.pos.config.sh_enable_internal_ref'>
+                                    <t t-if='line.default_code'> [                                        <t t-esc='line.default_code' />
+ ] </t>
+                                </t>
+                                <t t-if="line.customerNote">
+                                    <br/>
+                                    <em class="pos-receipt-left-padding pos-receipt-customer-note">
+                                        <i class="fa fa-pencil-square-o">&#160;
+                                            <t t-esc="line.customerNote"/>
+                                        </i>
+                                    </em>
+                                </t>
+                            </td>
+                            <td class="sh_a5_receipt_table_tbody_td">
+                                <t t-esc="line.qty" />
+                            </td>
+                            <td class="sh_a5_receipt_table_tbody_td">
+                                <t t-esc="line.unitPrice" />
+                            </td>
+                            <td class="sh_a5_receipt_table_tbody_td">
+                                <t t-esc="line.price" />
+                            </td>
+                        </tr>
+
+                    </t>
+
+                    <tr class="sh_a5_receipt_table_tbody_tr">
+                        <td class="sh_a5_receipt_table_tbody_td sh_a5_receipt_table_tbody_td_left" colspan="4">
+                                Total Amount
+                        </td>
+                        <td class="sh_a5_receipt_table_tbody_td">
+                            <span t-esc="props.formatCurrency(props.data.amount_total)" class="pos-receipt-right-align sh_a5_receipt_align_ecnter" />
+                        </td>
+                    </tr>
+
+                    <tr class="sh_a5_receipt_table_tbody_tr">
+                        <td class="sh_a5_receipt_table_tbody_td sh_a5_receipt_table_tbody_td_bold" colspan="5">
+                            <t t-esc="env.services.pos.get_order().total_with_tax_in_words" />
+                        </td>
+                    </tr>
+
+                    <t t-foreach="props.data.paymentlines" t-as="line" t-key="line.cid">
+
+                        <tr class="sh_a5_receipt_table_tbody_tr ">
+                            <td class="sh_a5_receipt_table_tbody_td sh_a5_receipt_table_tbody_td_left" colspan="4">
+                                <t t-esc="line.name" />
+                            </td>
+
+                            <td class="sh_a5_receipt_table_tbody_td">
+                                <span t-esc="props.formatCurrency(line.amount, false)" class="pos-receipt-right-align sh_a5_receipt_align_ecnter" />
+                            </td>
+                        </tr>
+                    </t>
+
+                    <tr class="sh_a5_receipt_table_tbody_tr">
+                        <td class="sh_a5_receipt_table_tbody_td sh_a5_receipt_table_tbody_td_left" colspan="4">
+                                CHANGE
+                        </td>
+                        <td class="sh_a5_receipt_table_tbody_td ">
+                            <span t-esc="props.formatCurrency(props.data.change)" class="pos-receipt-right-align sh_a5_receipt_align_ecnter" />
+                        </td>
+                    </tr>
+
+                    <t t-if="props.data.total_discount">
+                        <tr class="sh_a5_receipt_table_tbody_tr">
+                            <td class="sh_a5_receipt_table_tbody_td sh_a5_receipt_table_tbody_td_left" colspan="4">
+                                    Discounts
+                            </td>
+                            <td class="sh_a5_receipt_table_tbody_td">
+                                <span t-esc="props.formatCurrency(props.data.total_discount)" class="pos-receipt-right-align sh_a5_receipt_align_ecnter" />
+                            </td>
+                        </tr>
+
+                    </t>
+
+                    <t t-if="isTaxIncluded">
+                        <t t-foreach="props.data.tax_details" t-as="tax" t-key="tax.name">
+                            <tr class="sh_a5_receipt_table_tbody_tr">
+                                <td class="sh_a5_receipt_table_tbody_td sh_a5_receipt_table_tbody_td_left" colspan="4">
+                                    <t t-esc="tax.tax.amount" />
+                                </td>
+                                <td class="sh_a5_receipt_table_tbody_td">
+                                    <span t-esc="env.utils.formatCurrency(tax.amount)" class="pos-receipt-right-align sh_a5_receipt_align_ecnter" />
+                                </td>
+                            </tr>
+
+                        </t>
+                    </t>
+
+                </tbody>
+
+            </table>
+
+            <div t-if="props.data.footer" class="pos-receipt-center-align" style="white-space:pre-line">
+                <t t-esc="props.data.footer" />
+            </div>
+        </div>
+    </t>
+</templates>
