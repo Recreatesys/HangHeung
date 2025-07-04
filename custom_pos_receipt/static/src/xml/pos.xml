@@ -26,17 +26,68 @@
              <t t-if="props.data.company.website">
              </t>
         </xpath>
+        <xpath expr="//div[@t-if='props.data.header']" position="replace">
+            <t t-if="props.data.header">
+                <div style="white-space:pre-line; font-size: 12pt;">
+                    <t t-esc="props.data.header"/>
+                </div>
+            </t>
+        </xpath>
         <xpath expr="//div[@t-if='props.data.cashier']" position="replace">
             <div t-if="props.data.cashier" class="cashier">
-                <div t-esc="props.data.cashier" />
             </div>
         </xpath>
         <xpath expr="//div[@t-if='props.data.trackingNumber and !props.data.bigTrackingNumber']" position="replace">
-            <span class="tracking-number fs-1" t-esc="props.data.orderRef" />
+        </xpath>
+        <xpath expr="//div[@t-if='props.data.cashier']" position="after">
+            <div style="text-align: center; font-size: 18pt">
+                發票（門市收據）
+            </div>
+            <div style="text-align: left; font-size: 14pt; margin-left: -18px;">
+                店铺：<t t-esc='props.data.storeName' /> <br/>
+                發牌編碼：<t t-esc='props.data.orderRef' /> <span style="display:inline-block; width:40px;"></span>
+                收銀員：<t t-esc='props.data.storeCashier' /><br/>
+                取貨日期：<br/>
+                取貨店鋪：<br/>
+                會員號碼：<br/>
+            </div>
         </xpath>
     </t>
     <t t-name="custom_pos_receipt.remove_powered_by" t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension">
+        <xpath expr="//ReceiptHeader" position="after">
+            <div style="text-align: left; font-size: 14pt; margin-top: -20px;">
+                日期時間：<t t-esc='props.data.date' />
+            </div>
+            <hr style="border: none; border-top: 1px solid #000000; margin: 2px 0;" />
+            <div style="text-align: left; font-size: 14pt;">
+                數量<span style="display:inline-block; width:10px;"></span>
+                貨品名稱<span style="display:inline-block; width:10px;"></span>
+                價格<span style="display:inline-block; width:10px;"></span>
+            </div>
+            <hr style="border: none; border-top: 1px solid #000000; margin: 2px 0;" />
+        </xpath>
+        <xpath expr="//div[@class='pos-receipt-taxes']/div[@class='text-center']" position="replace">
+            <hr style="border: none; border-top: 1px solid #000000; margin: 2px 0;" />
+        </xpath>
+        <xpath expr="//div[@class='pos-receipt-amount receipt-total']/preceding-sibling::div[@class='text-center'][1]" position="replace">
+            <hr style="border: none; border-top: 1px solid #000000; margin: 2px 0;" />
+        </xpath>
+        <xpath expr="//div[@t-if='props.data.footer']" position="before">
+            <div style="text-align: center; font-size: 16pt;">
+                多謝惠顧
+            </div>
+        </xpath>
         <xpath expr="//div[@class='pos-receipt-order-data']/p[text()='Powered by Odoo']" position="replace">
+        </xpath>
+        <xpath expr="//div[@class='pos-receipt-order-data']/div[@t-esc='props.data.name']" position="replace">
+        </xpath>
+        <xpath expr="//div[@class='pos-receipt-order-data']/div[@id='order-date']" position="replace">
+            <div style="font-size: 12pt; margin-top: -40px;">
+                <hr style="border: none; border-top: 1px solid #000000; margin: 2px 0;" />
+                Thank you and have a nice day!<br/>
+                www.hangheung.com.hk<br/>
+                E.&amp;O.E.
+            </div>
         </xpath>
     </t>
 </templates>

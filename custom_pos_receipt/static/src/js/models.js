@@ -8,7 +8,9 @@ patch(PosStore.prototype, {
         return {
             ...super.getReceiptHeaderData(...arguments),
             partner: order.partner_id,
-            orderRef: order.name
+            orderRef: order.name,
+            storeName: order.config_id.name,
+            storeCashier:order.cashier
         };
     },
 });
