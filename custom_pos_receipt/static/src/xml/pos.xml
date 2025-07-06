@@ -43,23 +43,21 @@
             <div style="text-align: center; font-size: 18pt">
                 發票（門市收據）
             </div>
-            <div style="text-align: left; font-size: 14pt; margin-left: -18px;">
-                店铺：<t t-esc='props.data.storeName' /> <br/>
-                發牌編碼：<t t-esc='props.data.orderRef' /> <span style="display:inline-block; width:40px;"></span>
-                收銀員：<t t-esc='props.data.storeCashier' /><br/>
-                取貨日期：<br/>
-                取貨店鋪：<br/>
-                會員號碼：<br/>
-            </div>
         </xpath>
     </t>
     <t t-name="custom_pos_receipt.remove_powered_by" t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension">
         <xpath expr="//ReceiptHeader" position="after">
-            <div style="text-align: left; font-size: 14pt; margin-top: -20px;">
+            <div style="text-align: left; font-size: 12pt; margin-top: 0px;">
+                店铺：<t t-esc='props.data.headerData.storeName' /> <br/>
+                發牌編碼：<t t-esc='props.data.name' /> <span style="display:inline-block; width:5px;"></span>
+                收銀員：<t t-esc='props.data.cashier' /><br/>
+                取貨日期：<br/>
+                取貨店鋪：<br/>
+                會員號碼：<br/>
                 日期時間：<t t-esc='props.data.date' />
             </div>
             <hr style="border: none; border-top: 1px solid #000000; margin: 2px 0;" />
-            <div style="text-align: left; font-size: 14pt;">
+            <div style="text-align: left; font-size: 10pt;">
                 數量<span style="display:inline-block; width:10px;"></span>
                 貨品名稱<span style="display:inline-block; width:10px;"></span>
                 價格<span style="display:inline-block; width:10px;"></span>
