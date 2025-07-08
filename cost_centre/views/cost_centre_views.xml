@@ -1,0 +1,41 @@
+<odoo>
+    <data>
+        <record id="view_cost_centre_form" model="ir.ui.view">
+            <field name="name">cost.centre.form</field>
+            <field name="model">cost.centre</field>
+            <field name="arch" type="xml">
+                <form string="Cost Centre">
+                    <sheet>
+                        <group>
+                            <field name="name" required="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_cost_centre_list" model="ir.ui.view">
+            <field name="name">cost.centre.list</field>
+            <field name="model">cost.centre</field>
+            <field name="arch" type="xml">
+                <list string="Cost Centres">
+                    <field name="name"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="cost_center_action" model="ir.actions.act_window">
+            <field name="name">Cost Center</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">cost.centre</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <menuitem id="cost_center_menu"
+                  name="Cost Center"
+                  action="cost_center_action"
+                  parent="account.menu_finance_configuration"
+                  sequence="0"
+                  />
+    </data>
+</odoo>

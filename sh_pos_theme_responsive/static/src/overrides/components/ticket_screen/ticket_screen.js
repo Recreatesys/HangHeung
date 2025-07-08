@@ -8,6 +8,10 @@ import { usePos } from "@point_of_sale/app/store/pos_hook";
 patch(TicketScreen.prototype, {
     setup() {
         super.setup()
+        if (!this.state.filter) {
+            this.state.filter = 'PAYMENT';
+            this.onFilterSelected(this.state.filter);
+        }
         onMounted(this.onMounted);
         this.pos = usePos();
         setTimeout(() => {
@@ -66,5 +70,29 @@ patch(TicketScreen.prototype, {
             $('.sh_action_button').removeClass('sh_hide_action_button')
         }
         return res
+    },
+
+    onClickOrder(clickedOrder) {
+        this.setSelectedOrder(clickedOrder);
+        this.numberBuffer.reset();
+
+        if (clickedOrder?.uiState?.locked) {
+            const refundableLines = clickedOrder.get_orderlines().filter(line => {
+                const detail = this.getToRefundDetail(line);
+                const refundableQty = detail.line.qty - detail.line.refunded_qty;
+                return refundableQty > 0 && !detail.destionation_order_id;
+            });
+
+            for (const line of refundableLines) {
+                const toRefundDetail = this.getToRefundDetail(line);
+                const refundableQty = toRefundDetail.line.qty - toRefundDetail.line.refunded_qty;
+                toRefundDetail.qty = refundableQty;
+            }
+
+            if (refundableLines.length) {
+                this.state.selectedOrderlineIds[clickedOrder.id] = refundableLines[0].id;
+            }
+        }
     }
+
 });
