@@ -9,7 +9,7 @@ patch(TicketScreen.prototype, {
     setup() {
         super.setup()
         if (!this.state.filter) {
-            this.state.filter = 'PAYMENT';
+            this.state.filter = 'SYNCED';
             this.onFilterSelected(this.state.filter);
         }
         onMounted(this.onMounted);
