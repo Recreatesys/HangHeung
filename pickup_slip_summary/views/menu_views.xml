@@ -1,0 +1,10 @@
+<odoo>
+    <record id="action_inventory_report_wizard" model="ir.actions.act_window">
+        <field name="name">Inventory Report</field>
+        <field name="res_model">report.inventory.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_inventory_report_main" name="Pickup Slip Summary" parent="stock.menu_warehouse_report" action="action_inventory_report_wizard" sequence="10"/>
+</odoo>
