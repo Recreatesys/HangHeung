@@ -5,6 +5,9 @@ import { PosStore } from "@point_of_sale/app/store/pos_store";
 
 patch(PosStore.prototype, {
     getReceiptHeaderData(order) {
+        if (!order || !order.lines) {
+          return super.getReceiptHeaderData(...arguments);
+        }
         const totalQty = order.lines.reduce(
             (sum, line) => {
                 if (!line.is_reward_line && line.product_id.type !== "service" &&

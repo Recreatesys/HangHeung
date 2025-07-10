@@ -33,6 +33,7 @@ patch(Orderline, {
 patch(PosStore.prototype, {
   getReceiptHeaderData(order){
     const result = super.getReceiptHeaderData(...arguments);
+    if (!order) return result;
     result["invoice_number"]= order.invoice_number
     result["pos_recept_name"]= order.pos_recept_name    
     if(order.partner_id){
