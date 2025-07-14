@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields, api
 import io
 import base64
 from odoo.tools.misc import xlsxwriter
@@ -9,29 +9,38 @@ class ReportInventoryWizard(models.TransientModel):
     _description = 'Inventory Report Wizard'
 
     start_date = fields.Date(string="Start Date", required=True)
-    end_date = fields.Date(string="End Date", required=True, default=fields.Date.context_today, readonly=True)
+    end_date = fields.Date(string="End Date", required=True, default=fields.Date.context_today)
+
+    @api.constrains('end_date')
+    def _check_end_date(self):
+        for record in self:
+            if record.end_date != fields.Date.context_today(record):
+                raise UserError("End Date must be Today's Date")
 
     def print_report(self):
         if self.start_date > self.end_date:
             raise UserError("Start Date cannot be after End Date.")
 
-        picking_types = self.env['stock.picking.type'].search([])
-        all_names = picking_types.mapped('warehouse_id.name')
-        warehouse_codes = sorted(set(name.split('-')[0].strip() for name in all_names if name))
+        picking_types = self.env['stock.picking.type'].search([('code', '=', 'outgoing')])
+        warehouse_codes = sorted(
+            set(pt.warehouse_id.name.split('-')[0].strip()
+                for pt in picking_types
+                if pt.warehouse_id and pt.warehouse_id.name)
+        )
 
         pickings = self.env['stock.picking'].search([
             ('scheduled_date', '>=', self.start_date),
             ('scheduled_date', '<=', self.end_date),
-            ('state', 'in', ['confirmed', 'assigned'])
+            ('state', 'in', ['draft', 'confirmed', 'assigned']),
+            ('picking_type_id.code', '=', 'outgoing')
         ])
 
         if not pickings:
-            raise UserError("No records found in this date range.")
+            raise UserError("No delivery records found in this date range.")
 
         product_set = set()
         report_data = {}
         product_uom_map = {}
-        product_code_map = {}
 
         for picking in pickings:
             full_wh_name = picking.picking_type_id.warehouse_id.name or 'Unknown'
@@ -41,20 +50,22 @@ class ReportInventoryWizard(models.TransientModel):
                 continue
 
             for move in picking.move_ids_without_package:
-                product_name_full = move.product_id.display_name or 'Unknown'
-                product_set.add(product_name_full)
+                product = move.product_id
+                item_code = product.old_item_number or ''
+                product_name = product.name or 'Unknown'
+                uom = move.product_uom.name or ''
+                product_key = (item_code, product_name)
 
-                product_uom_map[product_name_full] = move.product_uom.name
-                product_code_map[product_name_full] = move.product_id.default_code or ''
-
-                report_data.setdefault(product_name_full, {}).setdefault(warehouse_code, 0)
-                report_data[product_name_full][warehouse_code] += move.product_uom_qty
+                product_set.add(product_key)
+                product_uom_map[product_key] = uom
+                report_data.setdefault(product_key, {}).setdefault(warehouse_code, 0)
+                report_data[product_key][warehouse_code] += move.product_uom_qty
 
         sorted_products = sorted(product_set)
 
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
-        sheet = workbook.add_worksheet('Inventory Report')
+        sheet = workbook.add_worksheet('Delivery Report')
 
         sheet.set_column(0, 0, 20)
         sheet.set_column(1, 1, 40)
@@ -79,16 +90,15 @@ class ReportInventoryWizard(models.TransientModel):
         total_by_wh = {wh: 0 for wh in warehouse_codes}
         row = 2
 
-        for product_name in sorted_products:
-            item_code = product_code_map.get(product_name, '')
-            uom = product_uom_map.get(product_name, '')
+        for item_code, product_name in sorted_products:
+            uom = product_uom_map.get((item_code, product_name), '')
 
             sheet.write(row, 0, item_code)
             sheet.write(row, 1, product_name)
             sheet.write(row, 2, uom)
 
             for col, wh in enumerate(warehouse_codes, start=3):
-                qty = report_data.get(product_name, {}).get(wh, 0)
+                qty = report_data.get((item_code, product_name), {}).get(wh, 0)
                 sheet.write(row, col, qty)
                 total_by_wh[wh] += qty
 
