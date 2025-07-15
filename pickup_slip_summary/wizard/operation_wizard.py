@@ -21,13 +21,6 @@ class ReportInventoryWizard(models.TransientModel):
         if self.start_date > self.end_date:
             raise UserError("Start Date cannot be after End Date.")
 
-        picking_types = self.env['stock.picking.type'].search([('code', '=', 'outgoing')])
-        warehouse_codes = sorted(
-            set(pt.warehouse_id.name.split('-')[0].strip()
-                for pt in picking_types
-                if pt.warehouse_id and pt.warehouse_id.name)
-        )
-
         pickings = self.env['stock.picking'].search([
             ('scheduled_date', '>=', self.start_date),
             ('scheduled_date', '<=', self.end_date),
@@ -42,11 +35,13 @@ class ReportInventoryWizard(models.TransientModel):
         report_data = {}
         product_uom_map = {}
 
-        for picking in pickings:
-            full_wh_name = picking.picking_type_id.warehouse_id.name or 'Unknown'
-            warehouse_code = full_wh_name.split('-')[0].strip()
+        partner_names = sorted(
+            set(p.partner_id.name for p in pickings if p.partner_id and p.partner_id.name)
+        )
 
-            if warehouse_code not in warehouse_codes:
+        for picking in pickings:
+            partner_name = picking.partner_id.name
+            if not partner_name:
                 continue
 
             for move in picking.move_ids_without_package:
@@ -58,8 +53,8 @@ class ReportInventoryWizard(models.TransientModel):
 
                 product_set.add(product_key)
                 product_uom_map[product_key] = uom
-                report_data.setdefault(product_key, {}).setdefault(warehouse_code, 0)
-                report_data[product_key][warehouse_code] += move.product_uom_qty
+                report_data.setdefault(product_key, {}).setdefault(partner_name, 0)
+                report_data[product_key][partner_name] += move.product_uom_qty
 
         sorted_products = sorted(product_set)
 
@@ -70,43 +65,42 @@ class ReportInventoryWizard(models.TransientModel):
         sheet.set_column(0, 0, 20)
         sheet.set_column(1, 1, 40)
         sheet.set_column(2, 2, 10)
-        for i in range(3, 3 + len(warehouse_codes)):
-            sheet.set_column(i, i, 10)
+        for i in range(3, 3 + len(partner_names)):
+            sheet.set_column(i, i, 20)
 
         header_format = workbook.add_format({'bold': True, 'align': 'center'})
 
         sheet.write(0, 0, '')
         sheet.write(0, 1, '')
         sheet.write(0, 2, '', header_format)
-        for col, wh in enumerate(warehouse_codes, start=3):
-            sheet.write(0, col, wh, header_format)
+        for col, partner in enumerate(partner_names, start=3):
+            sheet.write(0, col, partner, header_format)
 
         sheet.write(1, 0, 'Item Code', header_format)
         sheet.write(1, 1, 'Item Name', header_format)
         sheet.write(1, 2, 'UNIT', header_format)
-        for col in range(3, 3 + len(warehouse_codes)):
+        for col in range(3, 3 + len(partner_names)):
             sheet.write(1, col, 'UNIT', header_format)
 
-        total_by_wh = {wh: 0 for wh in warehouse_codes}
+        total_by_partner = {partner: 0 for partner in partner_names}
         row = 2
 
         for item_code, product_name in sorted_products:
             uom = product_uom_map.get((item_code, product_name), '')
-
             sheet.write(row, 0, item_code)
             sheet.write(row, 1, product_name)
             sheet.write(row, 2, uom)
 
-            for col, wh in enumerate(warehouse_codes, start=3):
-                qty = report_data.get((item_code, product_name), {}).get(wh, 0)
+            for col, partner in enumerate(partner_names, start=3):
+                qty = report_data.get((item_code, product_name), {}).get(partner, 0)
                 sheet.write(row, col, qty)
-                total_by_wh[wh] += qty
+                total_by_partner[partner] += qty
 
             row += 1
 
         sheet.write(row, 2, 'Total', header_format)
-        for col, wh in enumerate(warehouse_codes, start=3):
-            sheet.write(row, col, total_by_wh[wh], header_format)
+        for col, partner in enumerate(partner_names, start=3):
+            sheet.write(row, col, total_by_partner[partner], header_format)
 
         workbook.close()
         output.seek(0)
