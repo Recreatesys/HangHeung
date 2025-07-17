@@ -34,3 +34,4 @@ patch(PosOrder.prototype, {
         return newPaymentline;
     }
 });
+
