@@ -31,6 +31,11 @@ class ReportInventoryWizard(models.TransientModel):
                     return name.split(',')[1].split('-')[0].strip()
                 except IndexError:
                     return name.strip()
+            elif '-' in name:
+                try:
+                    return name.split('-')[0].strip()
+                except IndexError:
+                    return name.strip()
             return name.strip()
 
         product_set = set()
