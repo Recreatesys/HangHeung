@@ -3,6 +3,7 @@ import io
 import base64
 from odoo.tools.misc import xlsxwriter
 from odoo.exceptions import UserError
+import csv
 
 class ReportInventoryWizard(models.TransientModel):
     _name = 'report.inventory.wizard'
@@ -123,6 +124,101 @@ class ReportInventoryWizard(models.TransientModel):
             'res_model': 'report.inventory.wizard',
             'res_id': self.id,
             'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        })
+
+        download_url = f'/web/content/{attachment.id}?download=true'
+        return {
+            'type': 'ir.actions.act_url',
+            'url': download_url,
+            'target': 'self',
+        }
+
+    def print_csv_report(self):
+        if self.start_date > self.end_date:
+            raise UserError("Start Date cannot be after End Date.")
+
+        pickings = self.env['stock.picking'].search([
+            ('scheduled_date', '>=', self.start_date),
+            ('scheduled_date', '<=', self.end_date),
+            ('state', 'in', ['draft', 'confirmed', 'assigned']),
+            ('picking_type_id.code', '=', 'outgoing')
+        ])
+
+        if not pickings:
+            raise UserError("No delivery records found in this date range.")
+
+        def extract_code(name):
+            if ',' in name and '-' in name:
+                try:
+                    return name.split(',')[1].split('-')[0].strip()
+                except IndexError:
+                    return name.strip()
+            elif '-' in name:
+                try:
+                    return name.split('-')[0].strip()
+                except IndexError:
+                    return name.strip()
+            return name.strip()
+
+        product_set = set()
+        report_data = {}
+
+        partner_names = sorted(
+            set(extract_code(p.partner_id.name) for p in pickings if p.partner_id and p.partner_id.name)
+        )
+
+        for picking in pickings:
+            partner_name = picking.partner_id.name
+            if not partner_name:
+                continue
+
+            partner_code = extract_code(partner_name)
+
+            for move in picking.move_ids_without_package:
+                product = move.product_id
+                item_code = product.old_item_number or ''
+                product_name = product.name or 'Unknown'
+                product_key = (item_code, product_name)
+
+                product_set.add(product_key)
+                report_data.setdefault(product_key, {}).setdefault(partner_code, 0)
+                report_data[product_key][partner_code] += move.product_uom_qty
+
+        sorted_products = sorted(product_set)
+
+        output = io.StringIO()
+        writer = csv.writer(output)
+
+        # Header row: only Item Code + partner columns
+        header = ['Item Code'] + partner_names
+        writer.writerow(header)
+
+        total_by_partner = {partner: 0 for partner in partner_names}
+
+        for item_code, product_name in sorted_products:
+            row = [item_code]
+
+            for partner in partner_names:
+                qty = report_data.get((item_code, product_name), {}).get(partner, 0)
+                row.append(int(qty))
+                total_by_partner[partner] += qty
+
+            writer.writerow(row)
+
+        # Total row
+        total_row = ['Grand Total'] + [int(total_by_partner[partner]) for partner in partner_names]
+        writer.writerow(total_row)
+
+        csv_data = output.getvalue().encode('utf-8-sig')  # BOM Chinese
+        output.close()
+
+        attachment = self.env['ir.attachment'].create({
+            'name': 'Pickup Slip Summary.csv',
+            'type': 'binary',
+            'datas': base64.b64encode(csv_data),
+            'res_model': 'report.inventory.wizard',
+            'res_id': self.id,
+            'mimetype': 'text/csv'
         })
 
         download_url = f'/web/content/{attachment.id}?download=true'

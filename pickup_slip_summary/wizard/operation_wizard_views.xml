@@ -11,8 +11,14 @@
                 <footer>
                     <button name="print_report"
                             type="object"
-                            string="Print Report"
+                            string="Export Excel"
                             class="btn-primary"/>
+
+                    <button name="print_csv_report"
+                            type="object"
+                            string="Export CSV"
+                            class="btn-secondary"/>
+
                     <button string="Cancel" special="cancel"/>
                 </footer>
             </form>
