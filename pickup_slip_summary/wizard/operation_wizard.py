@@ -9,13 +9,7 @@ class ReportInventoryWizard(models.TransientModel):
     _description = 'Inventory Report Wizard'
 
     start_date = fields.Date(string="Start Date", required=True)
-    end_date = fields.Date(string="End Date", required=True, default=fields.Date.context_today)
-
-    @api.constrains('end_date')
-    def _check_end_date(self):
-        for record in self:
-            if record.end_date != fields.Date.context_today(record):
-                raise UserError("End Date must be Today's Date")
+    end_date = fields.Date(string="End Date", required=True)
 
     def print_report(self):
         if self.start_date > self.end_date:
@@ -31,18 +25,28 @@ class ReportInventoryWizard(models.TransientModel):
         if not pickings:
             raise UserError("No delivery records found in this date range.")
 
+        def extract_code(name):
+            if ',' in name and '-' in name:
+                try:
+                    return name.split(',')[1].split('-')[0].strip()
+                except IndexError:
+                    return name.strip()
+            return name.strip()
+
         product_set = set()
         report_data = {}
         product_uom_map = {}
 
         partner_names = sorted(
-            set(p.partner_id.name for p in pickings if p.partner_id and p.partner_id.name)
+            set(extract_code(p.partner_id.name) for p in pickings if p.partner_id and p.partner_id.name)
         )
 
         for picking in pickings:
             partner_name = picking.partner_id.name
             if not partner_name:
                 continue
+
+            partner_code = extract_code(partner_name)
 
             for move in picking.move_ids_without_package:
                 product = move.product_id
@@ -53,8 +57,8 @@ class ReportInventoryWizard(models.TransientModel):
 
                 product_set.add(product_key)
                 product_uom_map[product_key] = uom
-                report_data.setdefault(product_key, {}).setdefault(partner_name, 0)
-                report_data[product_key][partner_name] += move.product_uom_qty
+                report_data.setdefault(product_key, {}).setdefault(partner_code, 0)
+                report_data[product_key][partner_code] += move.product_uom_qty
 
         sorted_products = sorted(product_set)
 
