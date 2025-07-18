@@ -11,6 +11,7 @@ class ReportInventoryWizard(models.TransientModel):
 
     start_date = fields.Date(string="Start Date", required=True)
     end_date = fields.Date(string="End Date", required=True)
+    partner_id = fields.Many2one('res.partner', string="Shop")
 
     def print_report(self):
         if self.start_date > self.end_date:
@@ -168,9 +169,12 @@ class ReportInventoryWizard(models.TransientModel):
         product_set = set()
         report_data = {}
 
-        partner_names = sorted(
-            set(extract_code(p.partner_id.name) for p in pickings if p.partner_id and p.partner_id.name)
-        )
+        if self.partner_id:
+            partner_names = [extract_code(self.partner_id.name)]
+        else:
+            partner_names = sorted(
+                set(extract_code(p.partner_id.name) for p in pickings if p.partner_id and p.partner_id.name)
+            )
 
         for picking in pickings:
             partner_name = picking.partner_id.name
