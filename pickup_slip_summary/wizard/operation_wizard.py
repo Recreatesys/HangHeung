@@ -59,7 +59,8 @@ class ReportInventoryWizard(models.TransientModel):
                 item_code = product.old_item_number or ''
                 product_name = product.name or 'Unknown'
                 uom = move.product_uom.name or ''
-                product_key = (item_code, product_name)
+                category = product.categ_id.name or 'Uncategorized'
+                product_key = (category, item_code, product_name)
 
                 product_set.add(product_key)
                 product_uom_map[product_key] = uom
@@ -72,44 +73,48 @@ class ReportInventoryWizard(models.TransientModel):
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         sheet = workbook.add_worksheet('Delivery Report')
 
-        sheet.set_column(0, 0, 20)
-        sheet.set_column(1, 1, 40)
-        sheet.set_column(2, 2, 10)
-        for i in range(3, 3 + len(partner_names)):
+        sheet.set_column(0, 0, 30)  # Category
+        sheet.set_column(1, 1, 20)  # Item Code
+        sheet.set_column(2, 2, 40)  # Item Name
+        sheet.set_column(3, 3, 10)  # UNIT
+        for i in range(4, 4 + len(partner_names)):
             sheet.set_column(i, i, 20)
 
         header_format = workbook.add_format({'bold': True, 'align': 'center'})
 
-        sheet.write(0, 0, '')
-        sheet.write(0, 1, '')
-        sheet.write(0, 2, '', header_format)
-        for col, partner in enumerate(partner_names, start=3):
+        sheet.write(0, 0, '')  # Category
+        sheet.write(0, 1, '')  # Item Code
+        sheet.write(0, 2, '')  # Item Name
+        sheet.write(0, 3, '', header_format)  # UNIT
+        for col, partner in enumerate(partner_names, start=4):
             sheet.write(0, col, partner, header_format)
 
-        sheet.write(1, 0, 'Item Code', header_format)
-        sheet.write(1, 1, 'Item Name', header_format)
-        sheet.write(1, 2, 'UNIT', header_format)
-        for col in range(3, 3 + len(partner_names)):
+        sheet.write(1, 0, 'Category', header_format)
+        sheet.write(1, 1, 'Item Code', header_format)
+        sheet.write(1, 2, 'Item Name', header_format)
+        sheet.write(1, 3, 'UNIT', header_format)
+        for col in range(4, 4 + len(partner_names)):
             sheet.write(1, col, 'UNIT', header_format)
 
         total_by_partner = {partner: 0 for partner in partner_names}
         row = 2
 
-        for item_code, product_name in sorted_products:
-            uom = product_uom_map.get((item_code, product_name), '')
-            sheet.write(row, 0, item_code)
-            sheet.write(row, 1, product_name)
-            sheet.write(row, 2, uom)
+        for category, item_code, product_name in sorted_products:
+            uom = product_uom_map.get((category, item_code, product_name), '')
+            sheet.write(row, 0, category)
+            sheet.write(row, 1, item_code)
+            sheet.write(row, 2, product_name)
+            sheet.write(row, 3, uom)
 
-            for col, partner in enumerate(partner_names, start=3):
-                qty = report_data.get((item_code, product_name), {}).get(partner, 0)
+            for col, partner in enumerate(partner_names, start=4):
+                qty = report_data.get((category, item_code, product_name), {}).get(partner, 0)
                 sheet.write(row, col, qty)
                 total_by_partner[partner] += qty
 
             row += 1
 
-        sheet.write(row, 2, 'Total', header_format)
-        for col, partner in enumerate(partner_names, start=3):
+        sheet.write(row, 3, 'Total', header_format)
+        for col, partner in enumerate(partner_names, start=4):
             sheet.write(row, col, total_by_partner[partner], header_format)
 
         workbook.close()
