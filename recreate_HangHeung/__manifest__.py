@@ -12,12 +12,15 @@
     'website': '',
     'depends': ['contacts', 'base', 'stock', 'web', 'purchase'],
     'data': [
+        "security/ir.model.access.csv",
         "views/res_partner.xml",
         "views/customer_category_data.xml",
         "views/res_users.xml",
-        "security/ir.model.access.csv",
         "views/product_template.xml",
         "views/stock_picking_view.xml",
+        "views/reason_code_views.xml",
+        "wizard/wizard_open.xml"
+        # "views/custom_backorder.xml",
     ],
 
     'installable': True,

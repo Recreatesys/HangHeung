@@ -7,8 +7,10 @@
             <field name="model">discount.config</field>
             <field name="arch" type="xml">
                 <list default_order="id desc">
-                    <field name="product_id"/>
+                    <field name="display_name"/>
                     <field name="discount_product"/>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
                 </list>
             </field>
         </record>
@@ -20,21 +22,31 @@
                 <form>
                     <sheet>
                         <group>
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <div>
-                                        <label for="product_id"/>
-                                        <field name="product_id" required="true" domain="[('available_in_pos', '=', True)]" options="{'no_create': True}" class="w-100"/>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div>
-                                        <label for="discount_product"/>
-                                        <field name="discount_product" required="true" domain="[('available_in_pos', '=', True)]" options="{'no_create': True}" class="w-100"/>
-                                    </div>
-                                </div>
-                            </div>
+                            <field name="discount_apply_on" required="1"/>
+                            <field name="product_id" invisible="discount_apply_on != 'product'"
+                                   domain="[('available_in_pos', '=', True)]"
+                                   options="{'no_create': True}" class="w-100"/>
+
+                            <field name="categ_ids"
+                                   widget="many2many_tags"
+                                   invisible="discount_apply_on != 'category'"
+                                   options="{'no_create': True, 'no_open': True}"/>
+
+                            <field name="discount_product"
+                                   required="true"
+                                   domain="[('available_in_pos', '=', True)]"
+                                   options="{'no_create': True}" class="w-100"/>
+
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="company_id"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   groups="base.group_multi_company"/>
+                            <field name="pos_config_ids"
+                                   widget="many2many_tags"
+                                   options="{'no_create': True, 'no_open': True}"/>
                         </group>
+
                         <notebook>
                             <page string="Discount Lines">
                                 <field name="discount_line_ids">
@@ -62,8 +74,6 @@
                   name="POS Discount"
                   action="discount_config_action"
                   parent="point_of_sale.menu_point_config_product"
-                  sequence="2"
-                  />
-
+                  sequence="2"/>
     </data>
 </odoo>

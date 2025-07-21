@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_reason_wizard_form1" model="ir.ui.view">
+        <field name="name">wizard.code.form</field>
+        <field name="model">wizard.code</field>
+        <field name="arch" type="xml">
+            <form string="Reason Code">
+                <group>
+                    <field name="reason_code_id"/>
+                    <field name="operations"/>
+                </group>
+                <footer>
+                    <button string="Confirm" type="object" name="action_confirm_reason" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

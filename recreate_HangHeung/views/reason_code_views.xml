@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_reason_code_form" model="ir.ui.view">
+        <field name="name">reason.code.form</field>
+        <field name="model">reason.code</field>
+        <field name="arch" type="xml">
+            <form string="Reason Code">
+                <sheet>
+                    <group>
+                        <field name="code"/>
+                        <field name="remark"/>
+                        <field name="trx_type"/>
+                        <field name="priority"/>
+                        <field name="odoo_function"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_reason_code_tree" model="ir.ui.view">
+        <field name="name">reason.code.tree</field>
+        <field name="model">reason.code</field>
+        <field name="arch" type="xml">
+            <list string="Reason Codes">
+                <field name="code"/>
+                <field name="remark"/>
+                <field name="trx_type"/>
+                <field name="priority"/>
+                <field name="odoo_function"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_reason_code" model="ir.actions.act_window">
+        <field name="name">Reason Codes</field>
+        <field name="res_model">reason.code</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_reason_code_root" parent="stock.menu_stock_config_settings" name="Reason Codes"/>
+    <menuitem id="menu_reason_code" name="Reason Code" parent="menu_reason_code_root" action="action_reason_code"/>
+</odoo>

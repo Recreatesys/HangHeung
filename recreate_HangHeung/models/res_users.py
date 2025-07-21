@@ -10,4 +10,3 @@ class ResUsers(models.Model):
 
     default_receipt_type = fields.Many2one(comodel_name="stock.picking.type", string="Default Receipt", store=True,  domain="['|', ('warehouse_id', '=', False), ('warehouse_id.company_id', '=', company_id), ('name', '=', 'Receipts')]")
     default_dest_address = fields.Many2one(comodel_name="res.partner", string="Default Address", store=True)
-   
