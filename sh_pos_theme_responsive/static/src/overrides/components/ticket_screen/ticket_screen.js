@@ -4,6 +4,8 @@ import { TicketScreen } from "@point_of_sale/app/screens/ticket_screen/ticket_sc
 import { patch } from "@web/core/utils/patch";
 import { onMounted } from "@odoo/owl";
 import { usePos } from "@point_of_sale/app/store/pos_hook";
+import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { _t } from "@web/core/l10n/translation";
 
 patch(TicketScreen.prototype, {
     setup() {
@@ -93,6 +95,33 @@ patch(TicketScreen.prototype, {
                 this.state.selectedOrderlineIds[clickedOrder.id] = refundableLines[0].id;
             }
         }
+    },
+
+    async onDoRefund() {
+        const order = this.getSelectedOrder();
+        const currentTime = new Date();
+        const currentHours = currentTime.getHours() + currentTime.getMinutes() / 60;
+
+        const startTime = this.pos.config['start_time'];
+        const endTime = this.pos.config['end_time'];
+
+        if (startTime === 0 && endTime === 0) {
+            await this.dialog.add(AlertDialog, {
+                title: _t("Refund Time Window Not Set"),
+                body: _t("Refund or cancellation time window is not set for this POS configuration."),
+            });
+            return;
+        }
+        if (currentHours < startTime || currentHours > endTime) {
+            await this.dialog.add(AlertDialog,{
+                title: _t("Refund Not Allowed"),
+                body: _t(
+                    `Refunds are only allowed between time ${Math.floor(startTime)}:${(startTime % 1) * 60} and ${Math.floor(endTime)}:${(endTime % 1) * 60}.`
+                ),
+            });
+            return;
+        }
+        await super.onDoRefund();
     }
 
 });

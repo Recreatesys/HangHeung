@@ -14,4 +14,18 @@
             </block>
         </field>
     </record>
+
+    <record id="res_config_settings_view_form_inherit_refund_time" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.refund.time</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_pos_config_create_new']" position="after">
+                <group style="position: relative;top: 25px;left: -76%;">
+                    <field name="refund_start_time" widget="float_time"/>
+                    <field name="refund_end_time" widget="float_time"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
 </odoo>

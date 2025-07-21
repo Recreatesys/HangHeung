@@ -10,10 +10,10 @@ patch(PosOrder.prototype, {
         if (this.electronic_payment_in_progress()) {
             return false;
         }
-
         const totalAmountDue = this.getDefaultAmountDueToPayIn(payment_method);
+        const isRefund = this._isRefundOrder();
 
-        if (totalAmountDue <= 0) {
+        if (!isRefund && totalAmountDue <= 0) {
             return "__BLOCK_OVERPAY__";
         }
 

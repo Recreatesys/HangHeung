@@ -15,7 +15,7 @@
         "data/pos_theme_settings_data.xml",
         "security/ir.model.access.csv",
         "views/sh_pos_theme_settings_views.xml",
-        # "views/res_config_settings_views.xml",
+        "views/res_config_settings_views.xml",
     ],
     'assets': { 'point_of_sale._assets_pos': [
             'web/static/lib/jquery/jquery.js',
