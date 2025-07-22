@@ -10,7 +10,7 @@
                     <field name="reason_code_id" domain="[('odoo_function_ids', 'in', context.get('picking_type_id'))]"/>
                 </group>
                 <footer>
-                    <button string="Confirm" class="btn-primary" special="save"/>
+                    <button string="Confirm" type="object" name="action_confirm_reason" class="btn-primary"/>
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>

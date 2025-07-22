@@ -58,7 +58,7 @@ class StockPicking(models.Model):
             for move in picking.move_ids:
                 if move.scrapped:
                     continue
-                if move.product_uom_qty > move.quantity:
+                if move.product_uom_qty > move.quantity and not picking.reason_code:
                     move.picked = True
                     return {
                         'name': 'Provide Reason Code',

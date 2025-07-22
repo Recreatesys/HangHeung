@@ -12,7 +12,7 @@ class DiscountConfig(models.Model):
         ('category', 'Category')
     ], string="Apply Discount On", required=True, default='product')
 
-    product_id = fields.Many2one('product.product', string="Product", domain="[('available_in_pos', '=', True)]")
+    product_id = fields.Many2many('product.product', string="Product", domain="[('available_in_pos', '=', True)]")
     categ_ids = fields.Many2many('pos.category', string='Product Category',
                                  help="Category used in the Point of Sale.")
     discount_product = fields.Many2one('product.product', string="Discount Product",
@@ -32,7 +32,8 @@ class DiscountConfig(models.Model):
     def _compute_display_name(self):
         for record in self:
             if record.discount_apply_on == 'product':
-                record.display_name = record.product_id.display_name or "Product Discount"
+                products = ', '.join(record.product_id.mapped('name'))
+                record.display_name = f"Products: {products}" if record.product_id else "Product Discount"
             else:
                 categories = ', '.join(record.categ_ids.mapped('name'))
                 record.display_name = f"Category: {categories}" if categories else "Category Discount"
@@ -103,12 +104,12 @@ class DiscountConfigLine(models.Model):
                         f"overlaps with existing range {line_from} → {line_to}."
                     )
 
-            product = rec.config_id.product_id
-            if product:
-                unit_price = product.lst_price or 0
-                total_price = unit_price * rec.from_quantity
-                if rec.discount_amount > total_price:
-                    raise ValidationError(
-                        f"Discount amount ({rec.discount_amount}) cannot be greater than total price "
-                        f"({unit_price} × {rec.from_quantity} = {total_price})."
-                    )
+            # product = rec.config_id.product_id
+            # if product:
+            #     unit_price = product.lst_price or 0
+            #     total_price = unit_price * rec.from_quantity
+            #     if rec.discount_amount > total_price:
+            #         raise ValidationError(
+            #             f"Discount amount ({rec.discount_amount}) cannot be greater than total price "
+            #             f"({unit_price} × {rec.from_quantity} = {total_price})."
+            #         )
