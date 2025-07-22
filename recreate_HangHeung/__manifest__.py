@@ -19,6 +19,7 @@
         "views/product_template.xml",
         "views/stock_picking_view.xml",
         "views/reason_code_views.xml",
+        "views/pos_payment_method.xml",
         "wizard/wizard_open.xml"
         # "views/custom_backorder.xml",
     ],

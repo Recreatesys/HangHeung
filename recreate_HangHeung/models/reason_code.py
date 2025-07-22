@@ -13,7 +13,7 @@ class ReasonCode(models.Model):
         ('TRO', 'TRO'),
     ], string='Trx Type')
     priority = fields.Char(string='Priority')
-    odoo_function = fields.Char(string='Odoo Function')
+    odoo_function_ids = fields.Many2many("stock.picking.type",string='Odoo Function')
 
     @api.depends('code', 'remark')
     def _compute_display_name(self):

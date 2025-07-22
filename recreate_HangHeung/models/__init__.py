@@ -1,1 +1,1 @@
-from . import res_partner, customer_category,product_template, purchase, res_users, stock_picking, reason_code
+from . import res_partner, customer_category,product_template, purchase, res_users, stock_picking, reason_code, pos_payment_method

@@ -11,7 +11,7 @@
                         <field name="remark"/>
                         <field name="trx_type"/>
                         <field name="priority"/>
-                        <field name="odoo_function"/>
+                        <field name="odoo_function_ids" widget="many2many_tags"/>
                     </group>
                 </sheet>
             </form>
@@ -27,7 +27,7 @@
                 <field name="remark"/>
                 <field name="trx_type"/>
                 <field name="priority"/>
-                <field name="odoo_function"/>
+                <field name="odoo_function_ids" widget="many2many_tags"/>
             </list>
         </field>
     </record>
