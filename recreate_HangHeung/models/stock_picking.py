@@ -51,9 +51,7 @@ class StockPicking(models.Model):
                 dropship.dropship_validated = True
 
  
-
     def _pre_action_done_hook(self):
-        import pdb; pdb.set_trace();
         for picking in self:
             for move in picking.move_ids:
                 if move.scrapped:

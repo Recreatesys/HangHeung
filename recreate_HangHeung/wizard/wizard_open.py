@@ -31,15 +31,12 @@ class WizardCode(models.TransientModel):
 
         if not active_id or not active_model:
             return
-        import pdb; pdb.set_trace();
 
         record = self.env[active_model].browse(active_id)
-        # import pdb; pdb.set_trace();
 
         if self.reason_code_id.odoo_function == 'Receipt':
             if record._name == 'account.move' and record.move_type == 'out_refund':
                 record.reason_code_id = self.reason_code_id.id
-            
 
         elif self.reason_code_id.odoo_function == 'delivery':
             if record._name == 'account.move' and record.move_type in ('in_invoice', 'in_refund'):
