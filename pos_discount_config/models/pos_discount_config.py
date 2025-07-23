@@ -52,6 +52,13 @@ class DiscountConfig(models.Model):
             if rec.discount_apply_on == 'category' and not rec.categ_ids:
                 raise ValidationError("Please select at least one category for discount.")
 
+    @api.constrains('discount_product')
+    def _check_discount_product(self):
+        for rec in self:
+            discount_product = self.env['discount.config'].sudo().search([('product_id', 'in', rec.discount_product.ids), ('id', '!=', rec.id)], limit=1)
+            if discount_product:
+                raise ValidationError("The discount is applied to this Discount Product.")
+
     _sql_constraints = [
         ('product_unique', 'unique(product_id)', 'Configuration already exists for this product.')
     ]

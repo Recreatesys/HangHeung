@@ -77,9 +77,11 @@ class PosDiscountController(http.Controller):
         if not applicable_rule:
             return {}
 
+        total_discount = total_qty * applicable_rule.discount_amount
+
         return {
             'total_qty': total_qty,
-            'discount': applicable_rule.discount_amount,
+            'discount': total_discount,
             'discount_product': valid_config.discount_product.id,
             'split': [(total_qty, applicable_rule.discount_amount)],
         }
