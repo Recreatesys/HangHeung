@@ -6,35 +6,28 @@ from datetime import datetime
 class PosDiscountController(http.Controller):
 
     @http.route('/pos/discount_rule', type='json', auth='public')
-    def get_discount_rule(self, product_qty_map, pos_config_id=None):
-        """
-        Apply discount once for total qty of all configured products combined.
-        Handles both 'product' and 'category' based discount configs.
-        """
+    def get_discount_rule(self, product_id, qty, pos_config_id=None):
         current_dt = fields.Datetime.now()
         company_id = request.env.company.id
-        product_ids = list(map(int, product_qty_map.keys()))
+        product = request.env['product.product'].sudo().browse(product_id)
 
-        products = request.env['product.product'].sudo().browse(product_ids)
-        product_categ_map = {p.id: p.pos_categ_ids.ids for p in products}
+        # First try to get category-based config
+        category_ids = product.pos_categ_ids.ids if product.pos_categ_ids else []
 
-        all_category_ids = list({cat_id for cat_list in product_categ_map.values() for cat_id in cat_list})
-        valid_config = None
+        valid_config = request.env['discount.config'].sudo().search([
+            ('discount_apply_on', '=', 'category'),
+            ('start_date', '<=', current_dt),
+            ('end_date', '>=', current_dt),
+            ('company_id', '=', company_id),
+            ('pos_config_ids', 'in', [pos_config_id]),
+            ('categ_ids', 'in', category_ids),
+        ], limit=1)
 
-        if all_category_ids:
-            valid_config = request.env['discount.config'].sudo().search([
-                ('discount_apply_on', '=', 'category'),
-                ('start_date', '<=', current_dt),
-                ('end_date', '>=', current_dt),
-                ('company_id', '=', company_id),
-                ('pos_config_ids', 'in', [pos_config_id]),
-                ('categ_ids', 'in', all_category_ids),
-            ], limit=1)
-
+        # If not found, try product-based config
         if not valid_config:
             valid_config = request.env['discount.config'].sudo().search([
                 ('discount_apply_on', '=', 'product'),
-                ('product_id', 'in', product_ids),
+                ('product_id', '=', product_id),
                 ('start_date', '<=', current_dt),
                 ('end_date', '>=', current_dt),
                 ('company_id', '=', company_id),
@@ -48,38 +41,32 @@ class PosDiscountController(http.Controller):
             ('config_id', '=', valid_config.id)
         ], order='from_quantity desc')
 
-        total_qty = 0
+        discount_product_id = valid_config.discount_product.id
+        blocks = []
 
-        if valid_config.discount_apply_on == 'product':
-            config_product_ids = valid_config.product_id.ids
-            for pid, qty in product_qty_map.items():
-                if int(pid) in config_product_ids:
-                    total_qty += qty
-
-        elif valid_config.discount_apply_on == 'category':
-            config_categ_ids = valid_config.categ_ids.ids
-            for pid, qty in product_qty_map.items():
-                product_categs = product_categ_map.get(int(pid), [])
-                if any(cid in config_categ_ids for cid in product_categs):
-                    total_qty += qty
-
-        if total_qty == 0:
-            return {}
-
-        applicable_rule = None
         for rule in rules:
-            from_qty = rule.from_quantity
-            to_qty = rule.to_quantity if rule.to_quantity > 0 else rule.from_quantity
-            if from_qty <= total_qty <= to_qty:
-                applicable_rule = rule
-                break
+            max_qty = rule.to_quantity if rule.to_quantity > 0 else rule.from_quantity
+            blocks.append({
+                'min_qty': rule.from_quantity,
+                'max_qty': max_qty,
+                'discount': rule.discount_amount,
+            })
 
-        if not applicable_rule:
-            return {}
+        dp = [0] * (qty + 1)
+        backtrack = [[] for _ in range(qty + 1)]
+
+        for i in range(1, qty + 1):
+            for block in blocks:
+                for block_qty in range(block['min_qty'], block['max_qty'] + 1):
+                    if block_qty <= i:
+                        possible_discount = dp[i - block_qty] + block['discount']
+                        if possible_discount > dp[i]:
+                            dp[i] = possible_discount
+                            backtrack[i] = backtrack[i - block_qty] + [(block_qty, block['discount'])]
 
         return {
-            'total_qty': total_qty,
-            'discount': applicable_rule.discount_amount,
-            'discount_product': valid_config.discount_product.id,
-            'split': [(total_qty, applicable_rule.discount_amount)],
+            'qty': qty,
+            'discount': dp[qty],
+            'discount_product': discount_product_id,
+            'split': backtrack[qty],
         }

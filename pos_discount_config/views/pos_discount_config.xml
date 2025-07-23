@@ -24,7 +24,6 @@
                         <group>
                             <field name="discount_apply_on" required="1"/>
                             <field name="product_id" invisible="discount_apply_on != 'product'"
-                                   widget="many2many_tags"
                                    domain="[('available_in_pos', '=', True)]"
                                    options="{'no_create': True}" class="w-100"/>
 
