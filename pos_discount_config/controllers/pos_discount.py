@@ -75,13 +75,15 @@ class PosDiscountController(http.Controller):
                 break
 
         if not applicable_rule:
-            return {}
-
-        total_discount = total_qty * applicable_rule.discount_amount
+            last_rule = request.env['discount.config.line'].sudo().search([('config_id', '=', valid_config.id)], order='to_quantity desc', limit=1)
+            min_from_qty = min(rules.mapped('from_quantity'))
+            max_to_qty = min(rules.mapped('to_quantity'))
+            if min_from_qty <= total_qty and max_to_qty <= total_qty:
+                applicable_rule = last_rule
 
         return {
             'total_qty': total_qty,
-            'discount': total_discount,
+            'discount': applicable_rule.discount_amount,
             'discount_product': valid_config.discount_product.id,
             'split': [(total_qty, applicable_rule.discount_amount)],
         }
