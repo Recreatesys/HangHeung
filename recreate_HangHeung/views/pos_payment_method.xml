@@ -6,7 +6,8 @@
             <field name="inherit_id" ref="point_of_sale.pos_payment_method_view_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='payment_method_type']" position="after">
-                    <field name="refund_payment_method"/>
+                    <field name="is_octopus"/>
+                    <field name="refund_payment_method" readonly="is_octopus" force_save="1"/>
                 </xpath>
             </field>
         </record>

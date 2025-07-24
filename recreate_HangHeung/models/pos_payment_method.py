@@ -4,12 +4,19 @@ from odoo import models, fields, api
 class POSPPaymentMethod(models.Model):
     _inherit = 'pos.payment.method'
 
+    is_octopus = fields.Boolean(string='Is Octopus Payment Method', default=False)
     refund_payment_method = fields.Many2one(
         'pos.payment.method',
         string='Refund Payment Method',
         help="Select the payment method to use for refunds."
     )
 
+    @api.onchange('is_octopus')
+    def onchange_is_octopus(self):
+        for line in self:
+            if line.is_octopus:
+                payment_method = self.env['pos.payment.method'].sudo().search([('name', 'ilike', 'cash')], limit=1)
+                line.refund_payment_method = payment_method.id
 
 class POSMakePayment(models.TransientModel):
     _inherit = 'pos.make.payment'
