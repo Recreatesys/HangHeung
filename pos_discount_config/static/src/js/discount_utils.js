@@ -2,18 +2,18 @@
 
 import { rpc } from "@web/core/network/rpc";
 
-export async function applyDiscountLogic(order_id) {
-    const order = order_id;
+export async function applyDiscountLogic(order) {
     if (!order) return;
 
-    const productModel = order_id.models?.["product.product"];
+    const productModel = order.models?.["product.product"];
     const allProducts = productModel?.getAll?.() || [];
 
     const lines = Array.from(order.get_orderlines() || []);
-    const product_qty_map = {};
     const discountLines = lines.filter(l => l.note === "AUTO:discount");
+    const productLines = lines.filter(l => l.note !== "AUTO:discount");
 
-    for (const line of lines) {
+    const product_qty_map = {};
+    for (const line of productLines) {
         const pid = line.product_id?.id;
         if (pid) {
             product_qty_map[pid] = (product_qty_map[pid] || 0) + line.get_quantity();
@@ -21,9 +21,8 @@ export async function applyDiscountLogic(order_id) {
     }
 
     let discountData = {};
-
     try {
-        const pos_config_id = order_id?.config_id?.id;
+        const pos_config_id = order?.config_id?.id;
         discountData = await rpc('/pos/discount_rule', { product_qty_map, pos_config_id });
     } catch (error) {
         console.error("Error fetching discount rule:", error);
@@ -37,9 +36,14 @@ export async function applyDiscountLogic(order_id) {
         l => discountProduct && l.product_id?.id === discountProduct.id
     );
 
+    for (const dline of discountLines) {
+        const pid = dline.product_id?.id;
+        if (!discountProduct || pid !== discountProduct.id || discountData?.discount <= 0) {
+            order.removeOrderline(dline);
+        }
+    }
 
     if (discountData?.discount > 0 && discountProduct) {
-
         let split_summary = "";
         if (Array.isArray(discountData.split)) {
             const qtyCountMap = {};
@@ -48,10 +52,11 @@ export async function applyDiscountLogic(order_id) {
             }
             split_summary = Object.entries(qtyCountMap)
                 .map(([qty, count]) => `${qty}×${count}`)
-                .join(', ');
+                .join(", ");
         }
+
         if (!existingDiscountLine) {
-            const newLine = order_id.models["pos.order.line"].create({
+            const newLine = order.models["pos.order.line"].create({
                 product_id: discountProduct,
                 qty: 1,
                 price_unit: -discountData.discount,
@@ -59,26 +64,14 @@ export async function applyDiscountLogic(order_id) {
                 note: "AUTO:discount",
                 customer_note: split_summary || false,
             });
-
         } else {
             if (existingDiscountLine.get_unit_price() !== -discountData.discount) {
-            existingDiscountLine.set_unit_price(-discountData.discount);
-                }
-            existingDiscountLine.customer_note = split_summary || false;
-        }
-
-    } else if (discountLines != []) {
-        for (const dline of discountLines) {
-            order.removeOrderline(dline);
-        }
-    }
-
-    for (const dline of discountLines) {
-        const pid = dline.product_id?.id;
-        if (pid && !product_qty_map[pid] && dline) {
-            order.removeOrderline(dline);
+                existingDiscountLine.set_unit_price(-discountData.discount);
+            }
+            existingDiscountLine.set_customer_note?.(split_summary || false);
         }
     }
 }
+
 
 

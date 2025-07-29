@@ -22,16 +22,10 @@
                 <form>
                     <sheet>
                         <group>
-                            <field name="discount_apply_on" required="1"/>
-                            <field name="product_id" invisible="discount_apply_on != 'product'"
+                            <field name="product_id"
                                    widget="many2many_tags"
                                    domain="[('available_in_pos', '=', True)]"
                                    options="{'no_create': True}" class="w-100"/>
-
-                            <field name="categ_ids"
-                                   widget="many2many_tags"
-                                   invisible="discount_apply_on != 'category'"
-                                   options="{'no_create': True, 'no_open': True}"/>
 
                             <field name="discount_product"
                                    required="true"
@@ -46,14 +40,14 @@
                             <field name="pos_config_ids"
                                    widget="many2many_tags"
                                    options="{'no_create': True, 'no_open': True}"/>
+                            <field name="is_bogo"/>
                         </group>
 
                         <notebook>
-                            <page string="Discount Lines">
-                                <field name="discount_line_ids">
+                            <page string="Discount Lines"  invisible="is_bogo">
+                                <field name="discount_line_ids" invisible="is_bogo">
                                     <list editable="bottom">
-                                        <field name="from_quantity"/>
-                                        <field name="to_quantity"/>
+                                        <field name="to_quantity" string="Quantity"/>
                                         <field name="discount_amount"/>
                                     </list>
                                 </field>
