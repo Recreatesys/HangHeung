@@ -11,6 +11,19 @@
                 </xpath>
             </field>
         </record>
+        <record id="view_pos_payment_method_make_inherit_refund" model="ir.ui.view">
+            <field name="name">pos.payment.make.form.inherit.refund</field>
+            <field name="model">pos.make.payment</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_payment"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='payment_method_id']" position="attributes">
+                    <attribute name="domain">payment_method_id_domain</attribute>
+                </xpath>
+                <xpath expr="//field[@name='payment_method_id']" position="after">
+                    <field name="payment_method_id_domain" invisible="1"/>
+                </xpath>
+            </field>
+        </record>
     </data>
 </odoo>
   

@@ -23,6 +23,11 @@
         "wizard/wizard_open.xml"
         # "views/custom_backorder.xml",
     ],
+    'assets': {
+        'point_of_sale._assets_pos': [
+            'recreate_HangHeung/static/src/js/*'
+        ],
+    },
 
     'installable': True,
     'application': False,
