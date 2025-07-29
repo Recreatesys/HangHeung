@@ -48,7 +48,7 @@ class PosDiscountController(http.Controller):
         ], order='to_quantity desc')
 
         apply_to_all_products = not valid_config.product_id
-        config_product_ids = [valid_config.product_id.id] if valid_config.product_id else []
+        config_product_ids = valid_config.product_id.ids if valid_config.product_id else []
 
         # Step 4: Calculate total applicable quantity with logging
         total_qty = 0
