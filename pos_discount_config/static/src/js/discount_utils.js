@@ -5,13 +5,9 @@ import { rpc } from "@web/core/network/rpc";
 const discountUpdateLocks = new WeakMap();
 const discountTimerMap = new WeakMap();
 
-/**
- * Schedules discount logic after a short delay to avoid rapid re-triggering.
- */
+
 export function scheduleDiscountLogic(order) {
     if (!order) return;
-
-    const lockKey = order.uid || order;
 
     if (discountTimerMap.get(order)) {
         clearTimeout(discountTimerMap.get(order));
@@ -19,19 +15,16 @@ export function scheduleDiscountLogic(order) {
 
     const timer = setTimeout(() => {
         applyDiscountLogic(order);
-    }, 30); // allow quantity to fully settle
+    }, 30);
 
     discountTimerMap.set(order, timer);
 }
 
-/**
- * Main logic to compute and apply discount lines.
- */
+
 export async function applyDiscountLogic(order) {
     if (!order) return;
 
     const lockKey = order.uid || order;
-
     if (discountUpdateLocks.get(lockKey)) return;
     discountUpdateLocks.set(lockKey, true);
 
@@ -39,7 +32,7 @@ export async function applyDiscountLogic(order) {
         const productModel = order.models?.["product.product"];
         const allProducts = productModel?.getAll?.() || [];
 
-        await Promise.resolve(); // let quantity update settle
+        await Promise.resolve();
         const lines = Array.from(order.get_orderlines() || []);
 
         const product_qty_map = {};
@@ -61,22 +54,20 @@ export async function applyDiscountLogic(order) {
             return;
         }
 
-        const discountProduct = discountData?.discount_product
-            ? allProducts.find(p => p.id === discountData.discount_product)
-            : null;
-
-        // Remove old discount lines
         const discountLines = lines.filter(l => l.note === "AUTO:discount");
         for (const dline of discountLines) {
             order.removeOrderline(dline);
         }
 
-        // Add updated discount line
-        if (discountData?.discount > 0 && discountProduct) {
+        const discountBlocks = discountData?.discount_lines || [];
+        for (const block of discountBlocks) {
+            const discountProduct = allProducts.find(p => p.id === block.discount_product);
+            if (!discountProduct) continue;
+
             let split_summary = "";
-            if (Array.isArray(discountData.split)) {
+            if (Array.isArray(block.split)) {
                 const qtyCountMap = {};
-                for (const [qty] of discountData.split) {
+                for (const [qty] of block.split) {
                     qtyCountMap[qty] = (qtyCountMap[qty] || 0) + 1;
                 }
                 split_summary = Object.entries(qtyCountMap)
@@ -87,7 +78,7 @@ export async function applyDiscountLogic(order) {
             order.models["pos.order.line"].create({
                 product_id: discountProduct,
                 qty: 1,
-                price_unit: -discountData.discount,
+                price_unit: -block.discount,
                 order_id: order,
                 note: "AUTO:discount",
                 customer_note: split_summary || false,
