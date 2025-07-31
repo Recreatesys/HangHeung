@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="paperformat_shop_inventory_report" model="report.paperformat">
+        <field name="name">A4 Report Format</field>
+        <field name="default" eval="False"/>
+        <field name="format">custom</field>
+        <field name="page_width">210</field>
+        <field name="page_height">297</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">5</field>
+        <field name="margin_bottom">5</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="True"/>
+        <field name="header_spacing">5</field>
+        <field name="dpi">90</field>
+        <field name="disable_shrinking" eval="True"/>
+    </record>
+    <record id="action_pos_shop_report" model="ir.actions.report">
+        <field name="name">POS Shop Report</field>
+        <field name="model">pos.shop.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">pos_shop_report.report_pos_shop_template</field>
+        <field name="report_file">pos_shop_report.report_pos_shop_template</field>
+         <field name="paperformat_id" ref="pos_shop_report.paperformat_shop_inventory_report"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>
+

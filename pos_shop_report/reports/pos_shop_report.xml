@@ -1,0 +1,119 @@
+<odoo>
+  <template id="report_pos_shop_template">
+    <t t-call="web.external_layout">
+      <main class="page">
+        <h2 style="text-align: center;">Hoymay HK Ltd</h2>
+        <div style="text-align: center;">
+          <h3>Shop Name: <t t-esc="docs.shop_id.name"/></h3>
+        </div>
+
+        <table style="width: 100%; font-size: 14px; margin-bottom: 10px;">
+          <tr>
+            <td style="text-align: left; width: 33%;">
+              <h5><strong>Date From:</strong> <t t-esc="docs.date_start"/> to <t t-esc="docs.date_end"/></h5>
+            </td>
+            <td style="text-align: center; width: 34%;">
+              <h3 style="margin: 0;">Report - Shop Sales Report and Inventory Report</h3>
+            </td>
+            <td style="text-align: right; width: 33%;">
+              <h5>
+                <strong>Printed On:</strong>
+                <span>
+                  <t t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M:%S')"/>
+                </span>
+              </h5>
+            </td>
+          </tr>
+        </table>
+
+        <table class="table table-sm table-bordered" style="margin-top: 20px;">
+          <thead style="background-color: #f0f0f0;">
+            <tr>
+              <th>貨品</th>
+              <th>貨品說明</th>
+              <th>上傳數</th>
+              <th>進貨數</th>
+              <th>進貨數</th>
+              <th>銷售數</th>
+              <th>銷售退貨數</th>
+              <th>總結數</th>
+              <th>總銷售 標準金額</th>
+              <th>折扣金額</th>
+              <th>總銷售 最終金額</th>
+            </tr>
+          </thead>
+          <tbody>
+            <t t-if="docs.report_lines">
+              <t t-set="total_previous_stock" t-value="sum([line['previous_stock'] for line in docs.report_lines])"/>
+              <t t-set="total_stock_in" t-value="sum([line['stock_in'] for line in docs.report_lines])"/>
+              <t t-set="total_scrap_qty" t-value="sum([line['scrap_qty'] for line in docs.report_lines])"/>
+              <t t-set="total_sales_qty" t-value="sum([line['sales_qty'] for line in docs.report_lines])"/>
+              <t t-set="total_sales_refund_qty" t-value="sum([line['sales_refund_qty'] for line in docs.report_lines])"/>
+              <t t-set="total_qty_today" t-value="sum([line['total_qty_today'] for line in docs.report_lines])"/>
+              <t t-set="total_sales_amount" t-value="sum([line['sales_amount'] for line in docs.report_lines])"/>
+              <t t-set="total_discount_amount" t-value="sum([line['discount_amount'] for line in docs.report_lines])"/>
+              <t t-set="total_final_amount" t-value="sum([line['final_amount'] for line in docs.report_lines])"/>
+              <t t-foreach="docs.report_lines" t-as="line">
+                <tr>
+                  <td><t t-esc="line['sku']"/></td>
+                  <td><t t-esc="line['name']"/></td>
+                  <td><t t-esc="line['previous_stock']"/></td>
+                  <td><t t-esc="line['stock_in']"/></td>
+                  <td><t t-esc="line['scrap_qty']"/></td>
+                  <td><t t-esc="line['sales_qty']"/></td>
+                  <td><t t-esc="line['sales_refund_qty']"/></td>
+                  <td><t t-esc="line['total_qty_today']"/></td>
+                  <td><t t-esc="line['sales_amount']"/></td>
+                  <td><t t-esc="line['discount_amount']"/></td>
+                  <td><t t-esc="line['final_amount']"/></td>
+                </tr>
+              </t>
+
+              <tr style="font-weight: bold; background-color: #f9f9f9;">
+                <td colspan="2" style="text-align: right;">Subtotal:</td>
+                <td><t t-esc="total_previous_stock"/></td>
+                <td><t t-esc="total_stock_in"/></td>
+                <td><t t-esc="total_scrap_qty"/></td>
+                <td><t t-esc="total_sales_qty"/></td>
+                <td><t t-esc="total_sales_refund_qty"/></td>
+                <td><t t-esc="total_qty_today"/></td>
+                <td><t t-esc="total_sales_amount"/></td>
+                <td><t t-esc="total_discount_amount"/></td>
+                <td><t t-esc="total_final_amount"/></td>
+              </tr>
+              <tr>
+                <td colspan="10" style="text-align: right; font-weight: bold;">Final Total:</td>
+                <td><t t-esc="total_final_amount"/></td>
+              </tr>
+              <!-- <tr>
+                <td colspan="10" style="text-align: right; font-weight: bold;">Deducted Coupon:</td>
+                <td>COU11</td>
+              </tr> -->
+              <tr>
+                <td colspan="10" style="text-align: right; font-weight: bold;">Grand Total:</td>
+                <td><t t-esc="total_final_amount"/></td>
+              </tr>
+              <tr>
+                <td colspan="2" style="font-weight: bold; padding-top: 20px;">List of Payment Methods:</td>
+              </tr>
+              <t t-if="docs.payment_breakdown">
+                <t t-foreach="docs.payment_breakdown.items()" t-as="pay">
+                  <tr>
+                    <td colspan="2"><t t-esc="pay[0]"/></td>
+                  </tr>
+                </t>
+              </t>
+
+            </t>
+
+            <t t-if="not docs.report_lines">
+              <tr>
+                <td colspan="11" style="text-align:center;">No data found for selected filters.</td>
+              </tr>
+            </t>
+          </tbody>
+        </table>
+      </main>
+    </t>
+  </template>
+</odoo>

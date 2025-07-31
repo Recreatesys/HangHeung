@@ -1,0 +1,6 @@
+<odoo>
+    <menuitem id="menu_pos_config_shop_report"
+              name="POS Shop Report"
+              parent="point_of_sale.menu_point_rep"
+              sequence="90" action="pos_shop_report.action_pos_shop_report_wizard"/>
+</odoo>
