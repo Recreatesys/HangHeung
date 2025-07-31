@@ -15,7 +15,7 @@
         <xpath expr="//div[hasclass('product-name')]//span" position="after">
             <div class="sh_order_line_detail">
                 <ul class="info-list d-flex flex-column sh_info_list">
-                    <li class="price-per-unit">
+                    <!--<li class="price-per-unit">
                         <span class="qty px-1 border rounded text-bg-view fw-bolder me-1" t-esc="line.qty"/>
                         <t t-if="!props.basic_receipt">
                             x
@@ -26,7 +26,7 @@
                             /
                         </t>
                         <t t-if="line.unit" t-esc="line.unit" />
-                    </li>
+                    </li>-->
                     <li t-if="line.price !== 0 and line.discount and line.discount !== '0' and !props.basic_receipt">
                         With a <em><t t-esc="line.discount" />% </em> discount
                     </li>
