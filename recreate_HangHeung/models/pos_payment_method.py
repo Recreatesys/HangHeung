@@ -30,9 +30,38 @@ class POSPPaymentMethod(models.Model):
     @api.onchange('is_octopus')
     def onchange_is_octopus(self):
         for line in self:
-            if line.is_octopus:
-                payment_method = self.env['pos.payment.method'].sudo().search([('name', 'ilike', 'cash')], limit=1)
-                line.refund_payment_method = payment_method.id
+            if line.is_octopus and line.name:
+                provider_name = line.name.lower()
+                suffix = ''
+                if 'octopus' in provider_name:
+                    suffix_raw = provider_name.split('octopus')[-1]
+                    suffix = suffix_raw.strip().lstrip('-').lstrip().upper()
+
+                if suffix:
+                    refund_name_variants = [
+                        f"cash - {suffix}",
+                        f"cash-{suffix}",
+                        f"cash {suffix}",
+                        f"cash{suffix}",
+                    ]
+
+                    refund_method = False
+                    for name in refund_name_variants:
+                        refund_method = self.env['pos.payment.method'].sudo().search([
+                            ('name', 'ilike', name)
+                        ], limit=1)
+                        if refund_method:
+                            break
+
+                    line.refund_payment_method = refund_method.id if refund_method else False
+                else:
+                    refund_method_name = self.env['pos.payment.method'].sudo().search([
+                            ('name', 'ilike', 'Cash')
+                        ], limit=1)
+                    line.refund_payment_method = refund_method_name
+            else:
+                line.refund_payment_method = False
+
 
 class POSMakePayment(models.TransientModel):
     _inherit = 'pos.make.payment'
