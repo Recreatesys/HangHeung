@@ -2,10 +2,13 @@
   <template id="report_pos_shop_template">
     <t t-call="web.external_layout">
       <main class="page">
-        <h2 style="text-align: center;">Hoymay HK Ltd</h2>
+        <h2 style="text-align: center;"><t t-esc="docs.company_name"/></h2>
         <div style="text-align: center;">
           <h3>Shop Name: <t t-esc="docs.shop_id.name"/></h3>
+          <p><t t-esc="docs.shop_address"/></p>
+          <p>Tel: <t t-esc="docs.shop_phone"/></p>
         </div>
+
 
         <table style="width: 100%; font-size: 14px; margin-bottom: 10px;">
           <tr>
@@ -85,31 +88,27 @@
                 <td colspan="10" style="text-align: right; font-weight: bold;">Final Total:</td>
                 <td><t t-esc="total_final_amount"/></td>
               </tr>
-              <!-- <tr>
-                <td colspan="10" style="text-align: right; font-weight: bold;">Deducted Coupon:</td>
-                <td>COU11</td>
-              </tr> -->
+             <tr>
+                <td colspan="10" style="text-align: right; font-weight: bold;">Deducted Coupons:</td>
+                <td><t t-esc="docs.coupon_discount_total or 0.0"/></td>
+              </tr>
               <tr>
                 <td colspan="10" style="text-align: right; font-weight: bold;">Grand Total:</td>
-                <td><t t-esc="total_final_amount"/></td>
+                <td><t t-esc="total_final_amount - (docs.coupon_discount_total or 0.0)"/></td>
               </tr>
               <tr>
-                <td colspan="2" style="font-weight: bold; padding-top: 20px;">List of Payment Methods:</td>
-              </tr>
-              <t t-if="docs.payment_breakdown">
-                <t t-foreach="docs.payment_breakdown.items()" t-as="pay">
-                  <tr>
-                    <td colspan="2"><t t-esc="pay[0]"/></td>
-                  </tr>
-                </t>
-              </t>
 
+              <td colspan="5" style="font-weight: bold; padding-top: 20px;">List of Payment Methods</td>
+            </tr>
+            <t t-if="docs.payment_breakdown">
+              <t t-foreach="docs.payment_breakdown.items()" t-as="pay">
+                <tr>
+                  <td colspan="4" style="text-align: left;"><t t-esc="pay[0]"/>:</td>
+                  <td><t t-esc="pay[1]"/></td>
+                </tr>
+              </t>
             </t>
 
-            <t t-if="not docs.report_lines">
-              <tr>
-                <td colspan="11" style="text-align:center;">No data found for selected filters.</td>
-              </tr>
             </t>
           </tbody>
         </table>
