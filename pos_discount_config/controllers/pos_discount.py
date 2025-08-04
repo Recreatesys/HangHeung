@@ -114,7 +114,13 @@ class PosDiscountController(http.Controller):
                             if new_discount > dp[new_qty][0]:
                                 dp[new_qty] = (new_discount, current_split + [(r_qty, r_disc)])
 
-                best_discount, best_split = dp[total_qty]
+                best_discount = 0
+                best_split = []
+                for i in range(total_qty + 1):
+                    if dp[i][0] > best_discount:
+                        best_discount = dp[i][0]
+                        best_split = dp[i][1]
+
                 if best_discount > 0:
                     all_discounts.append({
                         'product_ids': included_pids,
@@ -175,7 +181,13 @@ class PosDiscountController(http.Controller):
                         if new_discount > dp[new_qty][0]:
                             dp[new_qty] = (new_discount, current_split + [(r_qty, r_disc)])
 
-            best_discount, best_split = dp[qty]
+            best_discount = 0
+            best_split = []
+            for i in range(qty + 1):
+                if dp[i][0] > best_discount:
+                    best_discount = dp[i][0]
+                    best_split = dp[i][1]
+
             if best_discount > 0:
                 discount_info.update({
                     'discount': best_discount,
