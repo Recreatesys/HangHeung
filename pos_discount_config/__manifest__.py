@@ -16,6 +16,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/pos_discount_config.xml',
+        'views/product_template.xml',
 
     ],
      'assets': {'point_of_sale._assets_pos': [

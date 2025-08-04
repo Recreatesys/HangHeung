@@ -16,6 +16,10 @@ class PosDiscountController(http.Controller):
         excluded_product_ids = set()
         product_ids = list(map(int, product_qty_map.keys()))
 
+        product_records = request.env['product.product'].sudo().browse(product_ids)
+        discountable_products = product_records.filtered(lambda p: not p.product_tmpl_id.is_discount)
+        discountable_product_ids = set(discountable_products.ids)
+
         product_configs = request.env['discount.config'].sudo().search([
             ('product_id', 'in', product_ids),
             ('start_date', '<=', current_dt),
@@ -29,6 +33,8 @@ class PosDiscountController(http.Controller):
         for config in product_configs:
             for product in config.product_id:
                 pid = product.id
+                if pid not in discountable_product_ids:
+                    continue
                 qty = product_qty_map.get(str(pid), 0)
                 if qty <= 0:
                     continue
@@ -57,7 +63,7 @@ class PosDiscountController(http.Controller):
         if global_bogo:
             for pid, qty in product_qty_map.items():
                 pid = int(pid)
-                if pid in excluded_product_ids:
+                if pid in excluded_product_ids or pid not in discountable_product_ids:
                     continue
                 discount_info = self._apply_discount_rule([pid], qty, global_bogo)
                 if discount_info:
@@ -83,7 +89,7 @@ class PosDiscountController(http.Controller):
 
             for pid, qty in product_qty_map.items():
                 pid = int(pid)
-                if pid in excluded_product_ids:
+                if pid in excluded_product_ids or pid not in discountable_product_ids:
                     continue
                 total_qty += qty
                 included_pids.append(pid)
