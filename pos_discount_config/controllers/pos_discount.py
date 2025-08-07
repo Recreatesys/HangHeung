@@ -200,7 +200,8 @@ class PosDiscountController(http.Controller):
         @http.route('/pos/validate_discount_products', type='json', auth='public')
         def validate_discount_products(self, product_ids):
             products = request.env['product.product'].sudo().browse(product_ids)
+            valid_product_ids = []
             for product in products:
-                if product.product_tmpl_id.is_discount:
-                    return False
-            return True
+                if not product.product_tmpl_id.is_discount:
+                    valid_product_ids.append(product.id)
+            return valid_product_ids

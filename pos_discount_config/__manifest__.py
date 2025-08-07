@@ -12,7 +12,7 @@
     'author': "Codetrade",
     'website': "https://www.codetrade.io",
     'version': '0.1',
-    'depends': ['point_of_sale'],
+    'depends': ['point_of_sale','pos_loyalty'],
     'data': [
         'security/ir.model.access.csv',
         'views/pos_discount_config.xml',
@@ -22,6 +22,7 @@
      'assets': {'point_of_sale._assets_pos': [
          'pos_discount_config/static/src/js/discount_utils.js',
          'pos_discount_config/static/src/js/pos_discount_patch.js',
+         'pos_discount_config/static/src/js/pos_order.js',
          'pos_discount_config/static/src/xml/pos_templates.xml',
      ],
     },
