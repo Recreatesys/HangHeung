@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_coupon_activated_excel_wizard,coupon.activated.excel.wizard,model_coupon_activated_excel_wizard,base.group_user,1,1,1,0
+access_coupon_inactivated_excel_wizard,coupon.inactivated.excel.wizard,model_coupon_inactivated_excel_wizard,base.group_user,1,1,1,0
+access_coupon_used_excel_wizard,coupon.used.excel.wizard,model_coupon_used_excel_wizard,base.group_user,1,1,1,0

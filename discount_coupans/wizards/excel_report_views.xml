@@ -1,0 +1,112 @@
+<odoo>
+
+    <record id="view_coupon_activated_excel_wizard" model="ir.ui.view">
+        <field name="name">coupon.activated.excel.wizard.form</field>
+        <field name="model">coupon.activated.excel.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Download Activated Coupons">
+                <group>
+                    <div>Download Activated Coupons report</div>
+                </group>
+                <footer>
+                    <button name="action_generate_excel"
+                            string="Generate Excel"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel" 
+                            class="btn-secondary" 
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_coupon_inactivated_excel_wizard" model="ir.ui.view">
+        <field name="name">coupon.inactivated.excel.wizard.form</field>
+        <field name="model">coupon.inactivated.excel.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Download Inactivated Coupons">
+                <group>
+                    <div>Download Inactivated Coupons report</div>
+                </group>
+                <footer>
+                    <button name="action_generate_excel"
+                            string="Generate Excel"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel" 
+                            class="btn-secondary" 
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_coupon_used_excel_wizard" model="ir.ui.view">
+        <field name="name">coupon.used.excel.wizard.form</field>
+        <field name="model">coupon.used.excel.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Download Used Coupons">
+                <group>
+                    <div>Download Used Coupons report</div>
+                </group>
+                <footer>
+                    <button name="action_generate_excel"
+                            string="Generate Excel"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel" 
+                            class="btn-secondary" 
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_coupon_excel" model="ir.actions.act_window">
+        <field name="name">Coupon Excel Report</field>
+        <field name="res_model">coupon.activated.excel.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_coupon_activated_excel_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+    <record id="action_coupon_inactivated_excel" model="ir.actions.act_window">
+        <field name="name">Inactivated Coupons</field>
+        <field name="res_model">coupon.inactivated.excel.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_coupon_inactivated_excel_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+    <record id="action_coupon_used_excel" model="ir.actions.act_window">
+        <field name="name">Used Coupons</field>
+        <field name="res_model">coupon.used.excel.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_coupon_used_excel_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_coupon_excel_report"
+              name="Coupon Report"
+              parent="point_of_sale.menu_point_rep"
+              sequence="25"/>
+
+    <menuitem id="menu_coupon_activated"
+              name="Coupon Made (Activated)"
+              parent="menu_coupon_excel_report"
+              action="action_coupon_excel"
+              sequence="2"/>
+
+    <menuitem id="menu_coupon_inactivated"
+              name="Coupon Made (Inactivated)"
+              parent="menu_coupon_excel_report"
+              action="action_coupon_inactivated_excel"
+              sequence="3"/>
+
+    <menuitem id="menu_coupon_used"
+              name="Coupon Used (Along with which POS)"
+              parent="menu_coupon_excel_report"
+              action="action_coupon_used_excel"
+              sequence="4"/>
+</odoo>

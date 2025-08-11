@@ -1,0 +1,47 @@
+<odoo>
+  <record id="inherit_loyalty_card_form" model="ir.ui.view">
+    <field name="name">inherit.loyalty.card.form</field>
+    <field name="model">loyalty.card</field>
+    <field name="inherit_id" ref="loyalty.loyalty_card_view_form"/>
+    <field name="arch" type="xml">
+
+      <xpath expr="//group" position="inside">
+        <group>
+            <field name="prefix"/>
+            <field name="range_from"/>
+            <field name="range_to"/>
+            <field name="store_id"/>
+            <field name="status"/>
+            <field name="date_activation"/>
+            <field name="date_sale"/>
+            <field name="redeem_shop_id"/>
+            <field name="remark" placeholder="Internal Remark" help="Used for internal notes or memos. Not visible on printed coupon."/>
+            <field name="expiration_type"/>
+            <field name="expiration_date" invisible="expiration_type != 'fixed'"/>
+            <field name="validity_days" invisible="expiration_type != 'post_activation'"/>
+            <field name="effective_expiration" readonly="1"/>
+        </group>
+        </xpath>
+      <xpath expr="//field[@name='history_ids']/list" position="inside">
+          <field name="salesperson_id"/>
+      </xpath>
+      
+    </field>
+  </record>
+  <record id="inherit_loyalty_card_list" model="ir.ui.view">
+      <field name="name">inherit.loyalty.card.tree</field>
+      <field name="model">loyalty.card</field>
+      <field name="inherit_id" ref="loyalty.loyalty_card_view_tree"/>
+      <field name="arch" type="xml">
+          <xpath expr="//field[@name='partner_id']" position="after">
+              <field name="status"/>
+              <field name="date_activation"/>
+              <field name="date_sale"/>
+              <field name="redeem_shop_id"/>
+          </xpath>
+      </field>
+  </record>
+
+</odoo>
+
+

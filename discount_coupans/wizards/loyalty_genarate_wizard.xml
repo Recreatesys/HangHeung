@@ -1,0 +1,20 @@
+<odoo>
+  <record id="inherit_loyalty_generate_wizard_form" model="ir.ui.view">
+    <field name="name">loyalty.generate.wizard.form</field>
+    <field name="model">loyalty.generate.wizard</field>
+    <field name="inherit_id" ref="loyalty.loyalty_generate_wizard_view_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//group" position="inside">
+            <group>
+                <field name="prefix" string="Prefix"/>
+                <field name="range_from" readonly="mode == 'selected'" force_save="1"/>
+                <field name="range_to" readonly="mode == 'selected'" force_save="1"/>
+                <field name="store_id"/>
+            </group>
+        </xpath>
+        <xpath expr="//field[@name='coupon_qty']" position="attributes">
+            <attribute name="invisible">True</attribute>
+        </xpath>
+    </field>
+  </record>
+</odoo>
