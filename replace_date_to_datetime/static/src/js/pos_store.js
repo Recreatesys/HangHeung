@@ -26,22 +26,22 @@ patch(PosStore.prototype, {
 
     async activateCode(code) {
         const order = this.get_order();
-        const orderLines = order.get_orderlines();
-        const productIds = [];
-        for (const line of orderLines) {
-            const productId = line.product_id.id;
-            productIds.push(productId);
-        }
-        try {
-            const isValid = await rpc("/pos/validate_discount_products", { product_ids: productIds });
+        // const orderLines = order.get_orderlines();
+        // const productIds = [];
+        // for (const line of orderLines) {
+        //     const productId = line.product_id.id;
+        //     productIds.push(productId);
+        // }
+        // try {
+        //     const isValid = await rpc("/pos/validate_discount_products", { product_ids: productIds });
 
-            if (!isValid) {
-                return _t("One or more products in your order are marked as discount items. Coupon cannot be applied.");
-            }
-        } catch (error) {
-            console.error("Error during discount check", error);
-            return _t("Error checking product discount status.");
-        }
+        //     if (!isValid) {
+        //         return _t("One or more products in your order are marked as discount items. Coupon cannot be applied.");
+        //     }
+        // } catch (error) {
+        //     console.error("Error during discount check", error);
+        //     return _t("Error checking product discount status.");
+        // }
         const rule = this.models["loyalty.rule"].find((rule) => {
             return rule.mode === "with_code" && (rule.promo_barcode === code || rule.code === code);
         });
