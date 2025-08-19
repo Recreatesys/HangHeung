@@ -11,6 +11,7 @@
             <field name="range_from"/>
             <field name="range_to"/>
             <field name="store_id"/>
+            <field name="allocated_store_id"/>
             <field name="status"/>
             <field name="date_activation"/>
             <field name="date_sale"/>
@@ -38,10 +39,18 @@
               <field name="date_activation"/>
               <field name="date_sale"/>
               <field name="redeem_shop_id"/>
+              <field name="allocated_store_id"/>
           </xpath>
       </field>
   </record>
 
+    <record id="server_action_assign_store" model="ir.actions.server">
+        <field name="name">Allocate Store</field>
+        <field name="model_id" ref="loyalty.model_loyalty_card"/>
+        <field name="binding_model_id" ref="loyalty.model_loyalty_card"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = env['ir.actions.act_window']._for_xml_id('discount_coupans.action_loyalty_assign_store_wizard')
+        </field>
+    </record>
 </odoo>
-
-

@@ -48,7 +48,8 @@ class SaleOrder(models.Model):
                 'name': code,
                 'product_id': product.id,
             })
-            location = self.env.ref('stock.stock_location_stock')
+            warehouse = product.store_id.picking_type_id.warehouse_id
+            location = warehouse.lot_stock_id or self.env.ref('stock.stock_location_stock')
             self.env['stock.quant'].create({
                 'product_id': product.id,
                 'location_id': location.id,
@@ -63,7 +64,8 @@ class SaleOrder(models.Model):
                 'prefix': static_prefix,
                 'range_from': number,
                 'range_to': number,
-                'store_id': product.store_id.id if product.store_id else (pos_config.id if pos_config else None),
+                # 'store_id': product.store_id.id if product.store_id else (pos_config.id if pos_config else None),
+                'allocated_store_id': product.store_id.id if product.store_id else (pos_config.id if pos_config else None),
                 'code': code,
                 'status': 'not_activated',
                 'program_id': product.loyalty_program_id.id,

@@ -8,12 +8,16 @@
             <group>
                 <field name="prefix" string="Prefix"/>
                 <field name="range_from" readonly="mode == 'selected'" force_save="1"/>
-                <field name="range_to" readonly="mode == 'selected'" force_save="1"/>
+                <field name="count" invisible="mode== 'selected'" force_save="1"/>
+                <field name="range_to" force_save="1"/>
                 <field name="store_id"/>
             </group>
         </xpath>
         <xpath expr="//field[@name='coupon_qty']" position="attributes">
             <attribute name="invisible">True</attribute>
+        </xpath>
+        <xpath expr="//field[@name='points_granted']" position="attributes">
+            <attribute name="readonly">True</attribute>
         </xpath>
     </field>
   </record>

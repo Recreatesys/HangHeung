@@ -10,12 +10,14 @@
         "security/ir.model.access.csv",
         "views/loyalty_card_views.xml",
         "views/product_template.xml",
+        "views/loyalty_program_views.xml",
         "wizards/loyalty_genarate_wizard.xml",
         "wizards/excel_report_views.xml",
+        "wizards/loyalty_assign_store_wizard.xml",
     ],
     "assets": {
-        "point_of_sale.assets": [
-            "discount_coupans/static/src/js/pos_store.js",
+        "point_of_sale._assets_pos": [
+            "discount_coupans/static/src/js/validate_order.js",
         ],
     },
     "installable": True,

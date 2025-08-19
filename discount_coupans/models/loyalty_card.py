@@ -10,7 +10,8 @@ class LoyaltyCard(models.Model):
     range_to = fields.Char(string='Range To', required=True, store=True)
     lot_id = fields.Many2one('stock.lot', string="Linked Lot")
 
-    store_id = fields.Many2one('pos.config', string='Store', required=True)
+    store_id = fields.Many2one('pos.config', string='Store')
+    allocated_store_id = fields.Many2one('pos.config', string="Allocated Store", readonly=True)
     code = fields.Char(string='Code', readonly=True, required=False, copy=False,default=False)
     
     status = fields.Selection([
@@ -73,7 +74,39 @@ class LoyaltyCard(models.Model):
         else:
             return super(LoyaltyCard, self).create(vals)
 
+    @api.model
+    def update_loyalty_from_pos(self, product_data):
+        for item in product_data:
+            partner_id = item.get('customer_id')
+            for lot_no in item.get('lots', []):
+                card = self.search([('code', '=', lot_no)], limit=1)
+                if card:
+                    wizard = self.env['loyalty.card.update.balance'].create({
+                        'card_id': card.id,
+                        'old_balance': card.points_display,
+                        'new_balance': 1,
+                        'description': 'Updated from POS sale',
+                    })
+                    wizard.action_update_card_point()
+                    card.write({
+                        'status': 'activated',
+                        'partner_id': partner_id or False,
+                        'date_activation': fields.datetime.now(),
+                    })
+        return True
 
+    @api.model
+    def update_coupon_redeem_from_pos(self, vals):
+        coupon_code = vals.get("coupon_code")
+        store_id = vals.get("store_id")
+
+        if coupon_code:
+            card = self.search([('code', '=', coupon_code)], limit=1)
+            if card:
+                card.write({
+                    'redeem_shop_id': store_id,
+                })
+        return True
 
 class LoyaltyHistory(models.Model):
     _inherit = 'loyalty.history'
