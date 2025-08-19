@@ -2,25 +2,8 @@
 
 import { patch } from "@web/core/utils/patch";
 import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment_screen";
-import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
-import { _t } from "@web/core/l10n/translation";
 
 patch(PaymentScreen.prototype, {
-    async _isOrderValid(isForceValidate) {
-        const isValid = await super._isOrderValid(isForceValidate);
-
-        const partner = this.currentOrder.get_partner();
-        if (!partner) {
-            this.dialog.add(AlertDialog, {
-                title: _t("Missing Customer"),
-                body: _t("Please select a customer before validating the order."),
-            });
-            return false;
-        }
-
-        return isValid;
-    },
-
     async _finalizeValidation(...args){
         const result = await super._finalizeValidation(...args);
         try {
