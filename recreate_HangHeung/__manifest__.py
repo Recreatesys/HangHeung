@@ -20,6 +20,7 @@
         "views/stock_picking_view.xml",
         "views/reason_code_views.xml",
         "views/pos_payment_method.xml",
+        "views/delivery_slip_report_inherit.xml",
         "wizard/wizard_open.xml"
         # "views/custom_backorder.xml",
     ],
