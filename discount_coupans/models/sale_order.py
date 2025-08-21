@@ -29,7 +29,7 @@ class SaleOrder(models.Model):
     def _generate_coupons_for_product(self, product, quantity):
         LoyaltyCard = self.env['loyalty.card']
         Lot = self.env['stock.lot']
-        static_prefix = "CPN"
+        static_prefix = "CHR"
 
         last_card = LoyaltyCard.search([('prefix', '=', static_prefix)], order="id desc", limit=1)
         last_number = 0

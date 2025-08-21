@@ -41,6 +41,7 @@
                                    widget="many2many_tags"
                                    options="{'no_create': True, 'no_open': True}"/>
                             <field name="is_bogo"/>
+                            <field name="is_exclusive_discount"/>
                         </group>
 
                         <notebook>

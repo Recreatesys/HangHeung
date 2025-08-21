@@ -5,6 +5,8 @@ import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { OrderSummary } from "@point_of_sale/app/screens/product_screen/order_summary/order_summary";
 import { patch } from "@web/core/utils/patch";
 import { scheduleDiscountLogic } from "./discount_utils";
+import { ask } from "@point_of_sale/app/store/make_awaitable_dialog";
+import { _t } from "@web/core/l10n/translation";
 
 patch(PosStore.prototype, {
     async addLineToCurrentOrder(productInfo, options, configure) {
@@ -40,11 +42,26 @@ patch(PosOrderline.prototype, {
 });
 
 patch(OrderSummary.prototype, {
-    updateSelectedOrderline(event) {
+    async updateSelectedOrderline(event) {
         const order = this.pos.get_order();
         const line = order?.get_selected_orderline();
 
         if (line?.is_auto_discount_line) {
+            if (event.key === "Backspace" || event.key === "Delete") {
+                const confirmed = await ask(this.dialog, {
+                    title: _t("Remove Auto Discount"),
+                    body: _t(
+                        "Are you sure you want to remove the auto-applied discount?\nIt will not be re-applied unless conditions are met again."
+                    ),
+                    cancelLabel: _t("No"),
+                    confirmLabel: _t("Yes"),
+                });
+                if (confirmed) {
+                    order.removeOrderline(line);
+                }else {
+                    return;
+                }
+            }
             return;
         }
         super.updateSelectedOrderline(event);

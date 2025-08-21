@@ -18,6 +18,7 @@
     "assets": {
         "point_of_sale._assets_pos": [
             "discount_coupans/static/src/js/validate_order.js",
+            "discount_coupans/static/src/js/coupon_code_validation.js",
         ],
     },
     "installable": True,

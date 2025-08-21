@@ -23,7 +23,32 @@ class DiscountConfig(models.Model):
     pos_config_ids = fields.Many2many('pos.config', string='Point of Sale')
 
     display_name = fields.Char(string="Name", compute="_compute_display_name", store=True)
-    is_bogo = fields.Boolean(string="Is BOGO", default=False)
+    is_bogo = fields.Boolean(string="By One Get One", default=False)
+    is_exclusive_discount = fields.Boolean(string="Is Exclusive Discount", default=False)
+
+
+    def _load_pos_data(self, data):
+        session_id = data['pos.session']['data'][0]['id']
+        session = self.env['pos.session'].browse(session_id)
+        records = self.search([('pos_config_ids', 'in', session.config_id.id)])
+        result = []
+        for rec in records:
+            result.append({
+                'id': rec.id,
+                'is_exclusive_discount': rec.is_exclusive_discount,
+                'discount_product': rec.discount_product.id,
+                'pos_config_ids': rec.pos_config_ids.ids,
+            })
+
+        return {
+            'data': result,
+            'fields': [
+                'id',
+                'is_exclusive_discount',
+                'discount_product',
+                'pos_config_ids',
+            ],
+        }
 
     @api.depends('product_id')
     def _compute_display_name(self):
