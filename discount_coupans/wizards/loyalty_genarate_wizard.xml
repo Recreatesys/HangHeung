@@ -11,6 +11,7 @@
                 <field name="count" invisible="mode== 'selected'" force_save="1"/>
                 <field name="range_to" force_save="1"/>
                 <field name="store_id"/>
+                <field name="preactive_coupon"/>
             </group>
         </xpath>
         <xpath expr="//field[@name='coupon_qty']" position="attributes">

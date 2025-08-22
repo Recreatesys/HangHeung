@@ -10,6 +10,7 @@ class LoyaltyGenerateWizard(models.TransientModel):
     range_to = fields.Char(string='Range To', required=True, compute="_compute_range_to")
     active = fields.Boolean(string='Active', default=True)
     store_id = fields.Many2one('pos.config', string='Store')
+    preactive_coupon = fields.Boolean(string="Pre-activate Coupon")
 
     @api.model
     def default_get(self, fields_list):

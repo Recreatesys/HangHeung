@@ -4,3 +4,4 @@ from  .import coupon_inactivated_excel
 from .import coupon_used_excel
 from .import coupon_transfer_excel
 from . import loyalty_assign_store_wizard
+from . import preactive_coupon
