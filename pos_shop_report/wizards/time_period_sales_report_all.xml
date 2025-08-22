@@ -1,0 +1,25 @@
+<odoo>
+    <record id="view_time_period_sales_report_all_form" model="ir.ui.view">
+        <field name="name">time.period.sales.report.all.form</field>
+        <field name="model">time.period.sales.report.all</field>
+        <field name="arch" type="xml">
+            <form string="Time Period Sales Report (All Store)">
+                <group>
+                    <field name="date"/>
+                </group>
+                <footer>
+                    <button string="Generate Report" type="object" name="action_generate_excel" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_time_period_sales_report_all" model="ir.actions.act_window">
+        <field name="name">Time Period Sales Report (All Store)</field>
+        <field name="res_model">time.period.sales.report.all</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_time_period_sales_report_all_form"/>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

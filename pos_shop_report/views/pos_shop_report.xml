@@ -3,4 +3,44 @@
               name="POS Shop Report"
               parent="point_of_sale.menu_point_rep"
               sequence="90" action="pos_shop_report.action_pos_shop_report_wizard"/>
+
+    <menuitem id="menu_sales_report"
+              name="Sales Report"
+              parent="point_of_sale.menu_point_rep"
+              sequence="90" action="action_sales_report_excel"/>
+
+    <menuitem id="menu_product_sales_detail_report_wizard"
+              name="Product Sales Detail Report (Individual Store)"
+              parent="point_of_sale.menu_point_rep"
+              sequence="91" action="pos_shop_report.action_product_sales_detail_report_wizard"/>
+
+    <menuitem id="menu_product_sale_all_shop_report"
+              name="Product Sales Detail Report (All Store)"
+              parent="point_of_sale.menu_point_rep"
+              sequence="92" action="pos_shop_report.action_product_sale_all_shop_report"/>
+
+    <menuitem id="menu_time_period_sales_report_individual"
+              name="Time Period Sales Report (Individual Store)"
+              parent="point_of_sale.menu_point_rep"
+              sequence="93" action="pos_shop_report.action_time_period_sales_report_individual"/>
+
+    <menuitem id="menu_time_period_sales_report_all"
+              name="Time Period Sales Report (All Store)"
+              parent="point_of_sale.menu_point_rep"
+              sequence="94" action="pos_shop_report.action_time_period_sales_report_all"/>
+
+    <menuitem id="menu_daily_product_sales_inventory_report"
+              name="Daily Product Sales and Inventory Report"
+              parent="point_of_sale.menu_point_rep"
+              sequence="95" action="pos_shop_report.action_daily_product_sales_inventory_report"/>
+
+    <menuitem id="menu_pos_shop_store_transaction_report_wizard"
+              name="Store Transaction Report"
+              parent="point_of_sale.menu_point_rep"
+              sequence="96" action="pos_shop_report.action_pos_shop_store_transaction_report_wizard"/>
+
+    <menuitem id="menu_coupon_gift_voucher_report"
+              name="Coupon Gift Voucher Report"
+              parent="point_of_sale.menu_point_rep"
+              sequence="97" action="pos_shop_report.action_coupon_gift_voucher_report_wizard"/>
 </odoo>

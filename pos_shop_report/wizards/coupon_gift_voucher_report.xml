@@ -1,0 +1,27 @@
+<odoo>
+    <record id="coupon_gift_voucher_report_wizard" model="ir.ui.view">
+        <field name="name">coupon.gift.voucher.report.wizard.form</field>
+        <field name="model">coupon.gift.voucher.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Coupon Gift Voucher Report">
+                <group>
+                    <field name="date_start"/>
+                    <field name="date_end"/>
+                </group>
+                <footer>
+                    <button name="action_generate_excel" type="object" string="Generate Report" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_coupon_gift_voucher_report_wizard" model="ir.actions.act_window">
+        <field name="name">Coupon Gift Voucher Report</field>
+        <field name="res_model">coupon.gift.voucher.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="coupon_gift_voucher_report_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

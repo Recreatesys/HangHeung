@@ -1,0 +1,25 @@
+<odoo>
+    <record id="view_product_sale_all_shop_report" model="ir.ui.view">
+        <field name="name">product.sale.all.shop.report.wizard.form</field>
+        <field name="model">product.sale.all.shop.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="POS Shop Report">
+                <group>
+                    <field name="date"/>
+                </group>
+                <footer>
+                    <button name="generate_report" type="object" string="Generate Report" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_product_sale_all_shop_report" model="ir.actions.act_window">
+        <field name="name">Product Sales Detail Report (All Stores)</field>
+        <field name="res_model">product.sale.all.shop.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_product_sale_all_shop_report"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

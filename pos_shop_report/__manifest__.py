@@ -14,6 +14,14 @@
     'data': [
         "security/ir.model.access.csv",
         "wizards/pos_shop_report_wizard.xml",
+        "wizards/sales_report.xml",
+        "wizards/product_sales_detail_report.xml",
+        "wizards/product_sales_detail_report_all.xml",
+        "wizards/time_period_sales_report_individual.xml",
+        "wizards/time_period_sales_report_all.xml",
+        "wizards/daily_product_sales_inventory_report.xml",
+        "wizards/store_transaction_detail.xml",
+        "wizards/coupon_gift_voucher_report.xml",
         "views/pos_shop_report.xml",
         "reports/pos_shop_report.xml",
         "reports/pos_shop_report_format.xml"

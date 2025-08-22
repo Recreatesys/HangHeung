@@ -1,2 +1,10 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_pos_shop_report_wizard,pos.shop.report.wizard,model_pos_shop_report_wizard,base.group_user,1,1,1,1
+access_sales_report_excel_wizard,sales.report.excel.wizard,model_sales_report_excel_wizard,base.group_user,1,1,1,1
+access_daily_product_sales_inventory_report,daily.product.sales.inventory.report,model_daily_product_sales_inventory_report,base.group_user,1,1,1,1
+access_pos_shop_store_transaction_report_wizard,pos.shop.store.transaction.report.wizard,model_pos_shop_store_transaction_report_wizard,base.group_user,1,1,1,1
+access_product_sales_detail_report_wizard,product.sales.detail.report.wizard,model_product_sales_detail_report_wizard,base.group_user,1,1,1,1
+access_product_sale_all_shop_report_wizard,product.sale.all.shop.report.wizard,model_product_sale_all_shop_report_wizard,base.group_user,1,1,1,1
+access_time_period_sales_report_individual,time.period.sales.report.individual,model_time_period_sales_report_individual,base.group_user,1,1,1,1
+access_time_period_sales_report_all,time.period.sales.report.all,model_time_period_sales_report_all,base.group_user,1,1,1,1
+access_coupon_gift_voucher_report_wizard,coupon.gift.voucher.report.wizard,model_coupon_gift_voucher_report_wizard,base.group_user,1,1,1,1

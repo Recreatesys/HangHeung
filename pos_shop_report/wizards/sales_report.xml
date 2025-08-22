@@ -1,0 +1,33 @@
+<odoo>
+
+    <record id="view_sales_report_excel_wizard" model="ir.ui.view">
+        <field name="name">sales.report.excel.wizard.form</field>
+        <field name="model">sales.report.excel.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Sales Report">
+                <group>
+                    <group>
+                        <field name="start_date"/>
+                        <field name="pos" string="Shop"/>
+                    </group>
+                    <group>
+                        <field name="end_date"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_generate_excel" string="Generate Excel" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sales_report_excel" model="ir.actions.act_window">
+        <field name="name">Sales Report Excel</field>
+        <field name="res_model">sales.report.excel.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_sales_report_excel_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+</odoo>
