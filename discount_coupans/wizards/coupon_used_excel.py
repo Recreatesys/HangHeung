@@ -8,14 +8,23 @@ class CouponUsedExcelWizard(models.TransientModel):
     _name = 'coupon.used.excel.wizard'
     _description = 'Used Coupon Excel Wizard'
 
+    from_date = fields.Date('From Date')
+    to_date = fields.Date('To Date')
     file_data = fields.Binary('Excel File', readonly=True)
     file_name = fields.Char('File Name', readonly=True)
 
     def action_generate_excel(self):
-        coupons = self.env['loyalty.card'].search([
+        domain = [
             ('status', '=', 'redeemed'),
             ('program_id.program_type', '=', 'coupons')
-        ])
+        ]
+
+        if self.from_date:
+            domain.append(('write_date', '>=', self.from_date))
+        if self.to_date:
+            domain.append(('write_date', '<=', self.to_date))
+
+        coupons = self.env['loyalty.card'].search(domain)
 
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
@@ -31,16 +40,13 @@ class CouponUsedExcelWizard(models.TransientModel):
 
         headers = ['Code', 'Prefix', 'Store', 'Status']
 
-
         sheet.set_column(0, 0, 20, cell_format)
         sheet.set_column(1, 1, 15, cell_format)
         sheet.set_column(2, 2, 30, cell_format)
         sheet.set_column(3, 3, 20, cell_format)
 
-
         for col, head in enumerate(headers):
             sheet.write(0, col, head, header_format)
-
 
         row = 1
         for coupon in coupons:

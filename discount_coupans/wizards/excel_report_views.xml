@@ -7,6 +7,12 @@
             <form string="Download Activated Coupons">
                 <group>
                     <div>Download Activated Coupons report</div>
+                    <field name="from_date"
+                           widget="date"
+                           string="From Date"/>
+                    <field name="to_date"
+                           widget="date"
+                           string="To Date"/>
                 </group>
                 <footer>
                     <button name="action_generate_excel"
@@ -28,6 +34,12 @@
             <form string="Download Inactivated Coupons">
                 <group>
                     <div>Download Inactivated Coupons report</div>
+                    <field name="from_date"
+                           widget="date"
+                           string="From Date"/>
+                    <field name="to_date"
+                           widget="date"
+                           string="To Date"/>
                 </group>
                 <footer>
                     <button name="action_generate_excel"
@@ -49,6 +61,12 @@
             <form string="Download Used Coupons">
                 <group>
                     <div>Download Used Coupons report</div>
+                    <field name="from_date"
+                           widget="date"
+                           string="From Date"/>
+                    <field name="to_date"
+                           widget="date"
+                           string="To Date"/>
                 </group>
                 <footer>
                     <button name="action_generate_excel"

@@ -8,14 +8,23 @@ class CouponInactivatedExcelWizard(models.TransientModel):
     _name = 'coupon.inactivated.excel.wizard'
     _description = 'Inactivated Coupon Excel Wizard'
 
+    from_date = fields.Date('From Date')
+    to_date = fields.Date('To Date')
     file_data = fields.Binary('Excel File', readonly=True)
     file_name = fields.Char('File Name', readonly=True)
 
     def action_generate_excel(self):
-        coupons = self.env['loyalty.card'].search([
+        domain = [
             ('status', '=', 'not_activated'),
             ('program_id.program_type', '=', 'coupons')
-        ])
+        ]
+
+        if self.from_date:
+            domain.append(('create_date', '>=', self.from_date))
+        if self.to_date:
+            domain.append(('create_date', '<=', self.to_date))
+
+        coupons = self.env['loyalty.card'].search(domain)
 
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
@@ -29,15 +38,13 @@ class CouponInactivatedExcelWizard(models.TransientModel):
         })
         cell_format = workbook.add_format({'text_wrap': True, 'valign': 'top'})
 
-        headers = ['Code', 'Prefix', 'Store', 'Status', 'Activation Date']
+        headers = ['Code', 'Prefix', 'Store', 'Status']
 
-        sheet.set_column(0, 0, 20, cell_format)  
-        sheet.set_column(1, 1, 15, cell_format)  
-        sheet.set_column(2, 2, 30, cell_format)  
-        sheet.set_column(3, 3, 20, cell_format) 
-        sheet.set_column(4, 4, 25, cell_format)  
+        sheet.set_column(0, 0, 20, cell_format)
+        sheet.set_column(1, 1, 15, cell_format)
+        sheet.set_column(2, 2, 30, cell_format)
+        sheet.set_column(3, 3, 20, cell_format)
 
-        
         for col, head in enumerate(headers):
             sheet.write(0, col, head, header_format)
 
@@ -47,7 +54,6 @@ class CouponInactivatedExcelWizard(models.TransientModel):
             sheet.write(row, 1, coupon.prefix or '', cell_format)
             sheet.write(row, 2, coupon.store_id.display_name or '', cell_format)
             sheet.write(row, 3, 'Not Activated' or '', cell_format)
-            sheet.write(row, 4, str(coupon.date_activation or ''), cell_format)
             row += 1
 
         workbook.close()

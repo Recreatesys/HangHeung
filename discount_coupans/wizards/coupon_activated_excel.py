@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields, api
 import base64
 import io
 import xlsxwriter
@@ -8,14 +8,23 @@ class CouponActivatedExcelWizard(models.TransientModel):
     _name = 'coupon.activated.excel.wizard'
     _description = 'Activated Coupon Excel Wizard'
 
+    from_date = fields.Date('From Date')
+    to_date = fields.Date('To Date')
     file_data = fields.Binary('Excel File', readonly=True)
     file_name = fields.Char('File Name', readonly=True)
 
     def action_generate_excel(self):
-        coupons = self.env['loyalty.card'].search([
+        domain = [
             ('status', '=', 'activated'),
             ('program_id.program_type', '=', 'coupons')
-        ])
+        ]
+
+        if self.from_date:
+            domain.append(('date_activation', '>=', self.from_date))
+        if self.to_date:
+            domain.append(('date_activation', '<=', self.to_date))
+
+        coupons = self.env['loyalty.card'].search(domain)
 
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
