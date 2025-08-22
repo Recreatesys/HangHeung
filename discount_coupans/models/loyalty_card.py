@@ -36,6 +36,19 @@ class LoyaltyCard(models.Model):
 
     effective_expiration = fields.Date(string="Effective Expiration", compute="_compute_dynamic_expiration_date", store=False)
 
+    allocated_date = fields.Date(string='Allocated Date', readonly=True)
+
+    @api.model
+    def create(self, vals):
+        if vals.get('allocated_store_id') and not vals.get('allocated_date'):
+            vals['allocated_date'] = fields.Date.today()
+        return super().create(vals)
+
+    def write(self, vals):
+        if 'allocated_store_id' in vals and not vals.get('allocated_date'):
+            vals['allocated_date'] = fields.Date.today()
+        return super().write(vals)
+
     @api.depends('date_activation', 'validity_days', 'expiration_type')
     def _compute_dynamic_expiration_date(self):
         for record in self:

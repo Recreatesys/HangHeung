@@ -12,6 +12,7 @@
             <field name="range_to"/>
             <field name="store_id"/>
             <field name="allocated_store_id"/>
+            <field name="allocated_date"/>
             <field name="status"/>
             <field name="date_activation"/>
             <field name="date_sale"/>
