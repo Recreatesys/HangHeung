@@ -21,6 +21,10 @@ patch(PosStore.prototype, {
         let self = this
         if(this.models['sh.pos.theme.settings'] && this.models['sh.pos.theme.settings'].getAll()[0] && this.models['sh.pos.theme.settings'].getAll()[0].display_product_cart_qty){
             let orderlines = Object.values(this.get_order().get_orderlines())
+            let selected_orderline = self.get_order().get_selected_orderline()
+            if (!selected_orderline){
+                return res
+            }
             
             let other_line_with_same_product = orderlines.filter((x) => (x.product_id.id == self.get_order().get_selected_orderline().product_id.id))
             

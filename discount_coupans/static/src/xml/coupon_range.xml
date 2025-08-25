@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="pos_editlistinput_inherit" t-inherit-mode="extension" t-inherit="point_of_sale.EditListInput">
+        <xpath expr="//div[hasclass('input-group')]" position="before">
+            <span class="tag badge badge-primary m-1 d-flex align-items-center">
+                <h3 class="mr-1">Qty:</h3>
+                <input type="number" min="1" id="lot_qty" class="form-control form-control-sm mx-1 w-25"/>
+                <i class="fa fa-times ml-1" role="button"/>
+            </span>
+        </xpath>
+    </t>
+    <t t-name="pos_editlistpopup_inherit" t-inherit-mode="extension" t-inherit="point_of_sale.EditListPopup">
+        <xpath expr="//button[hasclass('o-default-button')]" position="after">
+            <button class="btn btn-secondary btn-lg lh-lg" t-on-click="props.close">Close</button>
+        </xpath>
+    </t>
+</templates>

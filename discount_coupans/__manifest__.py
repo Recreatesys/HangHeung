@@ -20,6 +20,8 @@
             "discount_coupans/static/src/js/validate_order.js",
             "discount_coupans/static/src/js/coupon_code_validation.js",
             "discount_coupans/static/src/js/pos_lot_number.js",
+            "discount_coupans/static/src/js/coupon_range.js",
+            "discount_coupans/static/src/xml/coupon_range.xml",
         ],
     },
     "installable": True,
