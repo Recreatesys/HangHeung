@@ -5,7 +5,8 @@
         <field name="arch" type="xml">
             <form string="Time Period Sales Report (All Store)">
                 <group>
-                    <field name="date"/>
+                    <field name="from_date"/>
+                    <field name="to_date"/>
                 </group>
                 <footer>
                     <button string="Generate Report" type="object" name="action_generate_excel" class="btn-primary"/>

@@ -8,7 +8,8 @@ class TimePeriodSalesReportAll(models.TransientModel):
     _name = 'time.period.sales.report.all'
     _description = 'Time Period Sales Wizard (All Stores)'
 
-    date = fields.Date(string="Date", required=True)
+    from_date = fields.Date(string="From Date", required=True)
+    to_date = fields.Date(string="To Date", required=True)
 
     def action_generate_excel(self):
         company = self.env.company
@@ -19,14 +20,15 @@ class TimePeriodSalesReportAll(models.TransientModel):
         bold = workbook.add_format({'bold': True})
         header_format = workbook.add_format({'bold': True, 'align': 'center', 'valign': 'vcenter', 'border': 1})
         money = workbook.add_format({'num_format': '#,##0.00', 'align': 'right'})
+        money_bold = workbook.add_format({'num_format': '#,##0.00', 'bold': True})
 
         sheet.set_column(0, 0, 25)
         sheet.set_column('B:AA', 18)
 
         sheet.write(0, 0, company.name, bold)
         sheet.write(1, 0, "時段銷售報告(全線)")
-        sheet.write(2, 0, "日期:")
-        sheet.write(2, 1, str(self.date))
+        sheet.write(2, 0, "日期區間:")
+        sheet.write(2, 1, f"{self.from_date} 至 {self.to_date}")
 
         stores = self.env['pos.config'].search([])
         slots = {
@@ -41,8 +43,8 @@ class TimePeriodSalesReportAll(models.TransientModel):
             orders = self.env['pos.order'].search([
                 ('state', 'in', ['paid', 'done', 'invoiced']),
                 ('config_id', '=', store.id),
-                ('date_order', '>=', f"{self.date} 00:00:00"),
-                ('date_order', '<=', f"{self.date} 23:59:59"),
+                ('date_order', '>=', f"{self.from_date} 00:00:00"),
+                ('date_order', '<=', f"{self.to_date} 23:59:59"),
                 ('company_id', '=', company.id),
             ])
             grand_totals[store.id]['amount'] = sum(orders.mapped('amount_total'))
@@ -79,8 +81,8 @@ class TimePeriodSalesReportAll(models.TransientModel):
                     orders = self.env['pos.order'].search([
                         ('state', 'in', ['paid', 'done', 'invoiced']),
                         ('config_id', '=', store.id),
-                        ('date_order', '>=', f"{self.date} 00:00:00"),
-                        ('date_order', '<=', f"{self.date} 23:59:59"),
+                        ('date_order', '>=', f"{self.from_date} 00:00:00"),
+                        ('date_order', '<=', f"{self.to_date} 23:59:59"),
                         ('company_id', '=', company.id),
                     ])
 
@@ -93,9 +95,9 @@ class TimePeriodSalesReportAll(models.TransientModel):
                     total_amount = sum(slot_orders.mapped('amount_total'))
                     tx_count = len(slot_orders)
 
-                    if total_amount:
-                        sheet.write(row, col, total_amount, money)
-                        sheet.write(row, col + 1, total_amount, money)
+                    if total_amount or tx_count:
+                        sheet.write(row, col, total_amount if total_amount else "", money)
+                        sheet.write(row, col + 1, tx_count if tx_count else "")
                     col += 2
 
                     total_amount_all += total_amount
@@ -103,7 +105,7 @@ class TimePeriodSalesReportAll(models.TransientModel):
 
                 # Totals
                 sheet.write(row, col, total_amount_all if total_amount_all else "", money)
-                sheet.write(row, col + 1, total_amount_all if total_amount_all else "", money)
+                sheet.write(row, col + 1, total_count_all if total_count_all else "")
 
                 grand_total_amount += total_amount_all
                 grand_total_count += total_count_all
@@ -115,17 +117,17 @@ class TimePeriodSalesReportAll(models.TransientModel):
         sheet.write(row, 0, "總數", bold)
         col = 1
         for store in stores_with_data:
-            sheet.write(row, col, grand_totals[store.id]['amount'], money)
-            sheet.write(row, col + 1, grand_totals[store.id]['amount'], money)
+            sheet.write(row, col, grand_totals[store.id]['amount'], money_bold)
+            sheet.write(row, col + 1, grand_totals[store.id]['count'], bold)
             col += 2
 
-        sheet.write(row, col, grand_total_amount, money)
-        sheet.write(row, col + 1, grand_total_amount, money)
+        sheet.write(row, col, grand_total_amount, money_bold)
+        sheet.write(row, col + 1, grand_total_count, bold)
 
         workbook.close()
         output.seek(0)
 
-        filename = f"Time Period Sales Report All Stores {self.date}.xlsx"
+        filename = f"Time Period Sales Report All Stores {self.from_date} 至 {self.to_date}.xlsx"
         attachment = self.env['ir.attachment'].create({
             'name': filename,
             'type': 'binary',

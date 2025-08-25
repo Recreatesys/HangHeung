@@ -10,7 +10,8 @@ class ProductSaleAllShopReportWizard(models.TransientModel):
     _name = 'product.sale.all.shop.report.wizard'
     _description = 'POS Product All Store Report Wizard'
 
-    date = fields.Date(string='Date', required=True)
+    from_date = fields.Date(string='From Date', required=True)
+    to_date = fields.Date(string='To Date', required=True)
     file_data = fields.Binary('Excel File', readonly=True)
     file_name = fields.Char('File Name', readonly=True)
 
@@ -41,18 +42,17 @@ class ProductSaleAllShopReportWizard(models.TransientModel):
         company_name = self.env.company.name
         worksheet.merge_range("A1:B1", company_name, formats['title'])
         worksheet.merge_range("A2:B2", "產品銷售明細報告 (全線)", formats['title_header'])
-        worksheet.write("A3", "日期:", formats['title'])
-        worksheet.write("C3", self.date.strftime("%Y-%m-%d"))
+        worksheet.write("A3", "日期區間:", formats['title'])
+        worksheet.write("C3", f"{self.from_date.strftime('%Y-%m-%d')} 至 {self.to_date.strftime('%Y-%m-%d')}")
 
-        # Fetch orders and shops
-        start_dt = datetime.combine(self.date, time.min)
-        end_dt = datetime.combine(self.date, time.max)
+        start_dt = datetime.combine(self.from_date, time.min)
+        end_dt = datetime.combine(self.to_date, time.max)
         orders = self.env['pos.order'].search([
             ('state', 'in', ['paid', 'invoiced', 'done']),
             ('date_order', '>=', start_dt), ('date_order', '<=', end_dt)
         ])
         if not orders:
-            raise ValidationError('There are no orders for this date')
+            raise ValidationError('There are no orders for this date range')
 
         shops = orders.mapped('session_id.config_id')
 
@@ -65,7 +65,7 @@ class ProductSaleAllShopReportWizard(models.TransientModel):
 
         # Shop headers (Date and Shop Name)
         for shop in shops:
-            worksheet.merge_range(row, col, row, col + 2, self.date.strftime("%Y-%m-%d"), formats['shop_header'])
+            worksheet.merge_range(row, col, row, col + 2, f"{self.from_date.strftime('%Y-%m-%d')} 至 {self.to_date.strftime('%Y-%m-%d')}", formats['shop_header'])
             worksheet.merge_range(row + 1, col, row + 1, col + 2, shop.name, formats['shop_header'])
             col += 3
 
@@ -154,7 +154,7 @@ class ProductSaleAllShopReportWizard(models.TransientModel):
         excel_data = output.read()
         self.write({
             'file_data': base64.b64encode(excel_data),
-            'file_name': f"Product Sales Detail Report ({self.date.strftime('%Y-%m-%d')}).xlsx",
+            'file_name': f"Product Sales Detail Report ({self.from_date.strftime('%Y-%m-%d')} 至 {self.to_date.strftime('%Y-%m-%d')}).xlsx",
         })
 
         return {

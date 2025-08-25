@@ -5,7 +5,8 @@
         <field name="arch" type="xml">
             <form string="POS Shop Report">
                 <group>
-                    <field name="date"/>
+                    <field name="from_date"/>
+                    <field name="to_date"/>
                 </group>
                 <footer>
                     <button name="generate_report" type="object" string="Generate Report" class="btn-primary"/>

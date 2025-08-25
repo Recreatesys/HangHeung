@@ -9,8 +9,9 @@ class ProductSalesDetailReport(models.TransientModel):
     _name = 'product.sales.detail.report.wizard'
     _description = 'Product Sales Detail Report (Individual Store)'
 
-    date = fields.Date('Date')
-    store_id = fields.Many2one('pos.config', string='Store')
+    from_date = fields.Date('From Date', required=True)
+    to_date = fields.Date('To Date', required=True)
+    store_id = fields.Many2one('pos.config', string='Store', required=True)
 
     def action_generate_excel(self):
         company = self.env.company
@@ -30,8 +31,8 @@ class ProductSalesDetailReport(models.TransientModel):
 
         sheet.write(0, 0, company.name, bold)
         sheet.write(1, 0, "產品銷售明細報告(個別分店)")
-        sheet.write(2, 0, "日期:")
-        sheet.write(2, 1, str(self.date))
+        sheet.write(2, 0, "日期區間:")
+        sheet.write(2, 1, f"{self.from_date} 至 {self.to_date}")
         sheet.write(3, 0, "分店:")
         sheet.write(3, 1, self.store_id.name)
 
@@ -42,8 +43,8 @@ class ProductSalesDetailReport(models.TransientModel):
         row = 6
 
         orders = self.env['pos.order'].search([
-            ('date_order', '>=', f"{self.date} 00:00:00"),
-            ('date_order', '<=', f"{self.date} 23:59:59"),
+            ('date_order', '>=', f"{self.from_date} 00:00:00"),
+            ('date_order', '<=', f"{self.to_date} 23:59:59"),
             ('session_id.config_id', '=', self.store_id.id),
             ('state', 'in', ['paid', 'done', 'invoiced']),
             ('company_id', '=', company.id),
@@ -51,7 +52,7 @@ class ProductSalesDetailReport(models.TransientModel):
         pos_lines = orders.mapped('lines')
 
         if not pos_lines:
-            raise ValidationError(_('There are no orders for this date.'))
+            raise ValidationError(_('There are no orders for this date range.'))
 
         for line in pos_lines:
             sheet.write(row, 0, line.product_id.default_code or '', normal)
@@ -64,7 +65,7 @@ class ProductSalesDetailReport(models.TransientModel):
         workbook.close()
         output.seek(0)
 
-        filename = f"Product Sales Detail Report {self.store_id.name} {self.date}.xlsx"
+        filename = f"Product Sales Detail Report {self.store_id.name} {self.from_date} 至 {self.to_date}.xlsx"
         attachment = self.env['ir.attachment'].create({
             'name': filename,
             'type': 'binary',
