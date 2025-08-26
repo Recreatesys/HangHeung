@@ -14,6 +14,7 @@
         "wizards/loyalty_genarate_wizard.xml",
         "wizards/excel_report_views.xml",
         "wizards/loyalty_assign_store_wizard.xml",
+        "wizards/stock_move_wizard.xml"
     ],
     "assets": {
         "point_of_sale._assets_pos": [
@@ -22,6 +23,9 @@
             "discount_coupans/static/src/js/pos_lot_number.js",
             "discount_coupans/static/src/js/coupon_range.js",
             "discount_coupans/static/src/xml/coupon_range.xml",
+        ],
+        "web.assets_backend": [
+            "discount_coupans/static/src/js/stock_move_quantity.js",
         ],
     },
     "installable": True,

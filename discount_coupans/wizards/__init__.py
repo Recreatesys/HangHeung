@@ -5,3 +5,4 @@ from .import coupon_used_excel
 from .import coupon_transfer_excel
 from . import loyalty_assign_store_wizard
 from . import preactive_coupon
+from . import stock_move_wizard
