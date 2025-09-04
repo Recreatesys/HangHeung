@@ -155,6 +155,7 @@ patch(EditListPopup.prototype, {
 
             if (startIndex !== -1) {
                 const selectedLots = this.props.options.slice(startIndex, startIndex + lot_qty);
+            }
 
         const selectedLots = this.props.options.slice(fromIndex, toIndex + 1);
 
