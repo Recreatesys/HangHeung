@@ -1,0 +1,108 @@
+from datetime import datetime
+from odoo import models, fields, api
+from io import BytesIO
+import base64
+from openpyxl import Workbook
+from bs4 import BeautifulSoup
+from openpyxl.utils import get_column_letter
+from openpyxl.styles import Alignment, Font
+
+class DeliveryReportWizard(models.TransientModel):
+    _name = 'delivery.report.wizard'
+    _description = 'Delivery XLS Report Wizard'
+
+    date_from = fields.Date(required=True)
+    date_to = fields.Date(required=True)
+    file = fields.Binary('File', readonly=True)
+    file_name = fields.Char('Filename', readonly=True)
+
+    def action_generate_report(self):
+        pickings = self.env['stock.picking'].search([
+            ('picking_type_code', '=', 'outgoing'),
+            ('scheduled_date', '>=', self.date_from),
+            ('scheduled_date', '<=', self.date_to),
+            ('state', '=', 'done')
+        ])
+
+        products = self.env['product.product'].browse(
+            pickings.move_ids_without_package.product_id.ids
+        ).sorted(key=lambda p: p.name)
+
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Delivery Report"
+
+        base_headers = ["Dn Date", "Dn No", "Client", "Shop Code", "Remark"]
+        for col_idx, header in enumerate(base_headers, start=1):
+            cell = ws.cell(row=1, column=col_idx, value=header)
+            ws.merge_cells(start_row=1, start_column=col_idx, end_row=2, end_column=col_idx)
+            cell.alignment = Alignment(horizontal="center", vertical="center")
+            cell.font = Font(bold=True)
+        start_col = len(base_headers) + 1
+        for idx, product in enumerate(products, start=start_col):
+            cell = ws.cell(row=1, column=idx, value=product.name)
+            cell.alignment = Alignment(horizontal="center", vertical="center")
+            cell.font = Font(bold=True)
+            ws.cell(row=2, column=idx, value="Item Qty").alignment = Alignment(horizontal="center")
+
+        ws.column_dimensions[get_column_letter(1)].width = 20
+        ws.column_dimensions[get_column_letter(2)].width = 15
+        ws.column_dimensions[get_column_letter(3)].width = 30
+        ws.column_dimensions[get_column_letter(4)].width = 20
+        ws.column_dimensions[get_column_letter(5)].width = 25
+        for col_idx in range(start_col, start_col + len(products)):
+            ws.column_dimensions[get_column_letter(col_idx)].width = 18
+
+        row_idx = 3
+        for picking in pickings:
+            note_text = ""
+            if picking.note:
+                soup = BeautifulSoup(picking.note, "html.parser")
+                note_text = soup.get_text(separator=" ", strip=True)
+
+            shop_code = picking.origin.split("-")[0] if picking.origin else ""
+
+            row = [
+                picking.scheduled_date.strftime('%d/%m/%Y') if picking.scheduled_date else "",
+                picking.name or "",
+                picking.partner_id.name or "",
+                shop_code,
+                note_text
+            ]
+
+            for product in products:
+                qty = sum(
+                    line.quantity for line in picking.move_ids_without_package
+                    if line.product_id == product
+                )
+                row.append(qty if qty != 0 else "")
+
+            ws.append(row)
+            row_idx += 1
+
+        total_row = ["Grand Total", "", "", "", ""]
+        for idx, product in enumerate(products, start=start_col):
+            col_letter = ws.cell(row=2, column=idx).column_letter
+            total_row.append(f"=SUM({col_letter}3:{col_letter}{row_idx-1})")
+        ws.append(total_row)
+
+        fp = BytesIO()
+        wb.save(fp)
+        fp.seek(0)
+        file_data = base64.b64encode(fp.read())
+        fp.close()
+
+        formatted_date = datetime.now().strftime('%d-%m-%Y')
+        attachment = self.env['ir.attachment'].create({
+            'name': f"Delivery Report {formatted_date}.xlsx",
+            'type': 'binary',
+            'datas': file_data,
+            'res_model': self._name,
+            'res_id': self.id,
+        })
+
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{attachment.id}?download=true',
+            'target': 'self',
+        }

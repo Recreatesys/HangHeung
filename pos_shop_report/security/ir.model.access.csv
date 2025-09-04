@@ -8,3 +8,6 @@ access_product_sale_all_shop_report_wizard,product.sale.all.shop.report.wizard,m
 access_time_period_sales_report_individual,time.period.sales.report.individual,model_time_period_sales_report_individual,base.group_user,1,1,1,1
 access_time_period_sales_report_all,time.period.sales.report.all,model_time_period_sales_report_all,base.group_user,1,1,1,1
 access_coupon_gift_voucher_report_wizard,coupon.gift.voucher.report.wizard,model_coupon_gift_voucher_report_wizard,base.group_user,1,1,1,1
+access_scrap_report_wizard,scrap.report.wizard,model_scrap_report_wizard,base.group_user,1,1,1,1
+access_internal_transfer_report_wizard,internal.transfer.report.wizard,model_internal_transfer_report_wizard,base.group_user,1,1,1,1
+access_delivery_report_wizard,delivery.report.wizard,model_delivery_report_wizard,base.group_user,1,1,1,1

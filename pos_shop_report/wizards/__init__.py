@@ -7,3 +7,7 @@ from . import time_period_sales_report_all
 from . import daily_product_sales_inventory_report
 from . import store_transaction_detail
 from . import coupon_gift_voucher_report
+from . import scrap_report
+from . import internal_transfer_report
+from . import delivery_report_wizard
+from . import po_report_wizard

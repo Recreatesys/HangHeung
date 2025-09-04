@@ -22,6 +22,10 @@
         "wizards/daily_product_sales_inventory_report.xml",
         "wizards/store_transaction_detail.xml",
         "wizards/coupon_gift_voucher_report.xml",
+        "wizards/scrap_report.xml",
+        "wizards/internal_transfer_report.xml",
+        "wizards/delivery_report_wizard.xml",
+        "wizards/po_report_wizard.xml"
         "views/pos_shop_report.xml",
         "reports/pos_shop_report.xml",
         "reports/pos_shop_report_format.xml"

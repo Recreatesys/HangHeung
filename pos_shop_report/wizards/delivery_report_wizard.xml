@@ -1,0 +1,31 @@
+<odoo>
+    <record id="view_delivery_report_wizard" model="ir.ui.view">
+        <field name="name">delivery.report.wizard.form</field>
+        <field name="model">delivery.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Delivery XLS Report">
+                <group>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                </group>
+                <footer>
+                    <button string="Generate" type="object" name="action_generate_report" class="btn-primary"/>
+                    <button string="Close" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_delivery_report_wizard" model="ir.actions.act_window">
+        <field name="name">Delivery XLS Report</field>
+        <field name="res_model">delivery.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_delivery_report"
+          name="Delivery Report"
+          parent="stock.menu_warehouse_report"
+          action="pos_shop_report.action_delivery_report_wizard"/>
+
+</odoo>

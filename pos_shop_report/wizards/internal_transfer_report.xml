@@ -1,0 +1,31 @@
+<odoo>
+    <data>
+        <record id="internal_transfer_report_wizard" model="ir.ui.view">
+            <field name="name">internal.transfer.report.wizard</field>
+            <field name="model">internal.transfer.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Internal Transfer Report">
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <footer>
+                        <button string="Print XLSX" type="object" name="action_export_xlsx" class="btn-secondary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="action_internal_transfer_report_wizard" model="ir.actions.act_window">
+            <field name="name">Internal Transfer Report</field>
+            <field name="res_model">internal.transfer.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+    <menuitem id="menu_stock_internal_transfer_report"
+              name="Internal Transfer Report"
+              parent="stock.menu_warehouse_report"
+              sequence="97" action="pos_shop_report.action_internal_transfer_report_wizard"/>
+    </data>
+</odoo>
