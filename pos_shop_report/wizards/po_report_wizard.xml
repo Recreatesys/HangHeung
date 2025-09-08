@@ -26,6 +26,5 @@
     <menuitem id="menu_purchase_order_report"
               name="Purchase Order Report"
               parent="stock.menu_warehouse_report"
-              sequence="97" action="po_report.action_purchase_order_report_wizard"/>
+              sequence="97" action="pos_shop_report.action_purchase_order_report_wizard"/>
 </odoo>
-

@@ -11,3 +11,4 @@ access_coupon_gift_voucher_report_wizard,coupon.gift.voucher.report.wizard,model
 access_scrap_report_wizard,scrap.report.wizard,model_scrap_report_wizard,base.group_user,1,1,1,1
 access_internal_transfer_report_wizard,internal.transfer.report.wizard,model_internal_transfer_report_wizard,base.group_user,1,1,1,1
 access_delivery_report_wizard,delivery.report.wizard,model_delivery_report_wizard,base.group_user,1,1,1,1
+access_purchase_order_report_wizard,purchase.order.report.wizard,model_purchase_order_report_wizard,base.group_user,1,1,1,1
