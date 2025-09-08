@@ -62,7 +62,7 @@ class PurchaseOrderReportWizard(models.TransientModel):
 
         formatted_date = datetime.now().strftime('%d-%m-%Y')
         attachment = self.env['ir.attachment'].create({
-            'name': f"Purchase Order Report {formatted_date}.xlsx",
+            'name': f"Retail DN/PO Report {formatted_date}.xlsx",
             'type': 'binary',
             'datas': file_data,
             'res_model': self._name,

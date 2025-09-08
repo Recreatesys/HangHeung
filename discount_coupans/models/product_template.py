@@ -15,6 +15,6 @@ class ProductTemplate(models.Model):
     store_id = fields.Many2one(
         'pos.config',
         string='Store',
-        required=True,
+        required=False,
         help="Select the store where this coupon can be redeemed."
     )

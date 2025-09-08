@@ -3,7 +3,7 @@
         <field name="name">purchase.order.report.wizard.form</field>
         <field name="model">purchase.order.report.wizard</field>
         <field name="arch" type="xml">
-            <form string="Purchase Order Report">
+            <form string="Retail DN/PO Report">
                 <group>
                     <field name="date_from"/>
                     <field name="date_to"/>
@@ -17,14 +17,14 @@
     </record>
 
     <record id="action_purchase_order_report_wizard" model="ir.actions.act_window">
-        <field name="name">Purchase Order Report</field>
+        <field name="name">Retail DN/PO Report</field>
         <field name="res_model">purchase.order.report.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
     </record>
 
     <menuitem id="menu_purchase_order_report"
-              name="Purchase Order Report"
+              name="Retail DN/PO Report"
               parent="stock.menu_warehouse_report"
               sequence="97" action="pos_shop_report.action_purchase_order_report_wizard"/>
 </odoo>

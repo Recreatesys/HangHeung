@@ -4,7 +4,7 @@
             <field name="name">internal.transfer.report.wizard</field>
             <field name="model">internal.transfer.report.wizard</field>
             <field name="arch" type="xml">
-                <form string="Internal Transfer Report">
+                <form string="Shop to shop transfer Report">
                     <group>
                         <field name="date_from"/>
                         <field name="date_to"/>
@@ -17,14 +17,14 @@
             </field>
         </record>
         <record id="action_internal_transfer_report_wizard" model="ir.actions.act_window">
-            <field name="name">Internal Transfer Report</field>
+            <field name="name">Shop to shop transfer Report</field>
             <field name="res_model">internal.transfer.report.wizard</field>
             <field name="view_mode">form</field>
             <field name="target">new</field>
         </record>
 
     <menuitem id="menu_stock_internal_transfer_report"
-              name="Internal Transfer Report"
+              name="Shop to shop transfer Report"
               parent="stock.menu_warehouse_report"
               sequence="97" action="pos_shop_report.action_internal_transfer_report_wizard"/>
     </data>

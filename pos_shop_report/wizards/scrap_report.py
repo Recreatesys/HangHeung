@@ -77,7 +77,7 @@ class ScrapReportWizard(models.TransientModel):
 
         formatted_date = datetime.now().strftime('%d-%m-%Y')
         attachment = self.env['ir.attachment'].create({
-            'name': f"Shop write of {formatted_date}.xlsx",
+            'name': f"Shop write off {formatted_date}.xlsx",
             'type': 'binary',
             'datas': file_data,
             'res_model': self._name,
