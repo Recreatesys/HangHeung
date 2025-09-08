@@ -25,7 +25,7 @@
         "wizards/scrap_report.xml",
         "wizards/internal_transfer_report.xml",
         "wizards/delivery_report_wizard.xml",
-        "wizards/po_report_wizard.xml"
+        "wizards/po_report_wizard.xml",
         "views/pos_shop_report.xml",
         "reports/pos_shop_report.xml",
         "reports/pos_shop_report_format.xml"
