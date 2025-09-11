@@ -16,6 +16,7 @@ patch(EditListInput.prototype, {
     setup() {
         super.setup();
         Object.assign(this.state, {
+            quantityValue: "",
             secondInputValue: "",
             secondSelectedOptionValue: null,
             secondHideOptions: true,
@@ -23,18 +24,14 @@ patch(EditListInput.prototype, {
         this.optionsDropdownRef2 = useRef("options-dropdown-2");
 
         useEffect(() => {
-            if (this.optionsDropdownRef2.el) {
-                this.setupOptionsDropdown(this.optionsDropdownRef2.el);
-            }
+            if (this.optionsDropdownRef2.el) this.setupOptionsDropdown(this.optionsDropdownRef2.el);
         });
 
         const handleClickOutside = (event) => {
             const dropdownEl = this.optionsDropdownRef2.el;
-            const inputEl = document.getElementById("lot_id"); // select input by id
-            if (dropdownEl && inputEl) {
-                if (!dropdownEl.contains(event.target) && !inputEl.contains(event.target)) {
-                    this.state.secondHideOptions = true;
-                }
+            const endInputEl = document.querySelector("input[placeholder='End Serial/Lot Number']");
+            if (dropdownEl && endInputEl && !dropdownEl.contains(event.target) && !endInputEl.contains(event.target)) {
+                this.state.secondHideOptions = true;
             }
         };
 
@@ -46,74 +43,65 @@ patch(EditListInput.prototype, {
 
     get secondDisplayedOptions() {
         const options = this.props.getOptions();
-        if (!this.props.customInput) {
-            return options;
-        }
+        if (!this.props.customInput) return options;
         return options.filter((o) => o.includes(this.state.secondInputValue));
     },
 
-    onSecondInput(event) {
-        this.state.secondInputValue = event.target.value;
-        this.onResetSecondOptionsDropdown();
+    onQuantityInput(event) {
+        this.state.quantityValue = event.target.value;
+        this.updateEndSerial();
     },
-    onSecondKeyup(event) {
-        if (event.key === "Enter") {
-            if (this.state.secondSelectedOptionValue) {
-                this.onSecondSelectOption(this.state.secondSelectedOptionValue);
-            }
-        }
-    },
-    onSecondKeydown(event) {
-        let optionSelectionRelativeMove = 0;
-        if (event.key === "ArrowDown") optionSelectionRelativeMove = 1;
-        else if (event.key === "ArrowUp") optionSelectionRelativeMove = -1;
 
-        if (optionSelectionRelativeMove !== 0) {
-            event.preventDefault();
-            if (this.secondDisplayedOptions.length > 0) {
-                const curIndex = this.state.secondSelectedOptionValue
-                    ? this.secondDisplayedOptions.findIndex((o) => o === this.state.secondSelectedOptionValue)
-                    : null;
-                let nextIndex = curIndex !== null ? (curIndex + optionSelectionRelativeMove) % this.secondDisplayedOptions.length : 0;
-                if (nextIndex < 0) nextIndex = this.secondDisplayedOptions.length - 1;
+    updateEndSerial() {
+    const startInputEl = document.querySelector(".popup-input.list-line-input");
+    const startSerial = startInputEl ? startInputEl.value : "";
+    const quantity = parseInt(this.state.quantityValue, 10);
 
-                this.state.secondSelectedOptionValue = this.secondDisplayedOptions[nextIndex];
-            }
-        }
-    },
-    onSecondBlur() {
-        this.state.secondSelectedOptionValue = null;
-    },
-    onSecondClick() {
-        this.onResetSecondOptionsDropdown();
-    },
-    onSecondSelectOption(option) {
-        this.state.secondInputValue = option;
-        this.state.secondSelectedOptionValue = null;
-        this.state.secondHideOptions = true;
-    },
-    onResetSecondOptionsDropdown() {
-        if (this.state.secondHideOptions) {
-            this.state.secondHideOptions = false;
-        }
-        this.state.secondSelectedOptionValue = null;
+    if (!startSerial || isNaN(quantity) || quantity <= 0) {
+        this.state.secondInputValue = "";
+        return;
     }
+
+    const match = startSerial.match(/(\D*)(\d+)$/);
+    if (!match) {
+        this.state.secondInputValue = "";
+        return;
+    }
+
+    const prefix = match[1];
+    const startNumberStr = match[2];
+    const startNumber = parseInt(startNumberStr, 10);
+    const endNumber = startNumber + quantity - 1;
+
+    const endNumberStr = String(endNumber).padStart(startNumberStr.length, "0");
+
+    this.state.secondInputValue = `${prefix}${endNumberStr}`;
+}
+
 });
+
 
 patch(EditListPopup, {
     props: {
         ...EditListPopup.props,
         product_id: { type: String, optional: true },
+        order: { type: Object, optional: true },
     },
 });
+
 patch(EditListPopup.prototype, {
     confirm() {
-        const pos = this.env.services.pos;
         const order = this.env.services.pos.get_order();
+        if (!order) {
+            this.env.services.dialog.add(AlertDialog, {
+                title: "Error",
+                body: "No active order found.",
+            });
+            return;
+        }
+
+        const pos = this.env.services.pos;
         const product = this.env.services.pos.models['product.product'].get(parseInt(this.props.product_id));
-        const lot_qty = parseInt($('.edit-list-inputs #lot_qty').val())
-        const current_sr = $('.edit-list-inputs .list-line-input').val()
-        const end_sr = $('.edit-list-inputs input[placeholder="End Serial/Lot Number"]').val()
 
         if (!product) {
             this.env.services.dialog.add(AlertDialog, {
@@ -123,62 +111,72 @@ patch(EditListPopup.prototype, {
             return;
         }
 
-        if (!current_sr || !end_sr) {
+        const startSerial = $('.edit-list-inputs .list-line-input').val();
+        const quantity = parseInt($('.edit-list-inputs input[placeholder="Quantity"]').val());
+
+        if (!startSerial || isNaN(quantity) || quantity <= 0) {
             this.env.services.dialog.add(AlertDialog, {
                 title: "Validation Error",
-                body: "Please select both Start and End serial/lot numbers.",
+                body: "Quantity must be a positive number.",
             });
             return;
         }
 
-        const startIndex = this.props.options.indexOf(current_sr);
-        const endIndex = this.props.options.indexOf(end_sr);
-
-        if (startIndex === -1 || endIndex === -1) {
+        const match = startSerial.match(/(\D*)(\d+)$/);
+        if (!match) {
             this.env.services.dialog.add(AlertDialog, {
                 title: "Validation Error",
-                body: "Selected start or end serial/lot is not available in options.",
+                body: "Start Serial format is invalid.",
             });
             return;
         }
 
-        if (startIndex > endIndex) {
-            this.env.services.dialog.add(AlertDialog, {
-                title: "Validation Error",
-                body: `Start lot ${current_sr} must come before End lot ${end_sr}.`,
-            });
-            return;
-        }
+        const prefix = match[1];
+        const startNumberStr = match[2];
+        const startNumber = parseInt(startNumberStr, 10);
+        const endNumber = startNumber + quantity - 1;
 
-        const fromIndex = Math.min(startIndex, endIndex);
-        const toIndex = Math.max(startIndex, endIndex);
+        const availableLots = this.props.options || [];
+        const availableNumbers = availableLots
+            .map(lot => {
+                const matchNum = lot.match(/(\d+)$/);
+                return matchNum ? parseInt(matchNum[1], 10) : null;
+            })
+            .filter(n => n !== null);
 
-            if (startIndex !== -1) {
-                const selectedLots = this.props.options.slice(startIndex, startIndex + lot_qty);
-            }
-
-        const selectedLots = this.props.options.slice(fromIndex, toIndex + 1);
-
-        selectedLots.forEach(lotName => {
-            const orderline = order.models["pos.order.line"].create({
-                order_id: order,
-                product_id: product,
-                qty: 1,
-                price_unit: product.lst_price,
-            });
-
-            if (orderline) {
-                orderline.setPackLotLines({
-                    modifiedPackLotLines: {},
-                    newPackLotLines: [
-                        {
-                            lot_name: lotName,
-                        },
-                    ],
-                    setQuantity: true,
+        if (availableNumbers.length > 0) {
+            const maxAvailable = Math.max(...availableNumbers);
+            if (endNumber > maxAvailable) {
+                this.env.services.dialog.add(AlertDialog, {
+                    title: "Validation Error",
+                    body: `You cannot assign beyond ${prefix}${String(maxAvailable).padStart(startNumberStr.length, "0")}. Please reduce quantity.`,
                 });
+                return;
             }
+        }
+
+        const orderline = order.models["pos.order.line"].create({
+            order_id: order,
+            product_id: product,
+            qty: 1,
+            price_unit: product.lst_price,
         });
+
+        if (orderline) {
+            const lots = [];
+            for (let i = 0; i < quantity; i++) {
+                const lotNumber = String(startNumber + i).padStart(startNumberStr.length, "0");
+                lots.push({ lot_name: `${prefix}${lotNumber}` });
+            }
+
+            orderline.setPackLotLines({
+                modifiedPackLotLines: {},
+                newPackLotLines: lots,
+                setQuantity: false,
+            });
+            orderline.set_quantity(quantity);
+        }
+
         this.props.close();
     },
 });

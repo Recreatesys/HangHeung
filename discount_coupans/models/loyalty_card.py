@@ -114,7 +114,7 @@ class LoyaltyCard(models.Model):
         store_id = vals.get("store_id")
 
         if coupon_code:
-            card = self.search([('code', '=', coupon_code)], limit=1)
+            card = self.search([('code', '=', coupon_code)])
             if card:
                 card.write({
                     'redeem_shop_id': store_id,

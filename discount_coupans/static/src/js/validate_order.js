@@ -17,20 +17,19 @@ patch(PaymentScreen.prototype, {
                     this.currentOrder._code_activated_coupon_ids &&
                     this.currentOrder._code_activated_coupon_ids.length > 0
                 ) {
-                    activatedCoupon = this.currentOrder._code_activated_coupon_ids[0].code;
-
+                    for (let coupon of this.currentOrder._code_activated_coupon_ids) {
+                    if (coupon.code) {
+                        await this.env.services.orm.call(
+                            "loyalty.card",
+                            "update_coupon_redeem_from_pos",
+                            [{
+                                coupon_code: coupon.code,
+                                store_id: storeId,
+                            }]
+                        );
+                    }
                 }
-                if (activatedCoupon) {
-                    await this.env.services.orm.call(
-                        "loyalty.card",
-                        "update_coupon_redeem_from_pos",
-                        [{
-                            coupon_code: activatedCoupon,
-                            store_id: storeId,
-
-                        }]
-                    );
-                }
+            }
                 const orderLines = this.currentOrder.get_orderlines();
                 let productData = [];
 

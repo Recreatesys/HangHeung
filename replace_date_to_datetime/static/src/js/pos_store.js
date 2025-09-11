@@ -3,6 +3,7 @@ import {PosStore} from "@point_of_sale/app/store/pos_store";
 const {DateTime} = luxon;
 import { _t } from "@web/core/l10n/translation";
 import { rpc } from "@web/core/network/rpc";
+import { PosOrder } from "@point_of_sale/app/models/pos_order";
 
 patch(PosStore.prototype, {
     async processServerData() {
@@ -183,4 +184,109 @@ patch(PosStore.prototype, {
     },
 
 
+});
+
+patch(PosOrder.prototype, {
+    _updateRewardLines() {
+        if (!this.lines.length) {
+            return;
+        }
+        const rewardLines = this._get_reward_lines();
+        if (!rewardLines.length) {
+            return;
+        }
+
+        const productRewards = [];
+        const otherRewards = [];
+        const paymentRewards = [];
+
+        for (const line of rewardLines) {
+            const couponId = line.coupon_id?.id || line.coupon_id;
+            const productId = line._reward_product_id?.id || line._reward_product_id;
+
+            const claimedReward = {
+                reward: line.reward_id,
+                coupon_id: couponId,
+                args: {
+                    product: productId,
+                    price: line.price_unit,
+                    quantity: line.qty,
+                    cost: line.points_cost,
+                },
+                reward_identifier_code: line.reward_identifier_code,
+            };
+
+            if (
+                claimedReward.reward.program_id.program_type === "gift_card" ||
+                claimedReward.reward.program_id.program_type === "ewallet"
+            ) {
+                paymentRewards.push(claimedReward);
+            } else if (claimedReward.reward.reward_type === "product") {
+                productRewards.push(claimedReward);
+            } else if (
+                !otherRewards.some(
+                    (reward) =>
+                        reward.reward_identifier_code === claimedReward.reward_identifier_code
+                )
+            ) {
+                otherRewards.push(claimedReward);
+            }
+            line.delete();
+        }
+
+        const allRewards = productRewards.concat(otherRewards).concat(paymentRewards);
+        const allRewardsMerged = [];
+
+        allRewards.forEach((reward) => {
+            if (reward.reward.reward_type === "discount") {
+                allRewardsMerged.push(reward);
+                return;
+            }
+
+            const reward_index = allRewardsMerged.findIndex((item) => {
+                return (
+                    item.reward.id === reward.reward.id &&
+                    item.args.price === reward.args.price &&
+                    item.coupon_id === reward.coupon_id &&
+                    item.args.product === reward.args.product
+                );
+            });
+
+            if (reward_index > -1) {
+                allRewardsMerged[reward_index].args.quantity += reward.args.quantity;
+                allRewardsMerged[reward_index].args.cost += reward.args.cost;
+            } else {
+                allRewardsMerged.push(reward);
+            }
+        });
+
+        for (const claimedReward of allRewardsMerged) {
+            if (
+                !this._code_activated_coupon_ids.find(
+                    (coupon) => coupon.id === claimedReward.coupon_id
+                ) &&
+                !this.uiState.couponPointChanges[claimedReward.coupon_id]
+            ) {
+                continue;
+            }
+
+            if (
+                claimedReward.reward.program_id.program_type === "coupons" &&
+                this.lines.find(
+                    (rewardline) =>
+                        rewardline.reward_id?.id === claimedReward.reward.id &&
+                        (rewardline.coupon_id?.id === claimedReward.coupon_id ||
+                            rewardline.coupon_id === claimedReward.coupon_id)
+                )
+            ) {
+                continue;
+            }
+
+            this._applyReward(
+                claimedReward.reward,
+                claimedReward.coupon_id,
+                claimedReward.args
+            );
+        }
+    },
 });
