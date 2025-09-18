@@ -22,16 +22,22 @@ patch(EditListInput.prototype, {
             secondHideOptions: true,
         });
         this.optionsDropdownRef2 = useRef("options-dropdown-2");
-
+        this.all_options = [];
+        if (this.props.getOptions) {
+            const options = this.props.getOptions();
+            this.all_options = options.map(opt => (typeof opt === "string" ? opt : opt.text));
+        }
         useEffect(() => {
             if (this.optionsDropdownRef2.el) this.setupOptionsDropdown(this.optionsDropdownRef2.el);
         });
 
         const handleClickOutside = (event) => {
             const dropdownEl = this.optionsDropdownRef2.el;
-            const endInputEl = document.querySelector("input[placeholder='End Serial/Lot Number']");
-            if (dropdownEl && endInputEl && !dropdownEl.contains(event.target) && !endInputEl.contains(event.target)) {
-                this.state.secondHideOptions = true;
+            const inputEl = document.getElementById("lot_id"); // select input by id
+            if (dropdownEl && inputEl) {
+                if (!dropdownEl.contains(event.target) && !inputEl.contains(event.target)) {
+                    this.state.secondHideOptions = true;
+                }
             }
         };
 
@@ -40,11 +46,66 @@ patch(EditListInput.prototype, {
             return () => document.removeEventListener("click", handleClickOutside);
         });
     },
+    getAllOptions() {
+        return this.all_options;
+    },
 
     get secondDisplayedOptions() {
         const options = this.props.getOptions();
         if (!this.props.customInput) return options;
         return options.filter((o) => o.includes(this.state.secondInputValue));
+    },
+    onSecondInput(event) {
+        this.state.secondInputValue = event.target.value;
+        this.updateQuantityFromEnd();
+        this.onResetSecondOptionsDropdown();
+    },
+    onSecondKeyup(event) {
+        if (event.key === "Enter") {
+            if (this.state.secondSelectedOptionValue) {
+                this.onSecondSelectOption(this.state.secondSelectedOptionValue);
+            }
+        }
+    },
+    onSecondKeydown(event) {
+        let optionSelectionRelativeMove = 0;
+        if (event.key === "ArrowDown") optionSelectionRelativeMove = 1;
+        else if (event.key === "ArrowUp") optionSelectionRelativeMove = -1;
+
+        if (optionSelectionRelativeMove !== 0) {
+            event.preventDefault();
+            if (this.secondDisplayedOptions.length > 0) {
+                const curIndex = this.state.secondSelectedOptionValue
+                    ? this.secondDisplayedOptions.findIndex((o) => o === this.state.secondSelectedOptionValue)
+                    : null;
+                let nextIndex = curIndex !== null ? (curIndex + optionSelectionRelativeMove) % this.secondDisplayedOptions.length : 0;
+                if (nextIndex < 0) nextIndex = this.secondDisplayedOptions.length - 1;
+
+                this.state.secondSelectedOptionValue = this.secondDisplayedOptions[nextIndex];
+            }
+        }
+    },
+    onSecondBlur() {
+        this.state.secondSelectedOptionValue = null;
+    },
+    onSecondClick() {
+        this.onResetSecondOptionsDropdown();
+    },
+    onSecondSelectOption(option) {
+        this.state.secondInputValue = option;
+        this.state.secondSelectedOptionValue = null;
+        this.state.secondHideOptions = true;
+        const inputEl = document.getElementById("lot_id");
+        if (inputEl) {
+            inputEl.value = option;
+        }
+        this.updateQuantityFromEnd();
+    },
+    onResetSecondOptionsDropdown() {
+        if (this.state.secondHideOptions) {
+            this.state.secondHideOptions = false;
+        }
+        this.state.secondSelectedOptionValue = null;
     },
 
     onQuantityInput(event) {
@@ -53,31 +114,116 @@ patch(EditListInput.prototype, {
     },
 
     updateEndSerial() {
-    const startInputEl = document.querySelector(".popup-input.list-line-input");
-    const startSerial = startInputEl ? startInputEl.value : "";
-    const quantity = parseInt(this.state.quantityValue, 10);
+        const startInputEl = document.querySelector(".popup-input.list-line-input");
+        const startSerial = startInputEl ? startInputEl.value : "";
+        const quantity = parseInt(this.state.quantityValue, 10);
 
-    if (!startSerial || isNaN(quantity) || quantity <= 0) {
-        this.state.secondInputValue = "";
-        return;
+        if (!startSerial || isNaN(quantity) || quantity <= 0) {
+            this.state.secondInputValue = "";
+            this.state.secondSelectedOptionValue = null;
+            return;
+        }
+
+        const match = startSerial.match(/(\D*)(\d+)$/);
+        if (!match) {
+            this.state.secondInputValue = "";
+            this.state.secondSelectedOptionValue = null;
+            return;
+        }
+        const numLength = match[2].length;
+
+        const lots = this.getAllOptions()
+            .map(opt => {
+                const lotName = typeof opt === "string" ? opt : opt.text;
+                const m = lotName.match(/(\D*)(\d+)$/);
+                if (m) {
+                    return { full: lotName, prefix: m[1], number: parseInt(m[2], 10) };
+                }
+                return null;
+            })
+            .filter(lot => lot !== null)
+
+        const startIndex = lots.findIndex(lot => lot.full === startSerial);
+        const actualStartIndex = startIndex !== -1 ? startIndex : 0;
+
+        const selectedLots = [];
+        for (let i = actualStartIndex; i < lots.length; i++) {
+            selectedLots.push(lots[i]);
+            if (lots[i].full === lots[lots.length - 1].full) {
+                break;
+            }
+            if (selectedLots.length === quantity) {
+                break;
+            }
+        }
+        if (selectedLots.length < quantity) {
+            this.state.secondInputValue = "";
+            this.state.secondSelectedOptionValue = null;
+            return;
+        }
+        const endLot = selectedLots[selectedLots.length - 1];
+        const endNumberStr = String(endLot.number).padStart(numLength, "0");
+        const endSerial = endLot.prefix + endNumberStr;
+
+        this.state.secondInputValue = endSerial;
+        this.state.secondSelectedOptionValue = endSerial;
+
+        const endInputEl = document.getElementById("lot_id");
+        if (endInputEl) {
+            if (endInputEl.options) {
+                const optionEl = Array.from(endInputEl.options).find(opt => opt.value === endSerial);
+                if (optionEl) optionEl.selected = true;
+                else endInputEl.value = endSerial;
+            } else {
+                endInputEl.value = endSerial;
+            }
+        }
+
+        this.state.secondHideOptions = false;
+    },
+    updateQuantityFromEnd() {
+        const inputs = document.querySelectorAll(".popup-input.list-line-input");
+        const startInputEl = inputs[0];
+        const endInputEl = inputs[2];
+
+        const startSerial = startInputEl ? startInputEl.value : "";
+        const endSerial = endInputEl ? endInputEl.value : "";
+
+        if (!startSerial || !endSerial) {
+            this.state.quantityValue = "";
+            return;
+        }
+
+        const lots = this.getAllOptions()
+        .map(opt => {
+            const lotName = typeof opt === "string" ? opt : opt.text;
+            const m = lotName.match(/(\D*)(\d+)$/);
+            if (m) {
+                return { full: lotName, prefix: m[1], number: parseInt(m[2], 10) };
+            }
+            return null;
+        })
+        .filter(lot => lot !== null);
+
+        const startLot = lots.find(l => l.full === startSerial) || { full: startSerial };
+        const endLot = lots.find(l => l.full === endSerial) || { full: endSerial };
+
+        const startIndex = lots.findIndex(l => l.full === startLot.full);
+        const endIndex = lots.findIndex(l => l.full === endLot.full);
+
+        if (startIndex === -1 || endIndex === -1 || endIndex < startIndex) {
+            this.state.quantityValue = "";
+            return;
+        }
+        let quantity = 0;
+        for (let i = startIndex; i <= endIndex && i < lots.length; i++) {
+            quantity++;
+            if (lots[i].full === lots[lots.length - 1].full) {
+                break;
+            }
+        }
+        this.state.quantityValue = quantity.toString();
     }
-
-    const match = startSerial.match(/(\D*)(\d+)$/);
-    if (!match) {
-        this.state.secondInputValue = "";
-        return;
-    }
-
-    const prefix = match[1];
-    const startNumberStr = match[2];
-    const startNumber = parseInt(startNumberStr, 10);
-    const endNumber = startNumber + quantity - 1;
-
-    const endNumberStr = String(endNumber).padStart(startNumberStr.length, "0");
-
-    this.state.secondInputValue = `${prefix}${endNumberStr}`;
-}
-
 });
 
 
@@ -130,31 +276,18 @@ patch(EditListPopup.prototype, {
             });
             return;
         }
-
-        const prefix = match[1];
-        const startNumberStr = match[2];
-        const startNumber = parseInt(startNumberStr, 10);
-        const endNumber = startNumber + quantity - 1;
-
         const availableLots = this.props.options || [];
-        const availableNumbers = availableLots
-            .map(lot => {
-                const matchNum = lot.match(/(\d+)$/);
-                return matchNum ? parseInt(matchNum[1], 10) : null;
-            })
-            .filter(n => n !== null);
+        const startIndex = availableLots.findIndex(lot => lot === startSerial);
+        const lotsAvailableFromStart = availableLots.length - startIndex;
 
-        if (availableNumbers.length > 0) {
-            const maxAvailable = Math.max(...availableNumbers);
-            if (endNumber > maxAvailable) {
-                this.env.services.dialog.add(AlertDialog, {
-                    title: "Validation Error",
-                    body: `You cannot assign beyond ${prefix}${String(maxAvailable).padStart(startNumberStr.length, "0")}. Please reduce quantity.`,
-                });
-                return;
-            }
+        if (quantity > lotsAvailableFromStart) {
+            const lastLot = availableLots[availableLots.length - 1];
+            this.env.services.dialog.add(AlertDialog, {
+                title: "Validation Error",
+                body: `Not enough lots available from ${startSerial}. Maximum assignable lot is ${lastLot}. Please reduce quantity.`,
+            });
+            return;
         }
-
         const orderline = order.models["pos.order.line"].create({
             order_id: order,
             product_id: product,
@@ -163,18 +296,14 @@ patch(EditListPopup.prototype, {
         });
 
         if (orderline) {
-            const lots = [];
-            for (let i = 0; i < quantity; i++) {
-                const lotNumber = String(startNumber + i).padStart(startNumberStr.length, "0");
-                lots.push({ lot_name: `${prefix}${lotNumber}` });
-            }
+            const selectedLots = availableLots.slice(startIndex, startIndex + quantity)
+                .map(lotName => ({ lot_name: lotName }));
 
             orderline.setPackLotLines({
                 modifiedPackLotLines: {},
-                newPackLotLines: lots,
+                newPackLotLines: selectedLots,
                 setQuantity: false,
             });
-            orderline.set_quantity(quantity);
         }
 
         this.props.close();
@@ -240,7 +369,6 @@ patch(PosStore.prototype, {
                 }
                 return acc;
             }, {});
-
         // Remove lot/serial names that are already used in draft orders
         existingLots = existingLots.filter(
             (lot) => lot.product_qty > (usedLotsQty[lot.name]?.total || 0)
