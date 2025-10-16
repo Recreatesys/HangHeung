@@ -21,7 +21,8 @@
         "views/reason_code_views.xml",
         "views/pos_payment_method.xml",
         "views/delivery_slip_report_inherit.xml",
-        "wizard/wizard_open.xml"
+        "wizard/wizard_open.xml",
+        "views/purchase_order_view.xml",
         # "views/custom_backorder.xml",
     ],
     'assets': {

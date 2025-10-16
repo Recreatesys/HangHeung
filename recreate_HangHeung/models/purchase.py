@@ -23,9 +23,7 @@ class PurchaseOrder(models.Model):
 
     @api.model
     def _default_dest_address(self):
-        curr_company = self.env.context.get('allowed_company_ids')[0]
-        if curr_company == 2:
-            return self.env['res.users'].search([('id', '=', self.env.user.id)]).default_dest_address
+        return self.env['res.users'].search([('id', '=', self.env.user.id)]).default_dest_address
 
 
     partner_id = fields.Many2one(
@@ -48,7 +46,13 @@ class PurchaseOrder(models.Model):
         help="This will determine operation type of incoming shipment"
     )
 
-    dest_address_id = fields.Many2one('res.partner', compute='_compute_dest_address_id', store=True, readonly=False, default=_default_dest_address)
+    dest_address_id = fields.Many2one('res.partner', store=True, readonly=False, default=_default_dest_address)
+
+
+    @api.onchange('picking_type_id')
+    def onchange_dest_address_id(self):
+        for purchase_order in self:
+            purchase_order.dest_address_id = purchase_order.picking_type_id.warehouse_id.partner_id.id
 
 
     def copy(self, default=None):
@@ -120,6 +124,7 @@ class StockRule(models.Model):
 
         if errors:
             raise ProcurementException(errors)
+        
 
         for domain, procurements_rules in procurements_by_po_domain.items():
             # Get the procurements for the current domain.
@@ -139,13 +144,17 @@ class StockRule(models.Model):
                     # the same domain for PO and the _prepare_purchase_order method
                     # should only uses the common rules's fields.
                     vals = rules[0]._prepare_purchase_order(company_id, origins, positive_values)
+                    po_origin = self.env['purchase.order'].search([('company_id', '=', 1), ('partner_ref', '=', vals['origin'])])
                     # The company_id is the same for all procurements since
                     # _make_po_get_domain add the company in the domain.
                     # We use SUPERUSER_ID since we don't want the current user to be follower of the PO.
                     # Indeed, the current user may be a user without access to Purchase, or even be a portal user.
                     if vals['company_id'] == 2:
                         picking_type_id = self.env['stock.picking.type'].search([('code', '=', 'dropship'), ('company_id', '=', 2)], limit=1).id
-                        dest_address = self.env['res.users'].search([('id', '=', self.env.context['uid'])]).default_dest_address.id
+                        if not po_origin:
+                            dest_address = self.env['res.users'].search([('id', '=', self.env.context['uid'])]).default_dest_address.id
+                        else:
+                            dest_address = po_origin.dest_address_id.id
                         if picking_type_id:
                             vals['picking_type_id'] = picking_type_id
                         if dest_address:
