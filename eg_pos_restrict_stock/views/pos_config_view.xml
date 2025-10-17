@@ -1,0 +1,34 @@
+<odoo>
+    <record id="res_config_settings_form_view_for_pos_restrict_product_stock" model="ir.ui.view">
+        <field name="name">res.config.settings.form.pos.show.restrict.stock</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='pos_interface_section']" position="before">
+                <block title="restrict Product Out of Stock" id="pos_interface">
+                    <setting id="show_all_product_stock" title="Show All Product Stock" string="Show All Product Stock">
+                        <field name="show_all_product_stock"/>
+                        <div class="content-group mt16">
+                            <div class="text-muted">
+                                It will enable to Show All Product Stock.
+                            </div>
+                        </div>
+                    </setting>
+                    <setting id="restrict_product" title="Restrict Product out of Stock"
+                             string="Restrict Product Out of Stock">
+                        <field name="restrict_product"/>
+                        <div class="content-group mt16">
+                            <div class="text-muted">
+                                It will enable restrict Product Out of Stock in POS.
+                            </div>
+                        </div>
+                    </setting>
+                    <setting id="restrict_product_type" title="Stock Type" invisible="not show_all_product_stock"
+                             string="Show Stock Type">
+                        <field name="stock_type" widget="radio"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

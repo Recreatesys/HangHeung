@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="ProductItem" t-inherit="point_of_sale.ProductCard" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[@class='product-information-tag']" position="after">
+            <t t-if="env.services.pos.config.show_all_product_stock">
+                <t t-if="this.env.services.pos.config.stock_type == 'on_hand' or this.env.services.pos.config.stock_type == 'both'">
+                        <span class="product-stock " style="font-size:13px;">
+                           On Hand Qty: <t t-esc="props.product.qty_available"/>
+                            Unit
+
+                        </span>
+                    ---------------------------------------
+                </t>
+
+                    <t t-if="this.env.services.pos.config.stock_type == 'virtual' or this.env.services.pos.config.stock_type == 'both'">
+                        <span class="virtual-stock" style="font-size:13px;">
+                          Virtual Qty: <t t-esc="props.product.virtual_available"/>
+                            Unit
+                        </span>
+                </t>
+            </t>
+        </xpath>
+    </t>
+</templates>
