@@ -74,6 +74,10 @@ class ReportInventoryWizard(models.TransientModel):
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         sheet = workbook.add_worksheet('Delivery Report')
 
+        date_format = workbook.add_format({'bold': True, 'align': 'centre'})
+        sheet.write(0, 0, f"Start Date: {self.start_date}", date_format)
+        sheet.write(0, 2, f"End Date: {self.end_date}", date_format)
+
         sheet.set_column(0, 0, 30)  # Category
         sheet.set_column(1, 1, 20)  # Item Code
         sheet.set_column(2, 2, 40)  # Item Name
