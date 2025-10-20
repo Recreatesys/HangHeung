@@ -3,71 +3,76 @@
 <odoo>
 
     <template id="delivery_slip_inherit" inherit_id="stock.report_delivery_document">
-        
+
         <xpath expr="//div[@class='page']/h2" position="replace"></xpath>
         <xpath expr="//div[@class='page']/div[2]" position="replace"></xpath>
         <xpath expr="//div[@class='page']/div[3]" position="replace"></xpath>
         <xpath expr="//t[@t-set='address']" position="replace"></xpath>
-        <xpath expr="//table[@name='stock_move_table']/thead/tr" position="before">
-            <tr>
-                <th colspan="12">
-                    <div style="margin-bottom: 20px;">
-                        <div style="display: inline-block; margin-right: 275px; width: 250px; vertical-align: top;">
-                            <div class="col-7" name="div_incoming_address">
-                                <t t-set="show_partner" t-value="False" />
-                                <div name="vendor_address" t-if="o.picking_type_id.code=='incoming' and partner">
-                                    <span><strong>Vendor Address:</strong></span>
-                                    <t t-set="show_partner" t-value="True" />
-                                </div>
-                                <div name="customer_address" t-if="o.picking_type_id.code=='outgoing' and partner and partner != partner.commercial_partner_id">
-                                    <span><strong>Customer Address:</strong></span>
-                                    <t t-set="show_partner" t-value="True" />
-                                </div>
-                                <div t-if="show_partner" name="partner_header">
-                                    <div t-field="partner.commercial_partner_id"
-                                        t-options='{"widget": "contact", "fields": ["address", "name", "phone", "vat"], "no_marker": True, "phone_icons": True}'/>
-                                </div>
-                            </div>
+        <xpath expr="//table[@name='stock_move_table']" position="before">
+            <div style="margin-bottom: 20px;">
+                <div style="display: inline-block; margin-right: 275px; width: 250px; vertical-align: top;">
+                    <div class="col-7" name="div_incoming_address">
+                        <t t-set="show_partner" t-value="False"/>
+                        <div name="vendor_address" t-if="o.picking_type_id.code=='incoming' and partner">
+                            <span>
+                                <strong>Vendor Address:</strong>
+                            </span>
+                            <t t-set="show_partner" t-value="True"/>
                         </div>
-
-                        <div style="display: inline-block; width: 300px; vertical-align: top;">
-                            <div name="outgoing_delivery_address" t-if="o.should_print_delivery_address()">
-                                <span><strong>Delivery Address:</strong></span>
-                                <div t-out="o.move_ids[0].partner_id or o.partner_id"
-                                    t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
-                            </div>
-                            <div name="outgoing_warehouse_address"
-                                t-elif="o.picking_type_id.code != 'internal' and o.picking_type_id.warehouse_id.partner_id">
-                                <span><strong>Warehouse Address:</strong></span>
-                                <div t-field="o.picking_type_id.warehouse_id.partner_id"
-                                    t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
-                            </div>
+                        <div name="customer_address"
+                             t-if="o.picking_type_id.code=='outgoing' and partner and partner != partner.commercial_partner_id">
+                            <span>
+                                <strong>Customer Address:</strong>
+                            </span>
+                            <t t-set="show_partner" t-value="True"/>
+                        </div>
+                        <div t-if="show_partner" name="partner_header">
+                            <div t-field="partner.commercial_partner_id"
+                                 t-options='{"widget": "contact", "fields": ["address", "name", "phone", "vat"], "no_marker": True, "phone_icons": True}'/>
                         </div>
                     </div>
+                </div>
 
-                    <h2>
-                        <span t-field="o.name">WH/OUT/0001</span>
-                    </h2>
-                    <div class="oe_structure"></div>
-                    <div class="report-wrapping-flexbox clearfix row mt32 mb32">
-                        <div t-if="o.origin" style="display: inline-block; width: 30%; margin-right: 15px;" name="div_origin">
-                            <strong style="color: #AF8489">Order:</strong>
-                            <p t-field="o.origin" class="m-0">S0001</p>
-                        </div>
-                        <div t-if="o.state" style="display: inline-block; width: 30%;" name="div_sched_date">
-                            <strong style="color: #AF8489">Shipping Date:</strong>
-                            <p t-if="o.state == 'done'" t-field="o.date_done" class="m-0"/>
-                            <p t-else="" t-field="o.scheduled_date" class="m-0"/>
-                        </div>
-                        <div t-if="o.origin" style="display: inline-block; width: 30%;" name="div_sched_date">
-                            <strong style="color: #AF8489">Customer Reference:</strong>
-                            <t t-set="last_order_number" t-value="o.origin.split('-')[-1]"/>
-                            <p t-esc="last_order_number" class="m-0"/>
-                        </div>
+                <div style="display: inline-block; width: 300px; vertical-align: top;">
+                    <div name="outgoing_delivery_address" t-if="o.should_print_delivery_address()">
+                        <span>
+                            <strong>Delivery Address:</strong>
+                        </span>
+                        <div t-out="o.move_ids[0].partner_id or o.partner_id"
+                             t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
                     </div>
-                    <div class="oe_structure"></div>
-                </th>
-            </tr>
+                    <div name="outgoing_warehouse_address"
+                         t-elif="o.picking_type_id.code != 'internal' and o.picking_type_id.warehouse_id.partner_id">
+                        <span>
+                            <strong>Warehouse Address:</strong>
+                        </span>
+                        <div t-field="o.picking_type_id.warehouse_id.partner_id"
+                             t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
+                    </div>
+                </div>
+            </div>
+
+            <h2>
+                <span t-field="o.name">WH/OUT/0001</span>
+            </h2>
+            <div class="oe_structure"></div>
+            <div class="report-wrapping-flexbox clearfix row mt32 mb32">
+                <div t-if="o.origin" style="display: inline-block; width: 30%; margin-right: 15px;" name="div_origin">
+                    <strong style="color: #AF8489">Order:</strong>
+                    <p t-field="o.origin" class="m-0">S0001</p>
+                </div>
+                <div t-if="o.state" style="display: inline-block; width: 30%;" name="div_sched_date">
+                    <strong style="color: #AF8489">Shipping Date:</strong>
+                    <p t-if="o.state == 'done'" t-field="o.date_done" class="m-0"/>
+                    <p t-else="" t-field="o.scheduled_date" class="m-0"/>
+                </div>
+                <div t-if="o.origin" style="display: inline-block; width: 30%;" name="div_sched_date">
+                    <strong style="color: #AF8489">Customer Reference:</strong>
+                    <t t-set="last_order_number" t-value="o.origin.split('-')[-1]"/>
+                    <p t-esc="last_order_number" class="m-0"/>
+                </div>
+            </div>
+            <div class="oe_structure"></div>
         </xpath>
     </template>
 
