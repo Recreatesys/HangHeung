@@ -20,7 +20,7 @@ class ReportInventoryWizard(models.TransientModel):
         pickings = self.env['stock.picking'].search([
             ('scheduled_date', '>=', self.start_date),
             ('scheduled_date', '<=', self.end_date),
-            ('state', 'in', ['draft', 'confirmed', 'assigned']),
+            ('state', 'in', ['draft', 'confirmed', 'assigned', 'done']),
             ('picking_type_id.code', '=', 'outgoing')
         ])
 

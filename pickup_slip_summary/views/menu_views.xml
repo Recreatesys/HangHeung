@@ -1,6 +1,6 @@
 <odoo>
     <record id="action_inventory_report_wizard" model="ir.actions.act_window">
-        <field name="name">Inventory Report</field>
+        <field name="name">Pickup Slip Summary</field>
         <field name="res_model">report.inventory.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
