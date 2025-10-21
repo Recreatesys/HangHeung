@@ -40,8 +40,8 @@ class DeliveryReportWizard(models.TransientModel):
             cell.font = Font(bold=True)
         start_col = len(base_headers) + 1
         for idx, product in enumerate(products, start=start_col):
-            cell = ws.cell(row=1, column=idx, value=product.name)
-            cell.alignment = Alignment(horizontal="center", vertical="center")
+            cell = ws.cell(row=1, column=idx, value=f"{product.default_code or ''}\n{product.name}")
+            cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
             cell.font = Font(bold=True)
             ws.cell(row=2, column=idx, value="Item Qty").alignment = Alignment(horizontal="center")
 

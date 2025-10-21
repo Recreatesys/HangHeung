@@ -29,8 +29,8 @@ class InternalTransferReportWizard(models.TransientModel):
         normal = workbook.add_format({'border': 1})
 
         headers = [
-            ' V Stock Transfer Trx No', 'V Stock Transfer Trx Date', 'V Stock Transfer Sh Code', 'V Stock Transfer Item Code', 'V Stock Transfer Item Name',
-            'V Stock Transfer Item Unit', 'V Stock Transfer Qty', 'Reason Code', 'V Stock Transfer Location'
+            'Trx No', 'Trx Date', 'Sh Code', 'Item Code', 'Item Name',
+            'Unit', 'Qty', 'Reason Code', 'Transfer Location'
         ]
 
         # Write headers

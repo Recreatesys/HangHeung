@@ -16,9 +16,9 @@ class ScrapReportWizard(models.TransientModel):
     def action_export_xlsx(self):
         self.ensure_one()
         scrap_locations = self.env['stock.location'].search([
-            ('scrap_location', '=', True),
+            # ('scrap_location', '=', True),
             ('location_id', 'child_of', self.shop_id.view_location_id.id)
-        ])    
+        ])
 
         scrap_location_names = scrap_locations.mapped('complete_name')
         scraps = self.env['stock.scrap'].search([
