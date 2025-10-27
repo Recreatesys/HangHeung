@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="point_of_sale.PaymentScreenStatus" t-inherit-mode="extension">
+        <!-- Safely insert inside the existing div using its class -->
+        <xpath expr="//t[@t-name='point_of_sale.PaymentScreenStatus']/section" position="after">      
+            <div class="eft-qr-container"
+                 style="text-align: center; margin-top: 20px;">
+                <!-- JS will insert QR code here -->
+            </div>
+        </xpath>
+    </t>    
+</templates>
+
+
+            
+
+

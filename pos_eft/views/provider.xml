@@ -1,0 +1,26 @@
+<odoo>
+    <record id="view_pos_payment_terminals_inherit_custom" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.pos.payment.terminals</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='pos_payment_terminals_section']" position="inside">
+                <setting title="The transactions are processed by Alipay." string="Alipay" help="Accept payments with an Alipay terminal">
+                    <field name="pos_alipay_enabled"/>
+                </setting>
+                <setting title="The transactions are processed by WeChat Pay." string="WeChat Pay" help="Accept payments with a WeChat payment terminal">
+                    <field name="pos_wechat_enabled"/>
+                </setting>
+                <setting title="The transactions are processed by FPS." string="FPS" help="Accept payments with FPS (Faster Payment System)">
+                    <field name="pos_fps_enabled"/>
+                </setting>
+                <setting title="The transactions are processed by PayMe." string="PayMe" help="Accept payments with PayMe by HSBC">
+                    <field name="pos_payme_enabled"/>
+                </setting>
+                <setting title="The transactions are processed by UnionPay." string="UnionPay" help="Accept payments with a UnionPay terminal">
+                    <field name="pos_unionpay_enabled"/>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>

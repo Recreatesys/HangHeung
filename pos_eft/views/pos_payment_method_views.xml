@@ -1,0 +1,13 @@
+<odoo>
+  <record id="view_pos_payment_terminal_inherit" model="ir.ui.view">
+    <field name="name">pos.payment.terminal.inherit</field>
+    <field name="model">pos.payment.method</field>
+    <field name="inherit_id" ref="point_of_sale.pos_payment_method_view_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='use_payment_terminal']" position="after">
+        <field name="eft_user_confirm_key" invisible="use_payment_terminal not in ['alipay','wechat', 'fps', 'payme', 'unionpay']"/>
+        <field name="eft_secret_key" invisible="use_payment_terminal not in ['alipay','wechat', 'fps', 'payme', 'unionpay']"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>
