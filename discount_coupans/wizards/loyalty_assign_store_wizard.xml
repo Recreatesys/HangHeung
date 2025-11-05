@@ -4,12 +4,19 @@
         <field name="name">view.loyalty.assign.store.wizard.form</field>
         <field name="model">loyalty.assign.store.wizard</field>
         <field name="arch" type="xml">
-            <form string="Assign Store">
-                <group>
-                    <field name="store_id" options="{'no_create': True, 'no_create_edit': True}" required="True"/>
-                </group>
+            <form string="Assign Stores">
+                <sheet>
+                    <group>
+                        <field name="line_ids" nolabel="1" options="{'no_create': True}">
+                            <list editable="bottom">
+                                <field name="card_id" readonly="1" force_save="1"/>
+                                <field name="store_id" options="{'no_create': True, 'no_create_edit': True}" required="True"/>
+                            </list>
+                        </field>
+                    </group>
+                </sheet>
                 <footer>
-                    <button name="action_assign_store" type="object" string="Assign Store" class="btn-primary"/>
+                    <button name="action_assign_store" type="object" string="Assign Stores" class="btn-primary"/>
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>
