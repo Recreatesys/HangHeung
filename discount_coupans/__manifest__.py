@@ -14,7 +14,8 @@
         "wizards/loyalty_genarate_wizard.xml",
         "wizards/excel_report_views.xml",
         "wizards/loyalty_assign_store_wizard.xml",
-        "wizards/stock_move_wizard.xml"
+        "wizards/stock_move_wizard.xml",
+        "wizards/multiple_loyalty_assign_store_wizard_views.xml",
     ],
     "assets": {
         "point_of_sale._assets_pos": [

@@ -6,3 +6,6 @@ access_loyalty_assign_store_wizard,loyalty.assign.store.wizard,model_loyalty_ass
 access_coupon_transfer_excel_wizard,coupon.transfer.excel.wizard,model_coupon_transfer_excel_wizard,,1,1,1,0
 access_stock_move_add_wizard,stock.move.add.wizard,model_stock_move_add_wizard,base.group_user,1,1,1,0
 access_loyalty_assign_store_line,loyalty.assign.store.line,model_loyalty_assign_store_line,base.group_user,1,1,1,0
+access_coupon_summary_excel_wizard,coupon.summary.excel.wizard,model_coupon_summary_excel_wizard,base.group_user,1,1,1,0
+access_loyalty_assign_store_wizard_range,loyalty.assign.store.wizard.range,model_loyalty_assign_store_wizard_range,base.group_user,1,1,1,1
+access_loyalty_assign_store_range_line,loyalty.assign.store.range.line,model_loyalty_assign_store_range_line,base.group_user,1,1,1,1

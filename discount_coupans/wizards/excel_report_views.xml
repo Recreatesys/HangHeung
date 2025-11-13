@@ -88,8 +88,9 @@
             <form string="Download Transfer Coupons">
                 <group>
                     <div>Download Transfer Coupons report</div>
-                    <field name="shop_id"/>
-                    <field name="date"/>
+                    <field name="shop_ids" widget="many2many_tags"/>
+                    <field name="from_date"/>
+                    <field name="to_date"/>
                 </group>
                 <footer>
                     <button name="action_generate_transfer_excel"
@@ -99,6 +100,29 @@
                     <button string="Cancel"
                             class="btn-secondary"
                             special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="view_coupon_summary_excel_wizard" model="ir.ui.view">
+        <field name="name">coupon.summary.excel.wizard.form</field>
+        <field name="model">coupon.summary.excel.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Coupon Summary Report">
+                <group>
+                    <field name="from_date"/>
+                    <field name="to_date"/>
+                    <field name="program_ids" widget="many2many_tags"/>
+                    <field name="activated_shop_ids" widget="many2many_tags"/>
+                    <field name="sold_shop_ids" widget="many2many_tags"/>
+                </group>
+
+                <footer>
+                    <button name="action_generate_report_excel"
+                            type="object"
+                            string="Generate Excel"
+                            class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
                 </footer>
             </form>
         </field>
@@ -136,6 +160,13 @@
         <field name="target">new</field>
     </record>
 
+    <record id="action_coupon_summary_excel_wizard" model="ir.actions.act_window">
+        <field name="name">Coupon Summary Report</field>
+        <field name="res_model">coupon.summary.excel.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
     <menuitem id="menu_coupon_excel_report"
               name="Coupon Report"
               parent="point_of_sale.menu_point_rep"
@@ -164,4 +195,10 @@
               parent="menu_coupon_excel_report"
               action="action_coupon_transfer_excel"
               sequence="4"/>
+
+    <menuitem id="menu_coupon_summary_report"
+              name="Coupon Summary Report"
+              parent="menu_coupon_excel_report"
+              action="action_coupon_summary_excel_wizard"
+              sequence="5"/>
 </odoo>

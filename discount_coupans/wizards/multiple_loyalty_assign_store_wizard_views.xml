@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_loyalty_assign_store_range_wizard" model="ir.ui.view">
+        <field name="name">loyalty.assign.store.wizard.form</field>
+        <field name="model">loyalty.assign.store.wizard.range</field>
+        <field name="arch" type="xml">
+            <form string="Assign Store to Coupons">
+                <sheet>
+
+                    <field name="line_ids">
+                        <list editable="bottom" delete="true">
+                            <field name="prefix"/>
+                            <field name="range_from"/>
+                            <field name="range_to"/>
+                            <field name="store_id"/>
+                        </list>
+                    </field>
+                </sheet>
+
+                <footer>
+                    <button string="Assign Store" type="object" name="action_assign_store" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_assign_store_wizard" model="ir.actions.act_window">
+        <field name="name">Assign Store to Coupons</field>
+        <field name="res_model">loyalty.assign.store.wizard.range</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_assign_store_coupons_1"
+        name="Assign Store to Coupons"
+        parent="point_of_sale.menu_point_config_product"
+        action="action_assign_store_wizard"/>
+</odoo>
