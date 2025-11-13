@@ -1,8 +1,7 @@
 from odoo import models, fields,api
-from datetime import timedelta
+from datetime import time, timedelta, datetime
 from odoo.exceptions import ValidationError
-from datetime import datetime
-
+import pytz
 
 
 class POSShopReportWizard(models.TransientModel):
@@ -137,10 +136,19 @@ class POSShopReportWizard(models.TransientModel):
 
     def _compute_payment_breakdown(self):
         Payment = self.env['pos.payment']
+        user_tz = self.env.user.tz or 'UTC'
+        tz = pytz.timezone(user_tz)
+
+        start_local = tz.localize(datetime.combine(self.date_start, time.min))
+        end_local = tz.localize(datetime.combine(self.date_end, time.max))
+
+        start_utc = start_local.astimezone(pytz.UTC)
+        end_utc = end_local.astimezone(pytz.UTC)
+
         orders = self.env['pos.order'].search([
             ('config_id', '=', self.shop_id.id),
-            ('date_order', '>=', self.date_start),
-            ('date_order', '<=', self.date_end),
+            ('date_order', '>=', start_utc),
+            ('date_order', '<=', end_utc),
             ('state', 'in', ['paid', 'done', 'invoiced']),
         ])
         payments = Payment.search([('pos_order_id', 'in', orders.ids)])
