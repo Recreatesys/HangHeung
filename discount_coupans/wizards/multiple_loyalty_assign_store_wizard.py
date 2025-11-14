@@ -32,19 +32,21 @@ class LoyaltyAssignStoreWizard(models.TransientModel):
                 end = int(line.range_to)
             except (ValueError, TypeError):
                 line_issues.append(_("Range From and Range To must be numeric strings (zero-padded)"))
-    
-                all_line_errors.append(f"{line_header}: {'\n '.join(line_issues)}")
+                joined_issues = "\n ".join(line_issues)
+                all_line_errors.append(f"{line_header}: {joined_issues}")
                 continue
 
             if start >= end:
                 line_issues.append(_(f'{line.prefix} Range From should be less than Range To.'))
-                all_line_errors.append(f"{line_header}: {'\n '.join(line_issues)}")
+                joined_issues = "\n ".join(line_issues)
+                all_line_errors.append(f"{line_header}: {joined_issues}")
                 continue
 
             cards = Card.search([('code', '=like', f"{line.prefix}%")])
             if not cards:
                 line_issues.append(_("No coupons found with prefix %s.") % line.prefix)
-                all_line_errors.append(f"{line_header}: {'\n '.join(line_issues)}")
+                joined_issues = "\n ".join(line_issues)
+                all_line_errors.append(f"{line_header}: {joined_issues}")
                 continue
 
             filtered_cards = cards.filtered(lambda c: (
