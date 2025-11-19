@@ -17,6 +17,7 @@
             <field name="date_activation"/>
             <field name="date_sale"/>
             <field name="redeem_shop_id"/>
+            <field name="redeemed_datetime"/>
             <field name="remark" placeholder="Internal Remark" help="Used for internal notes or memos. Not visible on printed coupon."/>
             <field name="expiration_type"/>
             <field name="expiration_date" invisible="expiration_type != 'fixed'"/>
@@ -40,6 +41,7 @@
               <field name="date_activation"/>
               <field name="date_sale"/>
               <field name="redeem_shop_id"/>
+              <field name="redeemed_datetime"/>
               <field name="allocated_store_id"/>
           </xpath>
       </field>

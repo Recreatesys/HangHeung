@@ -56,7 +56,7 @@ class CouponSummaryExcelWizard(models.TransientModel):
         cell = workbook.add_format({'text_wrap': True, 'valign': 'top'})
 
         headers = [
-            'Code', 'Prefix', 'Coupon Program', 'Activated Shop', 'Sold To Shop',
+            'Code', 'Prefix', 'Coupon Program', 'Activated Shop', 'Redeemed Shop',
             'Status', 'Activation Date', 'Redeemed Date', 'Created Date'
         ]
 
@@ -72,7 +72,7 @@ class CouponSummaryExcelWizard(models.TransientModel):
             sheet.write(row, 4, c.redeem_shop_id.display_name or '', cell)
             sheet.write(row, 5, c.status.title() or '', cell)
             sheet.write(row, 6, str(c.date_activation or ''), cell)
-            sheet.write(row, 7, str(c.date_sale or ''), cell)
+            sheet.write(row, 7, str(c.redeemed_datetime or ''), cell)
             sheet.write(row, 8, str(c.create_date.date() if c.create_date else ''), cell)
             row += 1
 

@@ -3,7 +3,7 @@
     <t t-call="web.external_layout">
       <main class="page">
         <h2 style="text-align: center;"><t t-esc="docs.company_name"/></h2>
-        <div style="text-align: center;">
+        <div style="text-align: center;margin-top: 100px;">
           <h3>Shop Name: <t t-esc="docs.shop_id.name"/></h3>
           <p><t t-esc="docs.shop_address"/></p>
           <p>Tel: <t t-esc="docs.shop_phone"/></p>

@@ -24,9 +24,11 @@ class LoyaltyAssignStoreWizard(models.TransientModel):
 
         for line in self.line_ids:
             card = line.card_id
-            if card.allocated_store_id:
-                raise ValidationError(_("The Loyalty Card '%s' is already assigned to store '%s'.") %
-                    (card.code, card.allocated_store_id.display_name))
+
+            if card.status not in ['not_activated']:
+                raise ValidationError(_(
+                    "The Loyalty Card '%s' cannot be assigned because its status is '%s'."
+                ) % (card.code, card.status))
 
             product = card.program_id.product_id
             if not product:

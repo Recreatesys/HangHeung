@@ -24,6 +24,7 @@ class PosOrder(models.Model):
             if points <= 0 and coupon.status != 'redeemed' and int(coupon.points_display[0]) == 0:
                 coupon.write({
                     'status': 'redeemed',
+                    'redeemed_datetime': fields.Datetime.now(),
                 })
 
         return result

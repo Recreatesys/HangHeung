@@ -24,6 +24,7 @@ class LoyaltyCard(models.Model):
     date_activation = fields.Datetime(string="Activation Date", readonly=True)
     date_sale = fields.Datetime(string="Sale Date", readonly=True)
     redeem_shop_id = fields.Many2one('pos.config', string="Redeemed At", readonly=True)
+    redeemed_datetime = fields.Datetime(string="Redeemed Date", readonly=True)
 
     remark = fields.Text(string='Internal Remark', help="Used for internal notes or memos. Not visible on printed coupon.")
 
