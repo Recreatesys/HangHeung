@@ -7,6 +7,21 @@ class LoyaltyAssignStoreWizard(models.TransientModel):
 
     line_ids = fields.One2many('loyalty.assign.store.line', 'wizard_id', string='Cards to Assign')
 
+    common_store_id = fields.Many2one(
+        'pos.config',
+        string="Common Store",
+        help="Selecting a store here will apply it to all coupon lines."
+    )
+
+    line_ids = fields.One2many('loyalty.assign.store.line', 'wizard_id', string='Cards to Assign')
+
+    @api.onchange('common_store_id')
+    def _onchange_common_store_id(self):
+        """When common store is selected, apply it to all lines."""
+        if self.common_store_id:
+            for line in self.line_ids:
+                line.store_id = self.common_store_id.id
+
     @api.model
     def default_get(self, fields_list):
         res = super().default_get(fields_list)

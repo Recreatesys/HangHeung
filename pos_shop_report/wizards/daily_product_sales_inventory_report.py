@@ -2,9 +2,8 @@ import io
 import base64
 import xlsxwriter
 from datetime import timedelta
-from odoo import models, fields,api
+from odoo import models, fields, api
 from odoo.exceptions import ValidationError
-
 
 
 class DailyProductSalesInventoryReport(models.TransientModel):
@@ -21,6 +20,10 @@ class DailyProductSalesInventoryReport(models.TransientModel):
         StockMove = self.env['stock.move']
         StockScrap = self.env['stock.scrap']
 
+        all_products = self.env['product.product'].search([
+            ('type', 'in', ['product', 'consu', 'combo']),
+        ])
+
         lines = PosLine.search([
             ('order_id.config_id', '=', self.shop_id.id),
             ('order_id.date_order', '>=', self.date_start),
@@ -28,14 +31,30 @@ class DailyProductSalesInventoryReport(models.TransientModel):
             ('order_id.company_id', '=', company.id),
         ])
 
-        if not lines:
-            raise ValidationError("There are no orders for this date.")
-
         result = {}
+
+        for product in all_products:
+            result[product.id] = {
+                'product_id': product.id,
+                'sku': product.default_code or '',
+                'name': product.name or '',
+                'unit': product.uom_id.name,
+                'price': product.lst_price,
+                'previous_stock': 0,
+                'stock_in': 0,
+                'scrap_qty': 0,
+                'sales_qty': 0,
+                'sales_refund_qty': 0,
+                'total_qty_today': 0,
+                'sales_amount': 0,
+                'discount_amount': 0,
+                'final_amount': 0,
+            }
 
         for line in lines:
             product = line.product_id
             key = product.id
+
             if key not in result:
                 result[key] = {
                     'product_id': product.id,
@@ -51,7 +70,7 @@ class DailyProductSalesInventoryReport(models.TransientModel):
                     'total_qty_today': 0,
                     'sales_amount': 0,
                     'discount_amount': 0,
-                    'final_amount':0,
+                    'final_amount': 0,
                 }
 
             res = result[key]
@@ -94,7 +113,7 @@ class DailyProductSalesInventoryReport(models.TransientModel):
             result[product_id]['scrap_qty'] = sum(scraps.mapped('scrap_qty'))
 
             res = result[product_id]
-            res['total_qty_today'] =  res['sales_qty'] + res['sales_refund_qty']
+            res['total_qty_today'] = res['sales_qty'] + res['sales_refund_qty']
             res['final_amount'] = res['sales_amount'] - res['discount_amount']
 
         return list(result.values())
@@ -166,7 +185,7 @@ class DailyProductSalesInventoryReport(models.TransientModel):
             sheet.write(row, 0, line.get('sku', ''), normal_format)
             sheet.write(row, 1, line.get('name', ''), normal_format)
             sheet.write(row, 2, line.get('unit', ''), normal_format)
-            sheet.write(row, 3, line.get('price', 0.0), normal_format) 
+            sheet.write(row, 3, line.get('price', 0.0), normal_format)
             sheet.write(row, 4, line.get('previous_stock', 0), normal_format)
             sheet.write(row, 5, line.get('stock_in', 0), normal_format)
             sheet.write(row, 6, line.get('sales_qty', 0), normal_format)
@@ -199,4 +218,3 @@ class DailyProductSalesInventoryReport(models.TransientModel):
             'url': f'/web/content/{attachment.id}?download=true',
             'target': 'self',
         }
-

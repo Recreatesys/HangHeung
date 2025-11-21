@@ -9,3 +9,4 @@ from . import stock_move_wizard
 from . import loyalty_assign_store_line
 from . import coupon_summary_excel_wizard
 from . import multiple_loyalty_assign_store_wizard
+from . import generate_coupon_wizard
