@@ -16,7 +16,7 @@
         "wizards/loyalty_assign_store_wizard.xml",
         "wizards/stock_move_wizard.xml",
         "wizards/multiple_loyalty_assign_store_wizard_views.xml",
-        "wizards/generate_coupon_wizard_views.xml",
+        "wizards/generate_coupon_wizard.xml",
     ],
     "assets": {
         "point_of_sale._assets_pos": [
