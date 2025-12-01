@@ -1,0 +1,36 @@
+<odoo>
+    <record id="view_receipt_reason_report_wizard" model="ir.ui.view">
+        <field name="name">receipt.reason.report.wizard.form</field>
+        <field name="model">receipt.reason.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Receipt Reason Report">
+                <group>
+                    <field name="start_date" required="1"/>
+                    <field name="end_date" required="1"/>
+                    <field name="reason_code_ids" widget="many2many_tags"/>
+                </group>
+
+                <footer>
+                    <button string="Generate Excel"
+                            name="action_generate_report"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_receipt_reason_report_wizard" model="ir.actions.act_window">
+        <field name="name">Reason Code Report</field>
+        <field name="res_model">receipt.reason.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_receipt_reason_report"
+              name="Reason Code Report"
+              parent="stock.menu_warehouse_report"
+              action="action_receipt_reason_report_wizard"/>
+
+</odoo>

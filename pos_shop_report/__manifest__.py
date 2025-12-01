@@ -10,7 +10,7 @@
     """,
     'author': 'Lau Siu Hin',
     'website': '',
-    'depends': ['contacts', 'base', 'stock', 'web', 'purchase'],
+    'depends': ['contacts', 'base', 'stock', 'web', 'purchase','recreate_HangHeung'],
     'data': [
         "security/ir.model.access.csv",
         "wizards/pos_shop_report_wizard.xml",
@@ -26,6 +26,7 @@
         "wizards/internal_transfer_report.xml",
         "wizards/delivery_report_wizard.xml",
         "wizards/po_report_wizard.xml",
+        "wizards/reason_code_report.xml",
         "views/pos_shop_report.xml",
         "reports/pos_shop_report.xml",
         "reports/pos_shop_report_format.xml"

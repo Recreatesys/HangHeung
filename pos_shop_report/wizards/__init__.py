@@ -11,3 +11,4 @@ from . import scrap_report
 from . import internal_transfer_report
 from . import delivery_report_wizard
 from . import po_report_wizard
+from . import reason_code_report

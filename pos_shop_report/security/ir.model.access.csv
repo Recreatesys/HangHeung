@@ -12,3 +12,4 @@ access_scrap_report_wizard,scrap.report.wizard,model_scrap_report_wizard,base.gr
 access_internal_transfer_report_wizard,internal.transfer.report.wizard,model_internal_transfer_report_wizard,base.group_user,1,1,1,1
 access_delivery_report_wizard,delivery.report.wizard,model_delivery_report_wizard,base.group_user,1,1,1,1
 access_purchase_order_report_wizard,purchase.order.report.wizard,model_purchase_order_report_wizard,base.group_user,1,1,1,1
+access_receipt_reason_report_wizard,receipt.reason.report.wizard,model_receipt_reason_report_wizard,base.group_user,1,1,1,1
