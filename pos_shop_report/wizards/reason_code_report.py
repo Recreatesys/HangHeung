@@ -69,7 +69,7 @@ class ReceiptReasonReportWizard(models.TransientModel):
                 sheet.write(row, 1, str(picking.scheduled_date.date()) if picking.scheduled_date else "")
                 sheet.write(row, 2, picking.partner_id.name or "")
                 sheet.write(row, 3, picking.origin or "")
-                sheet.write(row, 4, picking.reason_code.code or "")
+                sheet.write(row, 4, f'{picking.reason_code.code}{picking.reason_code.remark}' or "")
                 sheet.write(row, 5, line.product_id.display_name)
                 sheet.write(row, 6, move.product_uom_qty)
                 sheet.write(row, 7, line.qty_done)

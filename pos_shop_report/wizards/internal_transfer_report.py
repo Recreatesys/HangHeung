@@ -57,7 +57,7 @@ class InternalTransferReportWizard(models.TransientModel):
                 sheet.write(row, 4, move.product_id.name or '', normal)
                 sheet.write(row, 5, move.product_uom.name or '', normal)
                 sheet.write(row, 6, move.quantity or 0, normal)
-                sheet.write(row, 7, getattr(transfer, 'reason_code', False) and transfer.reason_code.code or '', normal)
+                sheet.write(row, 7, getattr(transfer, 'reason_code', False) and f'{transfer.reason_code.code}{transfer.reason_code.remark}' or '', normal)
                 sheet.write(row, 8, transfer.location_dest_id.display_name or '', normal)
                 row += 1
 
