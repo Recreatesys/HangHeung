@@ -3,18 +3,27 @@
         <field name="name">generate.coupon.wizard.form</field>
         <field name="model">generate.coupon.wizard</field>
         <field name="arch" type="xml">
-            <form string="Generate Coupons">
+            <form string="Generate / Sell Coupons">
 
                 <group>
                     <field name="order_id" readonly="1"/>
-                    <field name="product_id"/>
-                    <field name="prefix"/>
+                    <field name="product_id" readonly="1"/>
+                    <field name="coupon_action"/>
                 </group>
 
-                <group string="Coupon Range">
-                    <field name="from_number" placeholder="e.g. 001200"/>
-                    <field name="range_count" placeholder="e.g. 50"/>
-                    <field name="to_number" readonly="1" force_save="1"/>
+                <!-- GENERATE MODE -->
+                <group invisible="coupon_action == 'sell'">
+                    <field name="prefix"/>
+                    <field name="from_number"/>
+                    <field name="range_count"/>
+                    <field name="to_number" readonly="1"/>
+                </group>
+
+                <!-- SELL MODE -->
+                <group invisible="coupon_action == 'generate'">
+                    <field name="selected_coupon_ids"
+                           widget="many2many_tags"
+                           domain="[('id','in',available_coupon_ids)]"/>
                 </group>
 
                 <group>
@@ -24,9 +33,8 @@
                 <footer>
                     <button name="action_generate"
                             type="object"
-                            string="Generate Coupons &amp; Confirm"
+                            string="Process Coupons"
                             class="btn-primary"/>
-
                     <button string="Cancel"
                             class="btn-secondary"
                             special="cancel"/>

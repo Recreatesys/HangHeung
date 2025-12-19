@@ -11,6 +11,7 @@
         "views/loyalty_card_views.xml",
         "views/product_template.xml",
         "views/loyalty_program_views.xml",
+        "views/sale_order_views.xml",
         "wizards/loyalty_genarate_wizard.xml",
         "wizards/excel_report_views.xml",
         "wizards/loyalty_assign_store_wizard.xml",
