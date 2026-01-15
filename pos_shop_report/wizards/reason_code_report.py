@@ -24,6 +24,8 @@ class ReceiptReasonReportWizard(models.TransientModel):
         ]
         if self.reason_code_ids:
             domain.append(('reason_code', 'in', self.reason_code_ids.ids))
+        else:
+            domain.append(('reason_code', '!=', False))
 
         pickings = self.env['stock.picking'].sudo().search(domain)
 
@@ -65,6 +67,8 @@ class ReceiptReasonReportWizard(models.TransientModel):
             for line in picking.move_line_ids:
 
                 move = line.move_id
+                if move.product_uom_qty == line.qty_done:
+                    continue
                 sheet.write(row, 0, picking.name or "")
                 sheet.write(row, 1, str(picking.scheduled_date.date()) if picking.scheduled_date else "")
                 sheet.write(row, 2, picking.partner_id.name or "")
