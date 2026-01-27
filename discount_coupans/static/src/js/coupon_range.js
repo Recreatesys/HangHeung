@@ -291,7 +291,7 @@ patch(EditListPopup.prototype, {
         const orderline = order.models["pos.order.line"].create({
             order_id: order,
             product_id: product,
-            qty: 1,
+            qty: quantity,
             price_unit: product.lst_price,
         });
 
