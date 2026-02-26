@@ -10,21 +10,21 @@ class PurchaseOrderReportWizard(models.TransientModel):
 
     date_from = fields.Date(string="Start Date", required=True)
     date_to = fields.Date(string="End Date", required=True)
-    company_id = fields.Many2one(
-        'res.company',
-        string="Company",
-        required=True,
-        default=lambda self: self.env.company,
-        help="Select which company's PO data to export"
-    )
+    company_selector = fields.Selection([
+        ('1', 'Hoymay HK Ltd'),
+        ('2', "That's Ltd"),
+        ('3', 'HANG HEUNG CAKE SHOP COMPANY LIMITED'),
+    ], string="Company", required=True)
+
 
     def action_export_xlsx(self):
         self.ensure_one()
 
+        company_id_int = int(self.company_selector)
         purchase_orders = self.env['purchase.order'].sudo().search([
             ('date_order', '>=', self.date_from),
             ('date_order', '<=', self.date_to),
-            ('company_id', '=', self.company_id.id),
+            ('company_id', '=', company_id_int),
         ], order='date_order asc')
 
         output = BytesIO()
