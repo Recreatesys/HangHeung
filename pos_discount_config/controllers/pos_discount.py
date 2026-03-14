@@ -6,10 +6,15 @@ from collections import defaultdict
 
 logger = logging.getLogger(__name__)
 
+
 class PosDiscountController(http.Controller):
 
     @http.route('/pos/discount_rule', type='json', auth='public')
-    def get_discount_rule(self, product_qty_map, pos_config_id=None):
+    def get_discount_rule(self, product_qty_map, pos_config_id=None, pricelist_id=None):
+
+        if pricelist_id:
+            pricelist = request.env['product.pricelist'].sudo().browse(pricelist_id)
+
         current_dt = fields.Datetime.now()
         company_id = request.env.company.id
         all_discounts = []
@@ -46,7 +51,7 @@ class PosDiscountController(http.Controller):
         for entry in config_map.values():
             if entry['qty'] <= 0:
                 continue
-            discount_info = self._apply_discount_rule(entry['product_ids'], entry['qty'], entry['config'])
+            discount_info = self._apply_discount_rule(entry['product_ids'], entry['qty'], entry['config'], pricelist)
             if discount_info:
                 all_discounts.append(discount_info)
                 excluded_product_ids.update(entry['product_ids'])
@@ -65,7 +70,7 @@ class PosDiscountController(http.Controller):
                 pid = int(pid)
                 if pid in excluded_product_ids or pid not in discountable_product_ids:
                     continue
-                discount_info = self._apply_discount_rule([pid], qty, global_bogo)
+                discount_info = self._apply_discount_rule([pid], qty, global_bogo, pricelist)
                 if discount_info:
                     all_discounts.append(discount_info)
                     excluded_product_ids.add(pid)
@@ -133,7 +138,7 @@ class PosDiscountController(http.Controller):
 
         return {'discount_lines': all_discounts}
 
-    def _apply_discount_rule(self, product_ids, qty, config):
+    def _apply_discount_rule(self, product_ids, qty, config, pricelist=None):
         if not config or not config.discount_product or qty <= 0:
             return None
 
@@ -147,9 +152,16 @@ class PosDiscountController(http.Controller):
         }
 
         if config.is_bogo and len(product_ids) == 1:
+
             pid = product_ids[0]
             product = request.env['product.product'].sudo().browse(pid)
-            unit_price = product.lst_price
+
+            if pricelist:
+                unit_price = pricelist._get_product_price(product, 1, False)
+            else:
+                unit_price = product.lst_price
+
+            # unit_price = product.lst_price
             free_items = qty // 2
             total_discount = free_items * unit_price
             if total_discount > 0:

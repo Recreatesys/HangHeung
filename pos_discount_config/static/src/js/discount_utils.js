@@ -48,7 +48,8 @@ export async function applyDiscountLogic(order) {
         let discountData = {};
         try {
             const pos_config_id = order?.config_id?.id;
-            discountData = await rpc('/pos/discount_rule', { product_qty_map, pos_config_id });
+            const pricelist_id = order?.pricelist_id?.id;
+            discountData = await rpc('/pos/discount_rule', { product_qty_map, pos_config_id, pricelist_id});
         } catch (error) {
             console.error("Error fetching discount rule:", error);
             return;
