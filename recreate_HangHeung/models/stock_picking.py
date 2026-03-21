@@ -25,7 +25,7 @@ class StockPicking(models.Model):
             if record.origin:
                 origin_po = record.origin.split('-')[-1].strip()
 
-                dropship = self.env['stock.picking'].with_company(2).search([
+                dropship = self.env['stock.picking'].sudo().with_company(2).search([
                     ('origin', '=', origin_po),
                     ('picking_type_id.code', '=', 'dropship')
                 ], limit=1)
@@ -38,7 +38,7 @@ class StockPicking(models.Model):
         if self.origin:
             origin_po = self.origin.split('-')[-1].strip()
 
-            dropship = self.env['stock.picking'].with_company(2).search([
+            dropship = self.env['stock.picking'].sudo().with_company(2).search([
                 ('origin', '=', origin_po),
                 ('picking_type_id.code', '=', 'dropship')
             ], limit=1)
