@@ -2,7 +2,6 @@ from collections import defaultdict
 from dateutil.relativedelta import relativedelta
 from odoo.exceptions import UserError
 from odoo import models, fields, api, _, SUPERUSER_ID
-from odoo.addons.stock.models.stock_rule import ProcurementException
 from odoo.tools import float_compare, groupby
 import logging
 
@@ -123,7 +122,7 @@ class StockRule(models.Model):
             procurements_by_po_domain[domain].append((procurement, rule))
 
         if errors:
-            raise ProcurementException(errors)
+            raise UserError('\n'.join(msg for _, msg in errors))
         
 
         for domain, procurements_rules in procurements_by_po_domain.items():
@@ -151,10 +150,14 @@ class StockRule(models.Model):
                     # Indeed, the current user may be a user without access to Purchase, or even be a portal user.
                     if vals['company_id'] == 2:
                         picking_type_id = self.env['stock.picking.type'].search([('code', '=', 'dropship'), ('company_id', '=', 2)], limit=1).id
-                        if not po_origin:
-                            dest_address = self.env['res.users'].search([('id', '=', self.env.context['uid'])]).default_dest_address.id
-                        else:
+                        if po_origin:
                             dest_address = po_origin.dest_address_id.id
+                        else:
+                            sale_order = self.env['sale.order'].search([('name', '=', procurement.origin)], limit=1)
+                            if sale_order and sale_order.partner_shipping_id:
+                                dest_address = sale_order.partner_shipping_id.id
+                            else:
+                                dest_address = self.env['res.users'].search([('id', '=', self.env.context['uid'])]).default_dest_address.id
                         if picking_type_id:
                             vals['picking_type_id'] = picking_type_id
                         if dest_address:
