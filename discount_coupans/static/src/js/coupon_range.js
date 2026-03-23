@@ -258,8 +258,7 @@ patch(EditListPopup.prototype, {
         }
 
         const startSerial = $('.edit-list-inputs .list-line-input').val();
-        const quantity = parseInt($('.edit-list-inputs input[placeholder="Quantity"]').val());
-
+        const quantity = parseInt($('.edit-list-inputs input[placeholder="Quantity"], .edit-list-inputs input[placeholder="數量"]').val());
         if (!startSerial || isNaN(quantity) || quantity <= 0) {
             this.env.services.dialog.add(AlertDialog, {
                 title: "Validation Error",
