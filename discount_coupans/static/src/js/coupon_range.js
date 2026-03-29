@@ -287,11 +287,13 @@ patch(EditListPopup.prototype, {
             });
             return;
         }
+        const price_list_price = product.get_price(order.pricelist_id, quantity)
+
         const orderline = order.models["pos.order.line"].create({
             order_id: order,
             product_id: product,
             qty: quantity,
-            price_unit: product.lst_price,
+            price_unit: price_list_price || product.lst_price,
         });
 
         if (orderline) {
