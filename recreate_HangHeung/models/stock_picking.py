@@ -74,3 +74,56 @@ class StockPicking(models.Model):
                         }
                     }
         return res
+
+    full_origin_chain = fields.Char(
+        string="Full Source Document",
+        compute="_compute_full_origin_chain",
+        store=False
+    )
+
+    def _compute_full_origin_chain(self):
+        for picking in self:
+            chain = []
+
+            # Extract the last segment of the origin string as the initial search key
+            search_key = False
+            if picking.origin:
+                first_segment = picking.origin.split('-')[0].strip()
+                search_key = picking.origin.split('-')[-1].strip()
+                if first_segment != search_key:
+                    chain.append(first_segment)
+
+            while search_key:
+                # Add the current segment to the chain
+                chain.append(search_key)
+
+                next_key = False
+
+                # Search for a related Sales Order
+                so = self.env['sale.order'].sudo().with_company(False).search([('name', '=', search_key)], limit=1)
+                if so:
+                    # Prefer SO.origin, but fallback to SO.client_order_ref if origin is empty
+                    source = so.origin or so.client_order_ref
+
+                    if source:
+                        # The source may contain multiple segments
+                        next_key = source.split('-')[-1].strip()
+                    else:
+                        next_key = False
+
+                    search_key = next_key
+                    continue
+
+                # Search for a related Purchase Order
+                po = self.env['purchase.order'].sudo().with_company(False).search([('name', '=', search_key)], limit=1)
+                if po:
+                    # PO.origin may contain multiple segments
+                    if po.origin:
+                        next_key = po.origin.split('-')[-1].strip()
+                    search_key = next_key
+                    continue
+
+                # Stop if no further linked document is found
+                search_key = False
+
+            picking.full_origin_chain = " - ".join(chain)

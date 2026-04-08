@@ -1,0 +1,31 @@
+<odoo>
+    <template id="purchase_order_report_inherit"
+              inherit_id="purchase.report_purchaseorder_document">
+
+        <!-- Replace the document title with a unified "PO, Purchase Order #<number>" -->
+        <xpath expr="//t[@t-set='layout_document_title']" position="replace">
+            <t t-set="layout_document_title"/>
+            <!-- Set current report name for external_layout_standard-->
+            <t t-set="current_report_name" t-value="'purchase.report_purchaseorder_document'"/>
+        </xpath>
+
+       <!-- Insert "Total Quantity" above the total section -->
+        <xpath expr="//div[@id='total']" position="before">
+            <div class="row justify-content-end mt-n3 pb-3">
+                <div class="col-4">
+                    <table class="o_total_table table table-borderless">
+                        <tr>
+                            <td class="text-start">Total Quantity</td>
+                            <td class="text-end">
+                                <t t-set="total_qty" t-value="sum(line.product_qty for line in o.order_line)"/>
+                                <span t-esc="total_qty"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </xpath>
+
+    </template>
+
+</odoo>

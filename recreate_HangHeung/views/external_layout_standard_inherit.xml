@@ -1,0 +1,24 @@
+<odoo>
+    <template id="external_layout_standard_inherit"
+              inherit_id="web.external_layout_standard">
+
+        <xpath expr="//div[starts-with(@t-attf-class, 'header')]" position="inside">
+
+            <!--  Only apply to report_purchaseorder_document -->
+            <t t-if="current_report_name == 'purchase.report_purchaseorder_document' and report_type == 'pdf'">
+                <div class="mt-4" style="font-size:32px;">
+                    PO, 採購單 #<span t-field="o.name"/>
+                </div>
+            </t>
+
+            <!--  Only apply to report_delivery slip -->
+            <t t-if="current_report_name == 'stock.report_deliveryslip' and report_type == 'pdf'">
+                <div class="mt-4" style="font-size:32px;">
+                    <span t-field="o.name">WH/OUT/0001</span>
+                </div>
+            </t>
+
+        </xpath>
+
+    </template>
+</odoo>

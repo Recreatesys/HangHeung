@@ -24,6 +24,8 @@
         "wizard/wizard_open.xml",
         "views/purchase_order_view.xml",
         # "views/custom_backorder.xml",
+        "views/purchase_order_report_inherit.xml",
+        "views/external_layout_standard_inherit.xml",
     ],
     'assets': {
         'point_of_sale._assets_pos': [

@@ -10,7 +10,7 @@
         <xpath expr="//t[@t-set='address']" position="replace"></xpath>
         <xpath expr="//table[@name='stock_move_table']" position="before">
             <div style="margin-bottom: 20px;">
-                <div style="display: inline-block; margin-right: 275px; width: 250px; vertical-align: top;">
+                <div style="display: inline-block; margin-right: 275px; width: 255px; vertical-align: top;">
                     <div class="col-7" name="div_incoming_address">
                         <t t-set="show_partner" t-value="False"/>
                         <div name="vendor_address" t-if="o.picking_type_id.code=='incoming' and partner">
@@ -52,9 +52,12 @@
                 </div>
             </div>
 
-            <h2>
+            <!--<h2>
                 <span t-field="o.name">WH/OUT/0001</span>
-            </h2>
+            </h2>-->
+            <!-- Set current report name for external_layout_standard-->
+            <t t-set="current_report_name" t-value="'stock.report_deliveryslip'"/>
+
             <div class="oe_structure"></div>
             <div class="report-wrapping-flexbox clearfix row mt32 mb32">
                 <div t-if="o.origin" style="display: inline-block; width: 30%; margin-right: 15px;" name="div_origin">
@@ -67,12 +70,70 @@
                 </div>
                 <div t-if="o.origin" style="display: inline-block; width: 30%;" name="div_sched_date">
                     <strong style="color: #AF8489">Customer Reference:</strong>
-                    <t t-set="last_order_number" t-value="o.origin.split('-')[-1]"/>
+                    <!-- Determine last segment from full_origin_chain if available -->
+                    <t t-if="o.full_origin_chain">
+                        <t t-set="last_order_number" t-value="o.full_origin_chain.split('-')[-1].strip()"/>
+                    </t>
+
+                    <!-- Fallback: use origin's last segment -->
+                    <t t-else="">
+                        <t t-set="last_order_number" t-value="o.origin.split('-')[-1].strip()"/>
+                    </t>
                     <p t-esc="last_order_number" class="m-0"/>
                 </div>
             </div>
             <div class="oe_structure"></div>
         </xpath>
+
+        <xpath expr="//table[@name='stock_move_table']/tbody" position="after">
+            <tbody>
+                <tr style="border-top: 2px solid black; font-weight: bold;">
+                    <td>Total</td>
+
+                    <!-- Ordered -->
+                    <td class="text-center">
+                        <t t-esc="sum(o.move_ids.mapped('product_uom_qty'))"/>
+                    </td>
+
+                    <!-- Delivered -->
+                    <td class="text-center">
+                        <t t-esc="sum(o.move_ids.mapped('quantity'))"/>
+                    </td>
+                </tr>
+            </tbody>
+        </xpath>
+
+        <xpath expr="//table[@name='stock_move_line_table']/tbody" position="after">
+            <tbody>
+
+                <!-- Check if serial/lot numbers are used -->
+                <t t-set="has_serial_number" t-value="o.move_line_ids.mapped('lot_id')"/>
+
+                <!-- Total row -->
+                <tr style="border-top: 2px solid black; font-weight: bold;">
+
+                    <!-- Label column -->
+                    <td t-att-colspan="has_serial_number and 2 or 1">
+                        Total
+                    </td>
+
+                    <!-- Ordered (Odoo logic = qty_done) -->
+                    <t t-if="not has_serial_number">
+                        <td class="text-center">
+                            <t t-esc="sum(o.move_line_ids.mapped('qty_done'))"/>
+                        </td>
+                    </t>
+
+                    <!-- Delivered -->
+                    <td class="text-center">
+                        <t t-esc="sum(o.move_line_ids.mapped('qty_done'))"/>
+                    </td>
+
+                </tr>
+
+            </tbody>
+        </xpath>
+
     </template>
 
 </odoo>

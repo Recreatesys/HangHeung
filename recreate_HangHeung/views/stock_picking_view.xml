@@ -15,6 +15,10 @@
 
                 </xpath>
 
+                <xpath expr="//field[@name='origin']" position="after">
+                    <field name="full_origin_chain" readonly="1"/>
+                </xpath>
+
             </field>
         </record>
     </data>
