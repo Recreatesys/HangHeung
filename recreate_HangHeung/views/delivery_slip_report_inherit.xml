@@ -71,14 +71,8 @@
                 <div t-if="o.origin" style="display: inline-block; width: 30%;" name="div_sched_date">
                     <strong style="color: #AF8489">Customer Reference:</strong>
                     <!-- Determine last segment from full_origin_chain if available -->
-                    <t t-if="o.full_origin_chain">
-                        <t t-set="last_order_number" t-value="o.full_origin_chain.split('-')[-1].strip()"/>
-                    </t>
-
-                    <!-- Fallback: use origin's last segment -->
-                    <t t-else="">
-                        <t t-set="last_order_number" t-value="o.origin.split('-')[-1].strip()"/>
-                    </t>
+		    <t t-set="source" t-value="o.full_origin_chain or o.origin or ''"/>
+		    <t t-set="last_order_number" t-value="source.split('-')[-1].strip()"/>
                     <p t-esc="last_order_number" class="m-0"/>
                 </div>
             </div>
