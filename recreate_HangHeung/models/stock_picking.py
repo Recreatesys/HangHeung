@@ -76,54 +76,54 @@ class StockPicking(models.Model):
         return res
 
     full_origin_chain = fields.Char(
-        string="Full Source Document",
+        string="Origin Chain",
         compute="_compute_full_origin_chain",
-        store=False
+        store=True
     )
 
+    @api.depends('origin')
     def _compute_full_origin_chain(self):
         for picking in self:
             chain = []
+            visited = set()
 
-            # Extract the last segment of the origin string as the initial search key
             search_key = False
+
             if picking.origin:
-                first_segment = picking.origin.split('-')[0].strip()
-                search_key = picking.origin.split('-')[-1].strip()
-                if first_segment != search_key:
-                    chain.append(first_segment)
+                parts = [p.strip() for p in picking.origin.split('-') if p.strip()]
 
-            while search_key:
-                # Add the current segment to the chain
+                if parts:
+                    if len(parts) > 1:
+                        chain.append(parts[0])
+                    search_key = parts[-1]
+
+            depth = 0
+            max_depth = 10
+
+            while search_key and search_key not in visited and depth < max_depth:
+                visited.add(search_key)
+                depth += 1
+
                 chain.append(search_key)
-
                 next_key = False
 
-                # Search for a related Sales Order
+                # Search SO
                 so = self.env['sale.order'].sudo().with_company(False).search([('name', '=', search_key)], limit=1)
+
                 if so:
-                    # Prefer SO.origin, but fallback to SO.client_order_ref if origin is empty
                     source = so.origin or so.client_order_ref
-
                     if source:
-                        # The source may contain multiple segments
                         next_key = source.split('-')[-1].strip()
-                    else:
-                        next_key = False
 
                     search_key = next_key
                     continue
 
-                # Search for a related Purchase Order
+                # Search PO
                 po = self.env['purchase.order'].sudo().with_company(False).search([('name', '=', search_key)], limit=1)
-                if po:
-                    # PO.origin may contain multiple segments
-                    if po.origin:
-                        next_key = po.origin.split('-')[-1].strip()
-                    search_key = next_key
-                    continue
 
-                # Stop if no further linked document is found
-                search_key = False
+                if po and po.origin:
+                    next_key = po.origin.split('-')[-1].strip()
+
+                search_key = next_key
 
             picking.full_origin_chain = " - ".join(chain)

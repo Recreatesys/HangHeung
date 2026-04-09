@@ -10,7 +10,7 @@
         <xpath expr="//t[@t-set='address']" position="replace"></xpath>
         <xpath expr="//table[@name='stock_move_table']" position="before">
             <div style="margin-bottom: 20px;">
-                <div style="display: inline-block; margin-right: 275px; width: 255px; vertical-align: top;">
+                <div style="display: inline-block; margin-right: 275px; width: 250px; vertical-align: top;">
                     <div class="col-7" name="div_incoming_address">
                         <t t-set="show_partner" t-value="False"/>
                         <div name="vendor_address" t-if="o.picking_type_id.code=='incoming' and partner">
@@ -91,12 +91,12 @@
                     <td>Total</td>
 
                     <!-- Ordered -->
-                    <td class="text-center">
+                    <td class="text-end">
                         <t t-esc="sum(o.move_ids.mapped('product_uom_qty'))"/>
                     </td>
 
                     <!-- Delivered -->
-                    <td class="text-center">
+                    <td class="text-end">
                         <t t-esc="sum(o.move_ids.mapped('quantity'))"/>
                     </td>
                 </tr>
