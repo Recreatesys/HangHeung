@@ -44,9 +44,12 @@ class ReportInventoryWizard(models.TransientModel):
         report_data = {}
         product_uom_map = {}
 
-        partner_names = sorted(
-            set(extract_code(p.partner_id.name) for p in pickings if p.partner_id and p.partner_id.name)
-        )
+        if self.partner_id:
+            partner_names = [extract_code(self.partner_id.name)]
+        else:
+            partner_names = sorted(
+                set(extract_code(p.partner_id.name) for p in pickings if p.partner_id and p.partner_id.name)
+            )
 
         for picking in pickings:
             partner_name = picking.partner_id.name
