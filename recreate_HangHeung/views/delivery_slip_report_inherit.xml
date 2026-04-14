@@ -28,7 +28,7 @@
                         </div>
                         <div t-if="show_partner" name="partner_header">
                             <div t-field="partner.commercial_partner_id"
-                                 t-options='{"widget": "contact", "fields": ["address", "name", "phone", "vat"], "no_marker": True, "phone_icons": True}'/>
+                                 t-options='{"widget": "contact", "fields": ["address", "name", "phone", "vat"], "no_marker": True}'/>
                         </div>
                     </div>
                 </div>
@@ -39,7 +39,7 @@
                             <strong>Delivery Address:</strong>
                         </span>
                         <div t-out="o.move_ids[0].partner_id or o.partner_id"
-                             t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
+                             t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True}'/>
                     </div>
                     <div name="outgoing_warehouse_address"
                          t-elif="o.picking_type_id.code != 'internal' and o.picking_type_id.warehouse_id.partner_id">
@@ -47,7 +47,7 @@
                             <strong>Warehouse Address:</strong>
                         </span>
                         <div t-field="o.picking_type_id.warehouse_id.partner_id"
-                             t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
+                             t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True}'/>
                     </div>
                 </div>
             </div>
@@ -127,6 +127,41 @@
 
             </tbody>
         </xpath>
+
+        <xpath expr="//div[@class='page']" position="inside">
+            <div style="margin-top: 60px; width: 100%;">
+
+                <div style="display: inline-block; width: 45%; vertical-align: top; text-align: left;">
+                    <div>
+                        I/We Received the above goods in good conditions<br/>
+                        &amp; agree the terms &amp; conditions stated above
+                    </div>
+
+                    <div style="margin-top: 100px; border-top: 1px solid #000; width: 80%;"></div>
+                    <div style="margin-top: 5px;">Signature &amp; Company Chop</div>
+
+                    <div style="margin-top: 5px;">
+                        Date:
+                    </div>
+                </div>
+
+                <div style="display: inline-block; width: 45%; vertical-align: top; text-align: left; margin-left: 5%;">
+                    <div>
+                        For and on behalf of :<br/>
+                        <strong><t t-esc="o.company_id.name"/></strong>
+                    </div>
+
+                    <div style="margin-top: 100px; border-top: 1px solid #000; width: 80%;"></div>
+                    <div style="margin-top: 5px;">Authorized Signature &amp; Company Chop</div>
+
+                    <div style="margin-top: 5px;">
+                        Date:
+                    </div>
+                </div>
+
+            </div>
+        </xpath>
+
 
     </template>
 
