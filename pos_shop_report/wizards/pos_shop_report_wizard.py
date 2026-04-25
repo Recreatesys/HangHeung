@@ -128,7 +128,13 @@ class POSShopReportWizard(models.TransientModel):
             result[product_id]['scrap_qty'] = sum(scraps.mapped('scrap_qty'))
 
             res = result[product_id]
-            res['total_qty_today'] =  res['sales_qty'] + res['sales_refund_qty']
+            res['total_qty_today'] = (
+                res['previous_stock']
+                + res['stock_in']
+                - res['scrap_qty']
+                - res['sales_qty']
+                + res['sales_refund_qty']
+            )
             res['final_amount'] = res['sales_amount'] - res['discount_amount']
 
         return list(result.values())
