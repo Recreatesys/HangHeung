@@ -76,7 +76,13 @@ class PurchaseOrder(models.Model):
     def _onchange_company_id(self):
         pass
 
-    
+    def _prepare_sale_order_data(self, name, partner, company, direct_delivery_address):
+        result = super()._prepare_sale_order_data(name, partner, company, direct_delivery_address)
+        if self.origin:
+            result['client_order_ref'] = f"{self.origin}-{self.name}"
+        result['intercompany_source_po_name'] = self.name
+        return result
+
 
 class StockRule(models.Model):
     _inherit = 'stock.rule'
@@ -211,6 +217,23 @@ class StockRule(models.Model):
                     if fields.Date.to_date(order_date_planned) < fields.Date.to_date(po.date_order):
                         po.date_order = order_date_planned
             self.env['purchase.order.line'].sudo().create(po_line_values)
+
+            if po.origin:
+                origin_parts = po.origin.split(', ')
+                new_parts = []
+                for part in origin_parts:
+                    if '-' in part:
+                        new_parts.append(part)
+                        continue
+                    so = self.env['sale.order'].sudo().search([('name', '=', part)], limit=1)
+                    if so and so.client_order_ref:
+                        new_parts.append(f"{so.client_order_ref}-{part}")
+                    else:
+                        new_parts.append(part)
+                chained_origin = ', '.join(new_parts)
+                if chained_origin != po.origin:
+                    po.write({'origin': chained_origin})
+
             if po.partner_id.purchase_auto_confirm:
                 po.button_confirm()
         
