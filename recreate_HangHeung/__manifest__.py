@@ -10,7 +10,7 @@
     """,
     'author': 'Lau Siu Hin',
     'website': '',
-    'depends': ['contacts', 'base', 'stock', 'web', 'purchase', 'point_of_sale'],
+    'depends': ['contacts', 'base', 'stock', 'web', 'purchase', 'point_of_sale', 'sale_purchase_inter_company_rules'],
     'data': [
         "security/ir.model.access.csv",
         "views/res_partner.xml",
