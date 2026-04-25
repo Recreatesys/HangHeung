@@ -23,7 +23,20 @@
           </h5>
         </div>
 
-        <table class="table table-sm table-bordered" style="margin-top: 20px;">
+        <table class="table table-sm table-bordered" style="margin-top: 20px; table-layout: fixed; width: 100%; font-size: 9pt; word-wrap: break-word;">
+          <colgroup>
+            <col style="width: 9%;"/>
+            <col style="width: 22%;"/>
+            <col style="width: 7%;"/>
+            <col style="width: 7%;"/>
+            <col style="width: 7%;"/>
+            <col style="width: 6%;"/>
+            <col style="width: 7%;"/>
+            <col style="width: 7%;"/>
+            <col style="width: 9%;"/>
+            <col style="width: 9%;"/>
+            <col style="width: 10%;"/>
+          </colgroup>
           <thead style="background-color: #f0f0f0;">
             <tr>
               <th>貨品</th>
