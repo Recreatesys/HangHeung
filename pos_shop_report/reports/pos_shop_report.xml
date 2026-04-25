@@ -1,7 +1,7 @@
 <odoo>
   <template id="report_pos_shop_template">
     <t t-call="web.external_layout">
-      <div class="page">
+      <main class="page">
         <h2 style="text-align: center;"><t t-esc="docs.company_name"/></h2>
         <div style="text-align: center;margin-top: 20px;">
           <h3>Shop Name: <t t-esc="docs.shop_id.name"/></h3>
@@ -106,7 +106,7 @@
             </t>
           </tbody>
         </table>
-      </div>
+      </main>
     </t>
   </template>
 </odoo>
