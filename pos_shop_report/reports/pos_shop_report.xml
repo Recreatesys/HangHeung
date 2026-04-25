@@ -73,13 +73,13 @@
                   <td><t t-esc="line['sales_qty']"/></td>
                   <td><t t-esc="line['sales_refund_qty']"/></td>
                   <td><t t-esc="line['total_qty_today']"/></td>
-                  <td><t t-esc="line['sales_amount']"/></td>
-                  <td><t t-esc="line['discount_amount']"/></td>
-                  <td><t t-esc="line['final_amount']"/></td>
+                  <td><t t-esc="'%.2f' % line['sales_amount']"/></td>
+                  <td><t t-esc="'%.2f' % line['discount_amount']"/></td>
+                  <td><t t-esc="'%.2f' % line['final_amount']"/></td>
                 </tr>
               </t>
 
-              <tr style="font-weight: bold; background-color: #f9f9f9;">
+              <tr style="font-weight: bold; background-color: #f9f9f9; font-size: 7pt;">
                 <td colspan="2" style="text-align: right;">Subtotal:</td>
                 <td><t t-esc="total_previous_stock"/></td>
                 <td><t t-esc="total_stock_in"/></td>
@@ -87,21 +87,21 @@
                 <td><t t-esc="total_sales_qty"/></td>
                 <td><t t-esc="total_sales_refund_qty"/></td>
                 <td><t t-esc="total_qty_today"/></td>
-                <td><t t-esc="total_sales_amount"/></td>
-                <td><t t-esc="total_discount_amount"/></td>
-                <td><t t-esc="total_final_amount"/></td>
+                <td><t t-esc="'%.2f' % total_sales_amount"/></td>
+                <td><t t-esc="'%.2f' % total_discount_amount"/></td>
+                <td><t t-esc="'%.2f' % total_final_amount"/></td>
               </tr>
               <tr>
                 <td colspan="10" style="text-align: right; font-weight: bold;">Final Total:</td>
-                <td><t t-esc="total_final_amount"/></td>
+                <td><t t-esc="'%.2f' % total_final_amount"/></td>
               </tr>
              <tr>
                 <td colspan="10" style="text-align: right; font-weight: bold;">Deducted Coupons:</td>
-                <td><t t-esc="docs.coupon_discount_total or 0.0"/></td>
+                <td><t t-esc="'%.2f' % (docs.coupon_discount_total or 0.0)"/></td>
               </tr>
               <tr>
                 <td colspan="10" style="text-align: right; font-weight: bold;">Grand Total:</td>
-                <td><t t-esc="total_final_amount - (docs.coupon_discount_total or 0.0)"/></td>
+                <td><t t-esc="'%.2f' % (total_final_amount - (docs.coupon_discount_total or 0.0))"/></td>
               </tr>
               <tr>
 
@@ -111,7 +111,7 @@
               <t t-foreach="docs.payment_breakdown.items()" t-as="pay">
                 <tr>
                   <td colspan="4" style="text-align: left;"><t t-esc="pay[0]"/>:</td>
-                  <td><t t-esc="pay[1]"/></td>
+                  <td><t t-esc="'%.2f' % pay[1]"/></td>
                 </tr>
               </t>
             </t>
