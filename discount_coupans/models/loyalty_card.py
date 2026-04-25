@@ -48,7 +48,49 @@ class LoyaltyCard(models.Model):
     def write(self, vals):
         if 'allocated_store_id' in vals and not vals.get('allocated_date'):
             vals['allocated_date'] = fields.Date.today()
-        return super().write(vals)
+        needs_lot_provisioning = (
+            'allocated_store_id' in vals
+            and vals.get('allocated_store_id')
+            and 'lot_id' not in vals
+        )
+        result = super().write(vals)
+        if needs_lot_provisioning:
+            self._ensure_loyalty_lot_and_quant()
+        return result
+
+    def _ensure_loyalty_lot_and_quant(self):
+        Lot = self.env['stock.lot'].sudo()
+        Quant = self.env['stock.quant'].sudo()
+        for card in self:
+            if card.lot_id or not card.allocated_store_id:
+                continue
+            product = card.program_id.product_id
+            if not product:
+                continue
+            store = card.allocated_store_id
+            warehouse = store.picking_type_id.warehouse_id
+            if not warehouse:
+                continue
+            location = warehouse.lot_stock_id or self.env.ref('stock.stock_location_stock')
+            lot = Lot.search([
+                ('name', '=', card.code),
+                ('product_id', '=', product.id),
+            ], limit=1)
+            if not lot:
+                lot = Lot.create({'name': card.code, 'product_id': product.id})
+            quant_exists = Quant.search_count([
+                ('product_id', '=', product.id),
+                ('location_id', '=', location.id),
+                ('lot_id', '=', lot.id),
+            ])
+            if not quant_exists:
+                Quant.create({
+                    'product_id': product.id,
+                    'location_id': location.id,
+                    'quantity': 1,
+                    'lot_id': lot.id,
+                })
+            super(LoyaltyCard, card).write({'lot_id': lot.id})
 
     @api.depends('date_activation', 'validity_days', 'expiration_type')
     def _compute_dynamic_expiration_date(self):
