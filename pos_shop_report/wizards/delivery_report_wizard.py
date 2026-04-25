@@ -60,7 +60,9 @@ class DeliveryReportWizard(models.TransientModel):
                 soup = BeautifulSoup(picking.note, "html.parser")
                 note_text = soup.get_text(separator=" ", strip=True)
 
-            shop_code = picking.partner_id.name.split("-")[0].strip() if picking.origin else ""
+            shop_code = ""
+            if picking.origin and picking.partner_id and picking.partner_id.name:
+                shop_code = picking.partner_id.name.split("-")[0].strip()
 
             row = [
                 picking.scheduled_date.strftime('%d/%m/%Y') if picking.scheduled_date else "",
