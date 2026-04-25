@@ -83,6 +83,22 @@ class PurchaseOrder(models.Model):
         result['intercompany_source_po_name'] = self.name
         return result
 
+    def button_cancel(self):
+        result = super().button_cancel()
+        for po in self:
+            downstream_sos = self.env['sale.order'].sudo().search([
+                ('auto_purchase_order_id', '=', po.id),
+                ('state', '!=', 'cancel'),
+            ])
+            if downstream_sos:
+                downstream_sos.with_user(SUPERUSER_ID)._action_cancel()
+                for so in downstream_sos:
+                    so.message_post(body=_(
+                        "Cancelled via chain cascade from %(po_name)s (company %(company)s).",
+                        po_name=po.name, company=po.company_id.name,
+                    ))
+        return result
+
 
 class StockRule(models.Model):
     _inherit = 'stock.rule'
