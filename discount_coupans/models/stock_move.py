@@ -8,15 +8,20 @@ class StockMove(models.Model):
         string='Coupon Range',
     )
 
-    @api.depends('move_line_ids.lot_id', 'product_id.is_coupon')
+    @api.depends('move_line_ids.lot_id', 'lot_ids', 'product_id.is_coupon')
     def _compute_coupon_lot_range_display(self):
         for move in self:
             if not move.product_id.is_coupon:
                 move.coupon_lot_range_display = False
                 continue
-            lot_names = sorted(
-                {ml.lot_id.name for ml in move.move_line_ids if ml.lot_id and ml.lot_id.name}
-            )
+            lot_names = set()
+            for ml in move.move_line_ids:
+                if ml.lot_id and ml.lot_id.name:
+                    lot_names.add(ml.lot_id.name)
+            for lot in move.lot_ids:
+                if lot.name:
+                    lot_names.add(lot.name)
+            lot_names = sorted(lot_names)
             if not lot_names:
                 move.coupon_lot_range_display = False
             elif len(lot_names) == 1:
