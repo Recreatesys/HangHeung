@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="report_delivery_document_coupon_range"
+              inherit_id="stock.report_delivery_document">
+
+        <xpath expr="//table[@name='stock_move_table']/tbody/tr/td[1]" position="inside">
+            <t t-if="move.coupon_lot_range_display">
+                <br/>
+                <span class="text-muted small">
+                    Coupon Range: <t t-esc="move.coupon_lot_range_display"/>
+                </span>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="stock_report_delivery_has_serial_move_line_coupon_range"
+              inherit_id="stock.stock_report_delivery_has_serial_move_line">
+        <xpath expr="//td[1]/span[@t-field='move_line.product_id']" position="after">
+            <t t-set="parent_move" t-value="move_line.move_id"/>
+            <t t-if="parent_move.coupon_lot_range_display">
+                <br/>
+                <span class="text-muted small">
+                    Coupon Range: <t t-esc="parent_move.coupon_lot_range_display"/>
+                </span>
+            </t>
+        </xpath>
+    </template>
+</odoo>

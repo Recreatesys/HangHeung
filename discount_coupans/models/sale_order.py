@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields, api
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -47,6 +47,22 @@ class SaleOrderLine(models.Model):
         string="Reserved Coupons",
         copy=False
     )
+
+    coupon_lot_range_display = fields.Char(
+        compute='_compute_coupon_lot_range_display',
+        string='Coupon Range',
+    )
+
+    @api.depends('reserved_coupon_ids.code')
+    def _compute_coupon_lot_range_display(self):
+        for line in self:
+            codes = sorted(c for c in line.reserved_coupon_ids.mapped('code') if c)
+            if not codes:
+                line.coupon_lot_range_display = False
+            elif len(codes) == 1:
+                line.coupon_lot_range_display = codes[0]
+            else:
+                line.coupon_lot_range_display = f"{codes[0]} - {codes[-1]}"
 
     def generate_coupon_button(self):
         self.ensure_one()

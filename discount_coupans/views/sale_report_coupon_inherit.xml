@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="report_saleorder_document_coupon_range"
+              inherit_id="sale.report_saleorder_document">
+        <xpath expr="//td[@name='td_name']" position="inside">
+            <t t-if="line.coupon_lot_range_display">
+                <br/>
+                <span class="text-muted small">
+                    Coupon Range: <t t-esc="line.coupon_lot_range_display"/>
+                </span>
+            </t>
+        </xpath>
+    </template>
+</odoo>
