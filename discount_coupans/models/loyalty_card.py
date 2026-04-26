@@ -39,6 +39,46 @@ class LoyaltyCard(models.Model):
 
     allocated_date = fields.Date(string='Allocated Date', readonly=True)
 
+    sold_at_amount = fields.Float(
+        string='Sold-At Amount',
+        readonly=True,
+        copy=False,
+        help=(
+            "Net amount actually paid by the customer at coupon-sale time "
+            "(before any redemption). Drives the accounting split between "
+            "240001 Receipts from Coupon (face value) and 240002 Redemption "
+            "from Coupon (sell-time discount carry)."
+        ),
+    )
+
+    face_value = fields.Float(
+        string='Face Value',
+        compute='_compute_face_value',
+        store=False,
+        help="Stated face value of this coupon (drawn from the program's product list price).",
+    )
+
+    discount_at_sale = fields.Float(
+        string='Discount at Sale',
+        compute='_compute_discount_at_sale',
+        store=False,
+        help="face_value - sold_at_amount. The portion that lands on 400010 Sales Discount at redeem time.",
+    )
+
+    @api.depends('program_id.product_id.lst_price')
+    def _compute_face_value(self):
+        for card in self:
+            product = card.program_id.product_id
+            card.face_value = product.lst_price if product else 0.0
+
+    @api.depends('face_value', 'sold_at_amount')
+    def _compute_discount_at_sale(self):
+        for card in self:
+            if card.sold_at_amount and card.face_value:
+                card.discount_at_sale = card.face_value - card.sold_at_amount
+            else:
+                card.discount_at_sale = 0.0
+
     @api.model
     def create(self, vals):
         if vals.get('allocated_store_id') and not vals.get('allocated_date'):
@@ -144,12 +184,31 @@ class LoyaltyCard(models.Model):
                         'description': 'Updated from POS sale',
                     })
                     wizard.action_update_card_point()
-                    card.write({
+                    vals = {
                         'status': 'activated',
                         'partner_id': partner_id or False,
                         'date_activation': fields.datetime.now(),
-                    })
+                    }
+                    if not card.sold_at_amount:
+                        sold_at = card._lookup_sold_at_from_pos()
+                        if sold_at is not None:
+                            vals['sold_at_amount'] = sold_at
+                    card.write(vals)
         return True
+
+    def _lookup_sold_at_from_pos(self):
+        self.ensure_one()
+        if not self.code:
+            return None
+        pack_lot = self.env['pos.pack.operation.lot'].sudo().search(
+            [('lot_name', '=', self.code)],
+            order='id desc',
+            limit=1,
+        )
+        line = pack_lot.pos_order_line_id
+        if line and line.qty:
+            return line.price_subtotal_incl / line.qty
+        return None
 
     @api.model
     def update_coupon_redeem_from_pos(self, vals):
