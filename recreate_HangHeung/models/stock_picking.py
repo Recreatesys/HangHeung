@@ -3,7 +3,8 @@ from odoo.exceptions import UserError
 
 
 class StockPicking(models.Model):
-    _inherit = 'stock.picking'
+    _name = 'stock.picking'
+    _inherit = ['stock.picking', 'product.catalog.mixin']
 
     has_dropship_origin = fields.Boolean(string='Has Dropship', default=False, compute="_compute_has_dropship")
     dropship_validated = fields.Boolean(string='Dropship Validated', default=False)
@@ -127,3 +128,57 @@ class StockPicking(models.Model):
                 search_key = next_key
 
             picking.full_origin_chain = " - ".join(chain)
+
+    def _is_readonly(self):
+        self.ensure_one()
+        return self.state in ('done', 'cancel')
+
+    def _get_product_catalog_domain(self):
+        domain = super()._get_product_catalog_domain()
+        return domain + [('is_storable', '=', True)]
+
+    def _get_product_catalog_record_lines(self, product_ids, child_field=False, **kwargs):
+        grouped = {}
+        for move in self.move_ids_without_package:
+            if move.product_id.id in product_ids:
+                grouped.setdefault(move.product_id, self.env['stock.move'])
+                grouped[move.product_id] |= move
+        return grouped
+
+    def _get_product_catalog_order_data(self, products, **kwargs):
+        result = super()._get_product_catalog_order_data(products, **kwargs)
+        for product in products:
+            entry = result.setdefault(product.id, {'productType': product.type})
+            entry['price'] = 0.0
+        return result
+
+    def _update_order_line_info(self, product_id, quantity, **kwargs):
+        self.ensure_one()
+        if self._is_readonly():
+            raise UserError(_(
+                "You can't modify lines of a picking in state '%s'."
+            ) % dict(self._fields['state'].selection).get(self.state, self.state))
+
+        product = self.env['product.product'].browse(product_id)
+        existing = self.move_ids_without_package.filtered(lambda m: m.product_id == product)
+
+        if existing:
+            if quantity <= 0:
+                existing.unlink()
+            else:
+                existing[0].product_uom_qty = quantity
+                if len(existing) > 1:
+                    (existing - existing[0]).unlink()
+        elif quantity > 0:
+            self.env['stock.move'].create({
+                'picking_id': self.id,
+                'product_id': product.id,
+                'product_uom_qty': quantity,
+                'product_uom': product.uom_id.id,
+                'name': product.display_name,
+                'location_id': self.location_id.id,
+                'location_dest_id': self.location_dest_id.id,
+                'company_id': self.company_id.id,
+                'picking_type_id': self.picking_type_id.id,
+            })
+        return 0.0

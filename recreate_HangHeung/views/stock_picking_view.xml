@@ -19,6 +19,15 @@
                     <field name="full_origin_chain" readonly="1"/>
                 </xpath>
 
+                <xpath expr="//field[@name='move_ids_without_package']/list" position="inside">
+                    <control>
+                        <create name="add_product_control" string="Add a Product"/>
+                        <button name="action_add_from_catalog" type="object" string="Catalog"
+                                class="px-4 btn-link"
+                                invisible="parent.picking_type_code != 'internal'"/>
+                    </control>
+                </xpath>
+
             </field>
         </record>
     </data>
