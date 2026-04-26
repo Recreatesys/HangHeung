@@ -19,24 +19,9 @@
             </t>
 
             <!-- Recurring strip for every picking report page -->
-            <t t-if="o and o._name == 'stock.picking' and report_type == 'pdf'">
-                <t t-set="addr_partner" t-value="(o.move_ids and o.move_ids[0].partner_id) or o.partner_id"/>
-                <t t-set="origin_text" t-value="o.full_origin_chain or o.origin"/>
-                <div t-if="addr_partner or origin_text"
-                     style="margin-top: 4px; font-size: 9pt; text-align: left;">
-                    <t t-if="addr_partner">
-                        <strong>Deliver to:</strong>
-                        <span t-esc="addr_partner.name or ''"/>
-                        <t t-if="addr_partner.street">, <t t-esc="addr_partner.street"/></t>
-                        <t t-if="addr_partner.city">, <t t-esc="addr_partner.city"/></t>
-                    </t>
-                    <span t-if="addr_partner and origin_text" style="margin: 0 8px; color: #999;">|</span>
-                    <t t-if="origin_text">
-                        <strong>Origin Chain:</strong>
-                        <span t-esc="origin_text"/>
-                    </t>
-                </div>
-            </t>
+            <div style="margin-top: 4px; font-size: 9pt; text-align: left; color: red;">
+                DEBUG-LAYOUT-EXT o=<t t-esc="o and o._name or 'NONE'"/> rt=<t t-esc="report_type or 'NONE'"/>
+            </div>
 
         </xpath>
 
