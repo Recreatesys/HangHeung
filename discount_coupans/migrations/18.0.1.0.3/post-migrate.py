@@ -9,7 +9,7 @@ NON_COUPON_PROGRAM_TYPES = ('promotion', 'promo_code', 'buy_x_get_y', 'next_orde
 DUAL_USE_PRODUCT_ID = 2026  # CLP 九折 — used by both CLP Card (coupons) and many promotions
 
 
-def migrate(cr, installed_version):
+def migrate(cr, version):
     env = api.Environment(cr, SUPERUSER_ID, {})
 
     pos_discount_categ = env.ref(
