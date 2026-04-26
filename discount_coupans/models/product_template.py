@@ -1,4 +1,6 @@
-from odoo import models, fields
+from odoo import _, api, models, fields
+from odoo.exceptions import ValidationError
+
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
@@ -18,3 +20,13 @@ class ProductTemplate(models.Model):
         required=False,
         help="Select the store where this coupon can be redeemed."
     )
+
+    @api.constrains('is_coupon', 'tracking')
+    def _check_coupon_tracking_serial(self):
+        for tmpl in self:
+            if tmpl.is_coupon and tmpl.tracking != 'serial':
+                raise ValidationError(_(
+                    "Coupon product '%(name)s' must use Serial Number tracking (not '%(tracking)s'). "
+                    "Each coupon code is a unique physical voucher and must be tracked one-to-one.",
+                    name=tmpl.display_name, tracking=tmpl.tracking,
+                ))
