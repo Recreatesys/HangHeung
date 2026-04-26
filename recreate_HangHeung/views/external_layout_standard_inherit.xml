@@ -16,6 +16,10 @@
                 <div class="mt-4" style="font-size:32px;">
                     <span t-field="o.name">WH/OUT/0001</span>
                 </div>
+            </t>
+
+            <!-- Recurring strip for every picking report page -->
+            <t t-if="o and o._name == 'stock.picking' and report_type == 'pdf'">
                 <t t-set="addr_partner" t-value="(o.move_ids and o.move_ids[0].partner_id) or o.partner_id"/>
                 <t t-set="origin_text" t-value="o.full_origin_chain or o.origin"/>
                 <div t-if="addr_partner or origin_text"
