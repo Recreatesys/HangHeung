@@ -14,7 +14,11 @@ patch(PosStore.prototype, {
             props.orderUuid = this.selectedOrderUuid;
         }
         if (!screenName) {
-            screenName = "ProductScreen";
+            if (order && order.finalized) {
+                screenName = "ReceiptScreen";
+            } else {
+                screenName = "ProductScreen";
+            }
         }
         this.showScreen(screenName, props);
     },
