@@ -116,15 +116,16 @@ class PosSession(models.Model):
     def _collect_coupon_adjustment_for_line(self, line, balances, acc_240001, acc_240002, acc_400001, acc_400010):
         product_tmpl = line.product_id.product_tmpl_id
 
-        if line.is_reward_line and line.coupon_id:
-            program = line.coupon_id.program_id
+        if line.is_reward_line and line.reward_id:
+            program = line.reward_id.program_id
+
             if program.program_type in COUPON_PROGRAM_TYPES:
                 face = abs(line.price_subtotal_incl)
-                if face <= 0:
+                if face <= 0 and line.coupon_id:
                     face = line.coupon_id.face_value or 0.0
                 if face <= 0:
                     return
-                sold_at = line.coupon_id.sold_at_amount or 0.0
+                sold_at = (line.coupon_id.sold_at_amount or 0.0) if line.coupon_id else 0.0
                 if 0 < sold_at < face:
                     disc_at_sale = face - sold_at
                 else:
@@ -149,28 +150,22 @@ class PosSession(models.Model):
                         balances[acc_400010] += disc_at_sale
                 return
 
+            if program.program_type in NON_COUPON_PROGRAM_TYPES and line.qty > 0:
+                negative_amount = abs(line.price_subtotal_incl)
+                if negative_amount <= 0:
+                    return
+                coupon_share = self._compute_coupon_share_in_order(line)
+                if coupon_share > 0:
+                    D = negative_amount * coupon_share
+                    balances[acc_240002] += D
+                    balances[acc_400010] -= D
+                return
+
         if product_tmpl.is_coupon and line.qty > 0 and line.discount and line.discount > 0:
             discount_amount = line.qty * line.price_unit * (line.discount / 100.0)
             if discount_amount > 0:
                 balances[acc_240002] += discount_amount
                 balances[acc_240001] -= discount_amount
-            return
-
-        if (
-            line.is_reward_line
-            and not line.coupon_id
-            and line.reward_id
-            and line.reward_id.program_id.program_type in NON_COUPON_PROGRAM_TYPES
-            and line.qty > 0
-        ):
-            negative_amount = abs(line.price_subtotal_incl)
-            if negative_amount <= 0:
-                return
-            coupon_share = self._compute_coupon_share_in_order(line)
-            if coupon_share > 0:
-                D = negative_amount * coupon_share
-                balances[acc_240002] += D
-                balances[acc_400010] -= D
             return
 
     def _is_order_coupon_related(self, order):
