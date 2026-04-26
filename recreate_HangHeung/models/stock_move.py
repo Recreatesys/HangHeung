@@ -12,6 +12,5 @@ class StockMove(models.Model):
         }
 
     def action_add_from_catalog(self):
-        picking_id = self.env.context.get('picking_id')
-        picking = self.env['stock.picking'].browse(picking_id)
+        picking = self.env['stock.picking'].browse(self.env.context.get('order_id'))
         return picking.with_context(child_field='move_ids_without_package').action_add_from_catalog()

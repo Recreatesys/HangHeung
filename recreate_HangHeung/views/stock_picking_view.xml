@@ -24,7 +24,7 @@
                         <create name="add_product_control" string="Add a Product"/>
                         <button name="action_add_from_catalog" type="object" string="Catalog"
                                 class="px-4 btn-link"
-                                context="{'picking_id': parent.id}"
+                                context="{'order_id': parent.id}"
                                 invisible="parent.picking_type_code != 'internal'"/>
                     </control>
                 </xpath>
