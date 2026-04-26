@@ -61,17 +61,17 @@ class PosSession(models.Model):
         ):
             return
 
+        rounding = self.currency_id.rounding
         line_vals = []
-        for account, signed in balances.items():
-            if float_is_zero(signed, precision_rounding=self.currency_id.rounding):
+        base_label = _('Coupon routing adjustment for session %s') % self.name
+        for (account, direction), amount in balances.items():
+            if float_is_zero(amount, precision_rounding=rounding):
                 continue
-            debit = signed if signed > 0 else 0.0
-            credit = -signed if signed < 0 else 0.0
             line_vals.append((0, 0, {
                 'account_id': account.id,
-                'name': _('Coupon routing adjustment for session %s') % self.name,
-                'debit': debit,
-                'credit': credit,
+                'name': base_label,
+                'debit': amount if direction == 'debit' else 0.0,
+                'credit': amount if direction == 'credit' else 0.0,
             }))
 
         if not line_vals:
@@ -140,14 +140,15 @@ class PosSession(models.Model):
                     and product_tmpl.categ_id == pos_discount_categ
                 )
 
-                balances[acc_240001] += face
-                balances[acc_240002] -= disc_at_sale
+                balances[(acc_240001, 'debit')] += face
+                balances[(acc_240002, 'credit')] += face
+                balances[(acc_240002, 'debit')] += (face - disc_at_sale)
                 if reward_in_pos_discount:
-                    balances[acc_400010] -= (face - disc_at_sale)
+                    balances[(acc_400010, 'credit')] += (face - disc_at_sale)
                 else:
-                    balances[acc_400001] -= face
+                    balances[(acc_400001, 'credit')] += face
                     if disc_at_sale > 0:
-                        balances[acc_400010] += disc_at_sale
+                        balances[(acc_400010, 'debit')] += disc_at_sale
                 return
 
             if program.program_type in NON_COUPON_PROGRAM_TYPES and line.qty > 0:
@@ -157,15 +158,15 @@ class PosSession(models.Model):
                 coupon_share = self._compute_coupon_share_in_order(line)
                 if coupon_share > 0:
                     D = negative_amount * coupon_share
-                    balances[acc_240002] += D
-                    balances[acc_400010] -= D
+                    balances[(acc_240002, 'debit')] += D
+                    balances[(acc_400010, 'credit')] += D
                 return
 
         if product_tmpl.is_coupon and line.qty > 0 and line.discount and line.discount > 0:
             discount_amount = line.qty * line.price_unit * (line.discount / 100.0)
             if discount_amount > 0:
-                balances[acc_240002] += discount_amount
-                balances[acc_240001] -= discount_amount
+                balances[(acc_240002, 'debit')] += discount_amount
+                balances[(acc_240001, 'credit')] += discount_amount
             return
 
     def _is_order_coupon_related(self, order):
