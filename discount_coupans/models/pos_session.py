@@ -120,11 +120,13 @@ class PosSession(models.Model):
                 face = abs(line.price_subtotal_incl)
                 if face <= 0:
                     return
-                disc_at_sale = max(0.0, line.coupon_id.discount_at_sale or 0.0)
-                disc_at_sale = min(disc_at_sale, face)
-                sold_at = face - disc_at_sale
+                sold_at = line.coupon_id.sold_at_amount or 0.0
+                if 0 < sold_at < face:
+                    disc_at_sale = face - sold_at
+                else:
+                    disc_at_sale = 0.0
                 balances[acc_240001] += face
-                balances[acc_400010] -= sold_at
+                balances[acc_400010] -= (face - disc_at_sale)
                 balances[acc_240002] -= disc_at_sale
                 return
 
