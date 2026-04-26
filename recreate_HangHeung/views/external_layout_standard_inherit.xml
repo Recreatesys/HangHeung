@@ -18,10 +18,6 @@
                 </div>
             </t>
 
-            <!-- Recurring strip for every picking report page -->
-            <div style="margin-top: 4px; font-size: 9pt; text-align: left; color: red;">
-                DEBUG-LAYOUT-EXT o=<t t-esc="o and o._name or 'NONE'"/> rt=<t t-esc="report_type or 'NONE'"/>
-            </div>
 
         </xpath>
 
