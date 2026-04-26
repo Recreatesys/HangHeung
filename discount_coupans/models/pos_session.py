@@ -1,7 +1,7 @@
 import logging
 from collections import defaultdict
 
-from odoo import _, fields, models
+from odoo import _, api, fields, models
 from odoo.tools import float_is_zero
 
 _logger = logging.getLogger(__name__)
@@ -172,6 +172,92 @@ class PosSession(models.Model):
                 balances[acc_240002] += D
                 balances[acc_400010] -= D
             return
+
+    def _is_order_coupon_related(self, order):
+        for line in order.lines:
+            if line.product_id.product_tmpl_id.is_coupon:
+                return True
+            if (
+                line.is_reward_line
+                and line.coupon_id
+                and line.coupon_id.program_id.program_type in COUPON_PROGRAM_TYPES
+            ):
+                return True
+        return False
+
+    def _accumulate_amounts(self, data):
+        data = super()._accumulate_amounts(data)
+        sales_dict = data.get('sales')
+        if not sales_dict:
+            return data
+
+        coupon_order_ids = {
+            order.id
+            for order in self._get_closed_orders()
+            if self._is_order_coupon_related(order)
+        }
+        if not coupon_order_ids:
+            return data
+
+        AccountTax = self.env['account.tax']
+        coupon_aggregation = defaultdict(lambda: {'amount': 0.0, 'amount_converted': 0.0})
+        for order in self._get_closed_orders():
+            if order.id not in coupon_order_ids or order.is_invoiced:
+                continue
+            base_lines = order.with_context(linked_to_pos=True)._prepare_tax_base_line_values()
+            AccountTax._add_tax_details_in_base_lines(base_lines, order.company_id)
+            AccountTax._round_base_lines_tax_details(base_lines, order.company_id)
+            AccountTax._add_accounting_data_in_base_lines_tax_details(base_lines, order.company_id, include_caba_tags=True)
+            tax_results = AccountTax._prepare_tax_lines(base_lines, order.company_id)
+            for base_line, to_update in tax_results['base_lines_to_update']:
+                sale_key = (
+                    base_line['account_id'].id,
+                    -1 if base_line['is_refund'] else 1,
+                    tuple(base_line['record'].tax_ids_after_fiscal_position.flatten_taxes_hierarchy().ids),
+                    tuple(base_line['tax_tag_ids'].ids),
+                    base_line['product_id'].id if self.config_id.is_closing_entry_by_product else False,
+                )
+                coupon_aggregation[sale_key]['amount'] += to_update['amount_currency']
+                coupon_aggregation[sale_key]['amount_converted'] += to_update['balance']
+
+        rounding = self.currency_id.rounding
+        new_sales = defaultdict(lambda: {'amount': 0.0, 'amount_converted': 0.0})
+        for key, vals in sales_dict.items():
+            coupon_part = coupon_aggregation.get(key)
+            if not coupon_part:
+                non_coupon_key = key + (False,)
+                new_sales[non_coupon_key] = dict(vals)
+                continue
+            non_coupon_amount = vals['amount'] - coupon_part['amount']
+            non_coupon_converted = vals['amount_converted'] - coupon_part['amount_converted']
+            if not float_is_zero(coupon_part['amount'], precision_rounding=rounding):
+                coupon_key = key + (True,)
+                new_sales[coupon_key] = {
+                    'amount': coupon_part['amount'],
+                    'amount_converted': coupon_part['amount_converted'],
+                }
+            if not float_is_zero(non_coupon_amount, precision_rounding=rounding):
+                non_coupon_key = key + (False,)
+                new_sales[non_coupon_key] = {
+                    'amount': non_coupon_amount,
+                    'amount_converted': non_coupon_converted,
+                }
+
+        data['sales'] = new_sales
+        return data
+
+    def _get_sale_vals(self, key, sale_vals):
+        is_coupon_related = False
+        if len(key) == 6:
+            account_id, sign, tax_ids, base_tag_ids, product_id, is_coupon_related = key
+            standard_key = (account_id, sign, tax_ids, base_tag_ids, product_id)
+        else:
+            standard_key = key
+
+        result = super()._get_sale_vals(standard_key, sale_vals)
+        if is_coupon_related:
+            result['name'] = _('Coupon')
+        return result
 
     def _compute_coupon_share_in_order(self, reward_line):
         order = reward_line.order_id
