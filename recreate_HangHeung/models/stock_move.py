@@ -10,3 +10,8 @@ class StockMove(models.Model):
             'price': 0.0,
             'readOnly': parent_record._is_readonly() if parent_record else False,
         }
+
+    def action_add_from_catalog(self):
+        picking_id = self.env.context.get('picking_id')
+        picking = self.env['stock.picking'].browse(picking_id)
+        return picking.with_context(child_field='move_ids_without_package').action_add_from_catalog()
