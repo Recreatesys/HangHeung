@@ -7,3 +7,5 @@ from . import pos_config
 from . import loyalty_program
 from . import stock_quant_relocate
 from . import account_move
+from . import loyalty_reward
+from . import discount_config

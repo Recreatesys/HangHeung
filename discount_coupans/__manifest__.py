@@ -1,13 +1,14 @@
 {
     "name": "Discount Coupons",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "summary": "Manage discount coupons and apply them to sales",
     "description": "This module allows you to create, manage, and apply discount coupons in sales and POS.",
     "author": "CodeTrade India Pvt.Ltd.",
     "website": "https://www.codetrade.io",
-    "depends": ["sale", "base", "point_of_sale","loyalty","pos_loyalty","replace_date_to_datetime","sale_loyalty"],
+    "depends": ["sale", "base", "point_of_sale","loyalty","pos_loyalty","replace_date_to_datetime","sale_loyalty","pos_discount_config"],
     "data": [
         "security/ir.model.access.csv",
+        "data/pos_discount_category.xml",
         "views/loyalty_card_views.xml",
         "views/product_template.xml",
         "views/loyalty_program_views.xml",
