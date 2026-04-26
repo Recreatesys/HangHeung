@@ -13,4 +13,12 @@ patch(TicketScreen.prototype, {
 
         await super.onDoRefund();
     },
+
+    async _setOrder(order) {
+        if (order && order.finalized) {
+            this.setSelectedOrder(order);
+            return;
+        }
+        await super._setOrder(order);
+    },
 });
