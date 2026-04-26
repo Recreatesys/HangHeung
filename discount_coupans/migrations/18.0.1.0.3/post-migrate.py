@@ -33,9 +33,7 @@ def migrate(cr, version):
     if not pos_discount_account:
         _logger.warning("Account 400010 POS Discount not found; category income mapping skipped.")
     else:
-        income_map = dict(pos_discount_categ.property_account_income_categ_id or {})
-        income_map['1'] = pos_discount_account.id
-        pos_discount_categ.property_account_income_categ_id = income_map
+        pos_discount_categ.with_company(company_1).property_account_income_categ_id = pos_discount_account
         _logger.info(
             "POS Discount category %s mapped to account %s for company 1",
             pos_discount_categ.id, pos_discount_account.id,
