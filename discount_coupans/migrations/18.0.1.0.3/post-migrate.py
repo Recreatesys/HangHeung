@@ -20,9 +20,10 @@ def migrate(cr, version):
         _logger.warning("POS Discount category XML record not found; skipping migration.")
         return
 
-    pos_discount_account = env['account.account'].search([
+    company_1 = env['res.company'].browse(1)
+    pos_discount_account = env['account.account'].with_company(company_1).search([
         ('account_type', '=', 'income'),
-        ('code_store', '@>', '{"1": "400010"}'),
+        ('code', '=', '400010'),
     ], limit=1)
     if not pos_discount_account:
         pos_discount_account = env['account.account'].search([
