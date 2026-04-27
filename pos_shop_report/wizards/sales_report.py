@@ -64,25 +64,32 @@ class SalesReportExcelWizard(models.TransientModel):
 
         cancel_order_total = 0
         cancel_qty = 0
+        void_by_method = defaultdict(lambda: {"amount": 0.0, "quantity": 0.0})
         for order in cancel_orders:
             cancel_order_total += order.amount_total
-            for line in orders.mapped("lines"):
-                cancel_qty += line.qty
+            order_qty = sum(line.qty for line in order.lines)
+            cancel_qty += order_qty
+            payments = order.payment_ids
+            if not payments:
+                void_by_method["(No Payment)"]["quantity"] += order_qty
+                continue
+            n_payments = len(payments)
+            for payment in payments:
+                method = payment.payment_method_id.name or "Unknown"
+                void_by_method[method]["amount"] += payment.amount
+                void_by_method[method]["quantity"] += order_qty / n_payments
 
-
-        discount_products = self.env['discount.config'].search([]).mapped('product_id')
-        loyal_reward_products = self.env['loyalty.reward'].search([]).mapped('discount_line_product_id')
-        discount_ids = discount_products.ids + loyal_reward_products.ids
-
-        summary = defaultdict(lambda: {"total_discount": 0.0, "count": 0})
-
+        coupon_program_types = ('coupons', 'gift_card', 'ewallet')
+        coupon_redemption = defaultdict(lambda: {"amount": 0.0, "quantity": 0})
         for line in orders.mapped("lines"):
-            if line.product_id.id in discount_ids:
-                pname = line.product_id.display_name
-                summary[pname]["total_discount"] += line.price_subtotal_incl
-                summary[pname]["count"] += 1
-
-
+            if not line.is_reward_line or not line.reward_id:
+                continue
+            program = line.reward_id.program_id
+            if program.program_type not in coupon_program_types:
+                continue
+            name = program.name or "Unknown"
+            coupon_redemption[name]["amount"] += abs(line.price_subtotal_incl)
+            coupon_redemption[name]["quantity"] += 1
 
         total_amount = 0
         total_transcation = 0
@@ -138,28 +145,40 @@ class SalesReportExcelWizard(models.TransientModel):
 
         row += 2
 
-        sheet.write(row, 0, "折扣及優惠劵(小標題)", header_format)
-        sheet.write(row, 1, "Amount discount", header_format)
-        sheet.write(row, 2, "Discount used", header_format)
-
+        sheet.write(row, 0, "Void單(小標題)", header_format)
+        sheet.write(row, 1, "Amount", header_format)
+        sheet.write(row, 2, "Quantity", header_format)
         row += 1
 
-        for discount, vals in summary.items():
-            sheet.write(row, 0, discount, cell_value_format)
-            sheet.write_number(row, 1, vals["total_discount"], cell_value_format)
-            sheet.write_number(row, 2, vals["count"], cell_value_format)
+        for method, vals in void_by_method.items():
+            sheet.write(row, 0, method, cell_value_format)
+            sheet.write_number(row, 1, vals["amount"], cell_value_format)
+            sheet.write_number(row, 2, vals["quantity"], cell_value_format)
             row += 1
 
+        sheet.write(row, 0, "總計:", cell_value_format_bold)
+        sheet.write_number(row, 1, cancel_order_total, cell_value_format)
+        sheet.write_number(row, 2, cancel_qty, cell_value_format)
+        row += 2
+
+        sheet.write(row, 0, "咭類兌換(小標題)", header_format)
+        sheet.write(row, 1, "Amount Redeemed", header_format)
+        sheet.write(row, 2, "Quantity Redeemed", header_format)
         row += 1
 
-        sheet.write(row, 0, "Void單(小標題)", header_format)
-        sheet.write(row, 1, '', cell_value_format)
-        row += 1
-        sheet.write(row, 0, "Void單數量:", header_format)
-        sheet.write(row, 1, cancel_qty, cell_value_format)
-        row += 1
-        sheet.write(row, 0, "總金額:", header_format)
-        sheet.write(row, 1, cancel_order_total, cell_value_format)
+        coupon_total_amount = 0.0
+        coupon_total_qty = 0
+        for coupon_name, vals in coupon_redemption.items():
+            sheet.write(row, 0, coupon_name, cell_value_format)
+            sheet.write_number(row, 1, vals["amount"], cell_value_format)
+            sheet.write_number(row, 2, vals["quantity"], cell_value_format)
+            coupon_total_amount += vals["amount"]
+            coupon_total_qty += vals["quantity"]
+            row += 1
+
+        sheet.write(row, 0, "總計:", cell_value_format_bold)
+        sheet.write_number(row, 1, coupon_total_amount, cell_value_format)
+        sheet.write_number(row, 2, coupon_total_qty, cell_value_format)
         row += 1
 
         workbook.close()
