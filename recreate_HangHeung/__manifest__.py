@@ -3,14 +3,14 @@
 
 {
     'name': 'Hang Heung Customizations',
-    'version': '1.0.7',
+    'version': '1.0.8',
     'summary': 'Includes all Hang Heung customizations',
     'description': """
         This module contains all of Hang Heung customizations.
     """,
     'author': 'Lau Siu Hin',
     'website': '',
-    'depends': ['contacts', 'base', 'stock', 'web', 'purchase', 'point_of_sale', 'sale_purchase_inter_company_rules'],
+    'depends': ['contacts', 'base', 'stock', 'web', 'purchase', 'point_of_sale', 'sale_purchase_inter_company_rules', 'account'],
     'data': [
         "security/ir.model.access.csv",
         "views/res_partner.xml",
@@ -27,6 +27,7 @@
         "views/purchase_order_report_inherit.xml",
         "views/external_layout_standard_inherit.xml",
         "views/sale_order_view.xml",
+        "views/account_move_views_inherit.xml",
     ],
     'assets': {
         'point_of_sale._assets_pos': [
