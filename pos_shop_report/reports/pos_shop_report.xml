@@ -122,6 +122,56 @@
             </t>
           </tbody>
         </table>
+
+        <t t-if="docs.coupon_lines">
+          <h4 style="text-align: left; margin: 20px 0 5px 0;">Coupon Allocation Summary</h4>
+          <table class="table table-sm table-bordered" style="table-layout: fixed; width: 100%; font-size: 9pt; word-wrap: break-word;">
+            <colgroup>
+              <col style="width: 22%;"/>
+              <col style="width: 11%;"/>
+              <col style="width: 25%;"/>
+              <col style="width: 9%;"/>
+              <col style="width: 11%;"/>
+              <col style="width: 11%;"/>
+              <col style="width: 11%;"/>
+            </colgroup>
+            <thead style="background-color: #f0f0f0;">
+              <tr>
+                <th>程式 / Program</th>
+                <th>SKU</th>
+                <th>名稱 / Name</th>
+                <th>面值 / Face</th>
+                <th>已分配未啟用</th>
+                <th>期內已贖回</th>
+                <th>期內銷售贖回額</th>
+              </tr>
+            </thead>
+            <tbody>
+              <t t-set="t_face" t-value="sum([c['face_value'] for c in docs.coupon_lines])"/>
+              <t t-set="t_alloc" t-value="sum([c['allocated_not_activated'] for c in docs.coupon_lines])"/>
+              <t t-set="t_redeem" t-value="sum([c['redeemed_in_period'] for c in docs.coupon_lines])"/>
+              <t t-set="t_sales" t-value="sum([c['redemption_sales'] for c in docs.coupon_lines])"/>
+              <t t-foreach="docs.coupon_lines" t-as="cline">
+                <tr>
+                  <td><t t-esc="cline['program_name']"/></td>
+                  <td><t t-esc="cline['sku']"/></td>
+                  <td><t t-esc="cline['name']"/></td>
+                  <td><t t-esc="'%.2f' % cline['face_value']"/></td>
+                  <td><t t-esc="cline['allocated_not_activated']"/></td>
+                  <td><t t-esc="cline['redeemed_in_period']"/></td>
+                  <td><t t-esc="'%.2f' % cline['redemption_sales']"/></td>
+                </tr>
+              </t>
+              <tr style="font-weight: bold; background-color: #f9f9f9; font-size: 8pt;">
+                <td colspan="3" style="text-align: right;">Subtotal:</td>
+                <td><t t-esc="'%.2f' % t_face"/></td>
+                <td><t t-esc="t_alloc"/></td>
+                <td><t t-esc="t_redeem"/></td>
+                <td><t t-esc="'%.2f' % t_sales"/></td>
+              </tr>
+            </tbody>
+          </table>
+        </t>
       </main>
     </t>
   </template>

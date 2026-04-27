@@ -14,6 +14,7 @@ class POSShopReportWizard(models.TransientModel):
     date_end = fields.Date(string='End Date', required=True)
 
     report_lines = fields.Json(string='Report Lines', readonly=True)
+    coupon_lines = fields.Json(string='Coupon Lines', readonly=True)
     payment_breakdown = fields.Json(string='Payment Breakdown', readonly=True)
     coupon_discount_total = fields.Float(string="Deducted Coupon", readonly=True)
     company_name = fields.Char(string="Company", compute="_compute_company_name")
@@ -55,6 +56,7 @@ class POSShopReportWizard(models.TransientModel):
     def generate_report(self):
         self.ensure_one()
         self.report_lines = self._compute_report_lines()
+        self.coupon_lines = self._compute_coupon_lines()
         self.payment_breakdown = self._compute_payment_breakdown()
         self.coupon_discount_total = self._compute_coupon_discount()
         return self.env.ref('pos_shop_report.action_pos_shop_report').report_action(self)
@@ -80,11 +82,15 @@ class POSShopReportWizard(models.TransientModel):
             raise ValidationError("No record Found.")
 
         result = {}
-        for line in lines.filtered(lambda l: l.price_subtotal_incl >= 0):
+        for line in lines.filtered(
+            lambda l: l.price_subtotal_incl >= 0
+            and not l.product_id.product_tmpl_id.is_coupon
+        ):
             product = line.product_id
             key = product.id
             if key not in result:
                 result[key] = {
+                    '_product_id': product.id,
                     'sku': product.default_code or '',
                     'name': product.name or '',
                     'previous_stock': 0,
@@ -171,7 +177,71 @@ class POSShopReportWizard(models.TransientModel):
             )
             data['final_amount'] = data['sales_amount'] - data['discount_amount']
 
-        return list(result.values())
+        # Sort by POS category name then SKU (default_code) ascending.
+        # Products without any pos_categ_ids fall to the end via 'zzz' sentinel.
+        cat_by_pid = {}
+        for prod in products:
+            cat_names = prod.product_tmpl_id.pos_categ_ids.mapped('name')
+            cat_by_pid[prod.id] = sorted(cat_names)[0] if cat_names else 'zzz'
+
+        result_list = list(result.values())
+        result_list.sort(key=lambda r: (cat_by_pid.get(r['_product_id'], 'zzz'), r['sku'] or ''))
+        for r in result_list:
+            r.pop('_product_id', None)
+        return result_list
+
+    def _compute_coupon_lines(self):
+        self.ensure_one()
+        LoyaltyCard = self.env['loyalty.card']
+        PosLine = self.env['pos.order.line']
+
+        user_tz = self.env.user.tz or 'UTC'
+        tz = pytz.timezone(user_tz)
+        start_local = tz.localize(datetime.combine(self.date_start, time.min))
+        end_local = tz.localize(datetime.combine(self.date_end, time.max))
+        start_utc = start_local.astimezone(pytz.UTC)
+        end_utc = end_local.astimezone(pytz.UTC)
+
+        coupon_products = self.env['product.product'].search([
+            ('product_tmpl_id.is_coupon', '=', True),
+            ('product_tmpl_id.loyalty_program_id', '!=', False),
+        ])
+
+        coupon_lines = []
+        for product in coupon_products:
+            program = product.product_tmpl_id.loyalty_program_id
+
+            allocated_not_activated = LoyaltyCard.search_count([
+                ('program_id', '=', program.id),
+                ('store_id', '=', self.shop_id.id),
+                ('status', '=', 'not_activated'),
+            ])
+
+            redeemed_lines = PosLine.search([
+                ('order_id.config_id', '=', self.shop_id.id),
+                ('order_id.date_order', '>=', start_utc),
+                ('order_id.date_order', '<=', end_utc),
+                ('is_reward_line', '=', True),
+                ('coupon_id.program_id', '=', program.id),
+            ])
+            redeemed_count = len(redeemed_lines.mapped('coupon_id'))
+            redemption_sales = abs(sum(redeemed_lines.mapped('price_subtotal_incl')))
+
+            if allocated_not_activated == 0 and redeemed_count == 0:
+                continue
+
+            coupon_lines.append({
+                'program_name': program.name or '',
+                'sku': product.default_code or '',
+                'name': product.name or '',
+                'face_value': product.list_price or 0.0,
+                'allocated_not_activated': allocated_not_activated,
+                'redeemed_in_period': redeemed_count,
+                'redemption_sales': redemption_sales,
+            })
+
+        coupon_lines.sort(key=lambda d: (d['program_name'], d['sku']))
+        return coupon_lines
     
 
     def _compute_payment_breakdown(self):
