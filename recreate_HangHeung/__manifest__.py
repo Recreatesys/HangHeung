@@ -3,7 +3,7 @@
 
 {
     'name': 'Hang Heung Customizations',
-    'version': '1.0.10',
+    'version': '1.0.11',
     'summary': 'Includes all Hang Heung customizations',
     'description': """
         This module contains all of Hang Heung customizations.
@@ -14,6 +14,7 @@
     'data': [
         "security/ir.model.access.csv",
         "security/pos_group.xml",
+        "security/sales_non_sales_groups.xml",
         "views/res_partner.xml",
         "views/customer_category_data.xml",
         "views/res_users.xml",
