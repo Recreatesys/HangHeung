@@ -2,6 +2,9 @@
   <template id="report_pos_shop_template">
     <t t-call="web.external_layout">
       <main class="page">
+        <style>
+          div[name="company_address"] { display: none !important; }
+        </style>
         <h2 style="text-align: center;"><t t-esc="docs.company_name"/></h2>
         <div style="text-align: center;margin-top: 20px;">
           <h3>Shop Name: <t t-esc="docs.shop_id.name"/></h3>
