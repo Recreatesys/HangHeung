@@ -1,10 +1,10 @@
 <odoo>
   <template id="report_pos_shop_template">
-    <t t-call="web.external_layout">
+    <t t-call="web.basic_layout">
       <main class="page">
-        <style>
-          div[name="company_address"] { display: none !important; }
-        </style>
+        <div style="text-align: right; font-size: 9pt; font-weight: bold; margin-bottom: 4px;">
+          <t t-esc="docs.company_name or ''"/>
+        </div>
         <h2 style="text-align: center;"><t t-esc="docs.company_name"/></h2>
         <div style="text-align: center;margin-top: 20px;">
           <h3>Shop Name: <t t-esc="docs.shop_id.name"/></h3>
