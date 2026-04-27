@@ -11,6 +11,7 @@ ACCOUNT_240001_CODE = '240001'
 ACCOUNT_240002_CODE = '240002'
 ACCOUNT_400001_CODE = '400001'
 ACCOUNT_400010_CODE = '400010'
+ACCOUNT_124300_CODE = '124300'
 
 COUPON_PROGRAM_TYPES = ('coupons', 'gift_card', 'ewallet')
 NON_COUPON_PROGRAM_TYPES = ('promotion', 'promo_code', 'buy_x_get_y', 'next_order_coupons', 'loyalty')
@@ -25,6 +26,14 @@ class PosSession(models.Model):
         readonly=True,
         copy=False,
     )
+    payment_reconciliation_move_id = fields.Many2one(
+        'account.move',
+        string="Payment Reconciliation Move",
+        readonly=True,
+        copy=False,
+        help="Clears the generic POS receivable (124300) to per-payment-method "
+             "outstanding accounts (e.g. Alipay 173000, Wechat 174000).",
+    )
 
     def _create_account_move(self, *args, **kwargs):
         result = super()._create_account_move(*args, **kwargs)
@@ -34,6 +43,13 @@ class PosSession(models.Model):
             except Exception as e:
                 _logger.exception(
                     "Coupon adjustment move creation failed for session %s: %s",
+                    session.name, e,
+                )
+            try:
+                session._create_payment_method_reconciliation_move()
+            except Exception as e:
+                _logger.exception(
+                    "Payment-method reconciliation move failed for session %s: %s",
                     session.name, e,
                 )
         return result
@@ -112,6 +128,116 @@ class PosSession(models.Model):
         if not (acc_240001 and acc_240002 and acc_400001 and acc_400010):
             return None
         return acc_240001, acc_240002, acc_400001, acc_400010
+
+    def _payment_method_clearing_account(self, method):
+        if method.is_cash_count and method.journal_id and method.journal_id.default_account_id:
+            return method.journal_id.default_account_id
+        return method.outstanding_account_id or False
+
+    def _create_payment_method_reconciliation_move(self):
+        self.ensure_one()
+        if self.payment_reconciliation_move_id:
+            return
+
+        Account = self.env['account.account'].with_company(self.company_id)
+        pos_ar_account = Account.search([('code', '=', ACCOUNT_124300_CODE)], limit=1)
+        if not pos_ar_account:
+            return
+        if not self.move_id:
+            return
+
+        rounding = self.currency_id.rounding
+        method_totals = defaultdict(float)
+        for order in self._get_closed_orders():
+            if order.is_invoiced:
+                continue
+            for payment in order.payment_ids:
+                method = payment.payment_method_id
+                if not method:
+                    continue
+                method_totals[method] += payment.amount
+
+        if not method_totals:
+            return
+
+        line_vals = []
+        base_label = _('Payment-method reconciliation for session %s') % self.name
+        for method, amount in method_totals.items():
+            if float_is_zero(amount, precision_rounding=rounding):
+                continue
+            dest = self._payment_method_clearing_account(method)
+            if not dest:
+                _logger.info(
+                    "Session %s: payment method %s has no clearing account; "
+                    "leaving its share on %s.",
+                    self.name, method.name, pos_ar_account.code,
+                )
+                continue
+            if dest.id == pos_ar_account.id:
+                continue
+            label = '%s - %s' % (base_label, method.name)
+            if amount > 0:
+                debit, credit = amount, 0.0
+                cr_debit, cr_credit = 0.0, amount
+            else:
+                debit, credit = 0.0, -amount
+                cr_debit, cr_credit = -amount, 0.0
+            line_vals.append((0, 0, {
+                'account_id': dest.id,
+                'name': label,
+                'debit': debit,
+                'credit': credit,
+            }))
+            line_vals.append((0, 0, {
+                'account_id': pos_ar_account.id,
+                'name': label,
+                'debit': cr_debit,
+                'credit': cr_credit,
+            }))
+
+        if not line_vals:
+            return
+
+        total_dr = sum(l[2]['debit'] for l in line_vals)
+        total_cr = sum(l[2]['credit'] for l in line_vals)
+        if not float_is_zero(total_dr - total_cr, precision_rounding=rounding):
+            _logger.warning(
+                "Payment-method reconciliation for session %s does not balance: "
+                "DR=%s CR=%s; clearing move skipped.",
+                self.name, total_dr, total_cr,
+            )
+            return
+
+        journal = self.config_id.journal_id
+        move = self.env['account.move'].sudo().create({
+            'journal_id': journal.id,
+            'date': fields.Date.context_today(self),
+            'ref': _('Payment reconciliation — session %s') % self.name,
+            'company_id': self.company_id.id,
+            'line_ids': line_vals,
+        })
+        move._post(soft=False)
+        self.payment_reconciliation_move_id = move.id
+
+        ar_lines = self.env['account.move.line'].search([
+            ('account_id', '=', pos_ar_account.id),
+            ('move_id', 'in', [self.move_id.id, move.id]),
+            ('parent_state', '=', 'posted'),
+        ])
+        if ar_lines:
+            try:
+                ar_lines.reconcile()
+            except Exception as e:
+                _logger.warning(
+                    "Could not auto-reconcile %s lines on session %s: %s",
+                    pos_ar_account.code, self.name, e,
+                )
+
+        _logger.info(
+            "Payment reconciliation move %s posted for session %s "
+            "(%d methods, total=%s)",
+            move.name, self.name, len(method_totals), total_dr,
+        )
 
     def _collect_coupon_adjustment_for_line(self, line, balances, acc_240001, acc_240002, acc_400001, acc_400010):
         product_tmpl = line.product_id.product_tmpl_id
@@ -269,7 +395,11 @@ class PosSession(models.Model):
                     'amount_converted': non_coupon_converted,
                 }
 
-        data['sales'] = new_sales
+        data['sales'] = {
+            k: v for k, v in new_sales.items()
+            if not float_is_zero(v['amount'], precision_rounding=rounding)
+            or not float_is_zero(v['amount_converted'], precision_rounding=rounding)
+        }
         return data
 
     def _get_sale_vals(self, key, sale_vals):

@@ -8,6 +8,8 @@
             <xpath expr="//field[@name='move_id']" position="after">
                 <field name="coupon_adjustment_move_id" readonly="1"
                        invisible="not coupon_adjustment_move_id"/>
+                <field name="payment_reconciliation_move_id" readonly="1"
+                       invisible="not payment_reconciliation_move_id"/>
             </xpath>
         </field>
     </record>
