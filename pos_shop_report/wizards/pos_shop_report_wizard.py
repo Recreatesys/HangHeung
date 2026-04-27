@@ -1,3 +1,4 @@
+from collections import defaultdict
 from odoo import models, fields,api
 from datetime import time, timedelta, datetime
 from odoo.exceptions import ValidationError
@@ -59,9 +60,15 @@ class POSShopReportWizard(models.TransientModel):
         return self.env.ref('pos_shop_report.action_pos_shop_report').report_action(self)
 
     def _compute_report_lines(self):
+        self.ensure_one()
         PosLine = self.env['pos.order.line']
         StockMove = self.env['stock.move']
         StockScrap = self.env['stock.scrap']
+
+        warehouse = self.shop_id.picking_type_id.warehouse_id
+        if not warehouse:
+            warehouse = self.env['stock.warehouse'].search(
+                [('name', '=', self.shop_id.name)], limit=1)
 
         lines = PosLine.search([
             ('order_id.config_id', '=', self.shop_id.id),
@@ -73,7 +80,6 @@ class POSShopReportWizard(models.TransientModel):
             raise ValidationError("No record Found.")
 
         result = {}
-
         for line in lines.filtered(lambda l: l.price_subtotal_incl >= 0):
             product = line.product_id
             key = product.id
@@ -89,7 +95,7 @@ class POSShopReportWizard(models.TransientModel):
                     'total_qty_today': 0,
                     'sales_amount': 0,
                     'discount_amount': 0,
-                    'final_amount':0,
+                    'final_amount': 0,
                 }
 
             res = result[key]
@@ -105,37 +111,65 @@ class POSShopReportWizard(models.TransientModel):
             res['sales_amount'] += qty * price
             res['discount_amount'] += abs(discount)
 
-        for product_id in result:
-            product = self.env['product.product'].browse(product_id)
+        product_ids = list(result.keys())
+        products = self.env['product.product'].browse(product_ids)
 
-            stock_qty = product.with_context(to_date=self.date_start - timedelta(days=1)).qty_available
-            result[product_id]['previous_stock'] = stock_qty
+        # previous_stock: qty on hand at end of day before date_start, scoped to the shop's warehouse
+        prev_stock_by_id = {pid: 0 for pid in product_ids}
+        if warehouse:
+            prev_date = self.date_start - timedelta(days=1)
+            for p in products.with_context(to_date=prev_date, warehouse_id=warehouse.id):
+                prev_stock_by_id[p.id] = p.qty_available
 
-            incoming = StockMove.search([
-                ('product_id', '=', product_id),
-                ('date', '>=', self.date_start),
-                ('date', '<=', self.date_end),
-                ('state', '=', 'done'),
-            ])
-            result[product_id]['stock_in'] = sum(incoming.mapped('product_uom_qty'))
+        # stock_in: stock.move arriving INTO the shop's warehouse from outside the shop
+        stock_in_by_id = defaultdict(float)
+        scrap_by_id = defaultdict(float)
+        if warehouse and warehouse.view_location_id:
+            shop_internal_location_ids = self.env['stock.location'].search([
+                ('id', 'child_of', warehouse.view_location_id.id),
+                ('usage', '=', 'internal'),
+            ]).ids
+            if shop_internal_location_ids:
+                for grp in StockMove.read_group(
+                    domain=[
+                        ('product_id', 'in', product_ids),
+                        ('date', '>=', self.date_start),
+                        ('date', '<=', self.date_end),
+                        ('state', '=', 'done'),
+                        ('location_dest_id', 'in', shop_internal_location_ids),
+                        ('location_id', 'not in', shop_internal_location_ids),
+                    ],
+                    fields=['product_id', 'product_uom_qty:sum'],
+                    groupby=['product_id'],
+                ):
+                    stock_in_by_id[grp['product_id'][0]] = grp['product_uom_qty']
 
-            scraps = StockScrap.search([
-                ('product_id', '=', product_id),
-                ('date_done', '>=', self.date_start),
-                ('date_done', '<=', self.date_end),
-                ('state', '=', 'done'),
-            ])
-            result[product_id]['scrap_qty'] = sum(scraps.mapped('scrap_qty'))
+                # scrap_qty: stock.scrap whose source is in the shop's warehouse
+                for grp in StockScrap.read_group(
+                    domain=[
+                        ('product_id', 'in', product_ids),
+                        ('date_done', '>=', self.date_start),
+                        ('date_done', '<=', self.date_end),
+                        ('state', '=', 'done'),
+                        ('location_id', 'in', shop_internal_location_ids),
+                    ],
+                    fields=['product_id', 'scrap_qty:sum'],
+                    groupby=['product_id'],
+                ):
+                    scrap_by_id[grp['product_id'][0]] = grp['scrap_qty']
 
-            res = result[product_id]
-            res['total_qty_today'] = (
-                res['previous_stock']
-                + res['stock_in']
-                - res['scrap_qty']
-                - res['sales_qty']
-                + res['sales_refund_qty']
+        for pid, data in result.items():
+            data['previous_stock'] = prev_stock_by_id.get(pid, 0)
+            data['stock_in'] = stock_in_by_id.get(pid, 0)
+            data['scrap_qty'] = scrap_by_id.get(pid, 0)
+            data['total_qty_today'] = (
+                data['previous_stock']
+                + data['stock_in']
+                - data['scrap_qty']
+                - data['sales_qty']
+                + data['sales_refund_qty']
             )
-            res['final_amount'] = res['sales_amount'] - res['discount_amount']
+            data['final_amount'] = data['sales_amount'] - data['discount_amount']
 
         return list(result.values())
     
