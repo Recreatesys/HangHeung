@@ -126,7 +126,7 @@ class SalesReportExcelWizard(models.TransientModel):
         sheet.write(row, 1, total_transcation, cell_value_format)
 
         row += 2
-        sheet.write(row, 0, "支付方式(小標題)",header_format)
+        sheet.write(row, 0, "支付方式",header_format)
         sheet.write(row, 1, "Amount",header_format)
         sheet.write(row, 2, "Transactions",header_format)
 
@@ -145,7 +145,7 @@ class SalesReportExcelWizard(models.TransientModel):
 
         row += 2
 
-        sheet.write(row, 0, "Void單(小標題)", header_format)
+        sheet.write(row, 0, "Void單", header_format)
         sheet.write(row, 1, "Amount", header_format)
         sheet.write(row, 2, "Quantity", header_format)
         row += 1
@@ -161,7 +161,7 @@ class SalesReportExcelWizard(models.TransientModel):
         sheet.write_number(row, 2, cancel_qty, cell_value_format)
         row += 2
 
-        sheet.write(row, 0, "咭類兌換(小標題)", header_format)
+        sheet.write(row, 0, "咭類兌換", header_format)
         sheet.write(row, 1, "Amount Redeemed", header_format)
         sheet.write(row, 2, "Quantity Redeemed", header_format)
         row += 1
