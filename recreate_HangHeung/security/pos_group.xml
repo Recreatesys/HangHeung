@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_pos_user" model="res.groups">
+        <field name="name">POS Group</field>
+        <field name="comment">Users in this group cannot see contacts where 'B2B Customer' or 'Vendor' is ticked, nor contacts whose parent company is marked B2B or Vendor.</field>
+    </record>
+
+    <record id="rule_partner_pos_user_no_b2b_vendor" model="ir.rule">
+        <field name="name">POS Group: hide B2B Customer / Vendor partners (and their children)</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('customer', '=', False), ('vendor', '=', False), '|', ('parent_id', '=', False), '&amp;', ('parent_id.customer', '=', False), ('parent_id.vendor', '=', False)] if user.has_group('recreate_HangHeung.group_pos_user') else [(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+</odoo>
