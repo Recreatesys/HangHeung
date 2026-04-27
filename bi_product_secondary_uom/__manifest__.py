@@ -2,7 +2,7 @@
 # Part of BrowseInfo. See LICENSE file for full copyright and licensing details.
 {
     'name': "Product Secondary Unit of Measure",
-    'version': '18.0.0.0',
+    'version': '18.0.0.1',
     'category':"Extra Tools",
     'summary': "Product secondary UOM Quantity inventory secondary UOM warehouse secondary UOM secondary UOM for product Sale Secondary UOM product stock unit of measurement purchase secondary unit of measures sales order secondary UOM purchase secondary UOM product uom",
     'description': """
