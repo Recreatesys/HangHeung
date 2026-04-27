@@ -245,8 +245,6 @@ class PosSession(models.Model):
         )
 
     def _collect_coupon_adjustment_for_line(self, line, balances, acc_240001, acc_240002, acc_400001, acc_400010):
-        product_tmpl = line.product_id.product_tmpl_id
-
         if line.is_reward_line and line.reward_id:
             program = line.reward_id.program_id
 
@@ -257,43 +255,20 @@ class PosSession(models.Model):
                 if face <= 0:
                     return
                 sold_at = (line.coupon_id.sold_at_amount or 0.0) if line.coupon_id else 0.0
-                if 0 < sold_at < face:
-                    disc_at_sale = face - sold_at
-                else:
-                    disc_at_sale = 0.0
+                if sold_at <= 0:
+                    sold_at = face
 
-                pos_discount_categ = self.env.ref(
-                    'discount_coupans.product_category_pos_discount',
-                    raise_if_not_found=False,
-                )
-                reward_in_pos_discount = bool(
-                    pos_discount_categ
-                    and product_tmpl.categ_id == pos_discount_categ
-                )
-
-                balances[(acc_240001, 'debit')] += face
-                balances[(acc_240002, 'credit')] += face
-                balances[(acc_240002, 'debit')] += (face - disc_at_sale)
-                if reward_in_pos_discount:
-                    balances[(acc_400010, 'credit')] += (face - disc_at_sale)
-                else:
-                    balances[(acc_400001, 'credit')] += face
-                    if disc_at_sale > 0:
-                        balances[(acc_400010, 'debit')] += disc_at_sale
+                balances[(acc_240001, 'debit')] += sold_at
+                balances[(acc_240002, 'credit')] += sold_at
+                balances[(acc_240002, 'debit')] += sold_at
+                balances[(acc_400001, 'credit')] += sold_at
                 return
 
             if program.program_type in NON_COUPON_PROGRAM_TYPES:
-                # Sell-time discount on coupons is now rerouted at the standard
-                # session move via _accumulate_amounts (400010 -> 240002 for the
-                # coupon share). No adjustment needed here.
+                # Mech B sell-disc on coupons is netted into 240001 via the
+                # standard session move (_accumulate_amounts reroute). No
+                # adjustment needed here.
                 return
-
-        if product_tmpl.is_coupon and line.qty > 0 and line.discount and line.discount > 0:
-            discount_amount = line.qty * line.price_unit * (line.discount / 100.0)
-            if discount_amount > 0:
-                balances[(acc_240002, 'debit')] += discount_amount
-                balances[(acc_240001, 'credit')] += discount_amount
-            return
 
     def _is_order_coupon_related(self, order):
         for line in order.lines:
@@ -322,12 +297,12 @@ class PosSession(models.Model):
             return data
 
         Account = self.env['account.account'].with_company(self.company_id)
-        acc_240002 = Account.search([('code', '=', ACCOUNT_240002_CODE)], limit=1)
+        acc_240001 = Account.search([('code', '=', ACCOUNT_240001_CODE)], limit=1)
         acc_400010 = Account.search([('code', '=', ACCOUNT_400010_CODE)], limit=1)
 
         AccountTax = self.env['account.tax']
         coupon_aggregation = defaultdict(lambda: {'amount': 0.0, 'amount_converted': 0.0})
-        reroute_to_240002 = defaultdict(lambda: {'amount': 0.0, 'amount_converted': 0.0})
+        reroute_sell_disc = defaultdict(lambda: {'amount': 0.0, 'amount_converted': 0.0})
         for order in self._get_closed_orders():
             if order.id not in coupon_order_ids or order.is_invoiced:
                 continue
@@ -359,12 +334,12 @@ class PosSession(models.Model):
                 if (
                     is_mech_b_sell
                     and acc_400010
-                    and acc_240002
+                    and acc_240001
                     and base_line['account_id'].id == acc_400010.id
                     and sign == -1
                 ):
-                    reroute_to_240002[sale_key]['amount'] += amt
-                    reroute_to_240002[sale_key]['amount_converted'] += conv
+                    reroute_sell_disc[sale_key]['amount'] += amt
+                    reroute_sell_disc[sale_key]['amount_converted'] += conv
 
         rounding = self.currency_id.rounding
         new_sales = defaultdict(lambda: {'amount': 0.0, 'amount_converted': 0.0})
@@ -377,7 +352,7 @@ class PosSession(models.Model):
             non_coupon_amount = vals['amount'] - coupon_part['amount']
             non_coupon_converted = vals['amount_converted'] - coupon_part['amount_converted']
 
-            rerouted = reroute_to_240002.get(key)
+            rerouted = reroute_sell_disc.get(key)
             rerouted_amount = rerouted['amount'] if rerouted else 0.0
             rerouted_converted = rerouted['amount_converted'] if rerouted else 0.0
             coupon_kept_amount = coupon_part['amount'] - rerouted_amount
@@ -388,8 +363,8 @@ class PosSession(models.Model):
                 new_sales[coupon_key]['amount'] += coupon_kept_amount
                 new_sales[coupon_key]['amount_converted'] += coupon_kept_converted
 
-            if rerouted and not float_is_zero(rerouted_amount, precision_rounding=rounding):
-                target_key = (acc_240002.id,) + key[1:] + (True,)
+            if rerouted and acc_240001 and not float_is_zero(rerouted_amount, precision_rounding=rounding):
+                target_key = (acc_240001.id,) + key[1:] + (True,)
                 new_sales[target_key]['amount'] += rerouted_amount
                 new_sales[target_key]['amount_converted'] += rerouted_converted
 
@@ -409,8 +384,6 @@ class PosSession(models.Model):
 
     def _get_sale_vals(self, key, sale_vals):
         is_coupon_related = False
-        account_id = key[0]
-        sign = key[1]
         if len(key) == 6:
             account_id, sign, tax_ids, base_tag_ids, product_id, is_coupon_related = key
             standard_key = (account_id, sign, tax_ids, base_tag_ids, product_id)
@@ -419,13 +392,7 @@ class PosSession(models.Model):
 
         result = super()._get_sale_vals(standard_key, sale_vals)
         if is_coupon_related:
-            Account = self.env['account.account'].with_company(self.company_id)
-            acc_240002 = Account.search([('code', '=', ACCOUNT_240002_CODE)], limit=1)
-            if acc_240002 and account_id == acc_240002.id and sign == -1:
-                result['name'] = _('Coupon sell-time discount carry')
-                result['account_id'] = acc_240002.id
-            else:
-                result['name'] = _('Coupon')
+            result['name'] = _('Coupon')
         return result
 
     def _compute_coupon_share_in_order(self, reward_line):
