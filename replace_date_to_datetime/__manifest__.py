@@ -3,7 +3,7 @@
 
 {
     'name': 'Replace Date To Datetime',
-    'version': '1.0',
+    'version': '1.0.1',
     'summary': 'Replace Date To Datetime',
     'description': """
         Replace Date To Datetime.

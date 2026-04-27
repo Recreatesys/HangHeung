@@ -64,6 +64,8 @@ patch(PosStore.prototype, {
                     const discountData = await rpc("/pos/get_coupon_discount_data", {
                         coupon_id: false,
                         program_id: rule.program_id.id,
+                        pricelist_id: order.pricelist_id ? order.pricelist_id.id : false,
+                        partner_id: order.get_partner() ? order.get_partner().id : false,
                     });
 
                     const discountProductIds = discountData?.discount_product_ids || [];
@@ -136,6 +138,8 @@ patch(PosStore.prototype, {
                     const discountData = await rpc("/pos/get_coupon_discount_data", {
                         coupon_id: payload.coupon_id,
                         program_id: payload.program_id,
+                        pricelist_id: order.pricelist_id ? order.pricelist_id.id : false,
+                        partner_id: order.get_partner() ? order.get_partner().id : false,
                     });
 
                     const discountProductIds = discountData?.discount_product_ids || [];

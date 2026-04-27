@@ -136,6 +136,11 @@ class PosSession(models.Model):
 
     def _create_payment_method_reconciliation_move(self):
         self.ensure_one()
+        enabled = self.env['ir.config_parameter'].sudo().get_param(
+            'discount_coupans.payment_reconciliation_enabled', 'False',
+        )
+        if str(enabled).strip().lower() not in ('1', 'true', 'yes', 'on'):
+            return
         if self.payment_reconciliation_move_id:
             return
 

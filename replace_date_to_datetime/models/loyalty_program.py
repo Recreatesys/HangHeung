@@ -26,7 +26,7 @@ class LoyaltyProgram(models.Model):
 
 class POSCouponDiscountController(http.Controller):
     @http.route('/pos/get_coupon_discount_data', type='json', auth='user')
-    def get_coupon_discount_data(self, coupon_id, program_id):
+    def get_coupon_discount_data(self, coupon_id, program_id, pricelist_id=False, partner_id=False):
         discount_product_ids = []
         discount_amounts = {}
 
@@ -38,18 +38,32 @@ class POSCouponDiscountController(http.Controller):
         elif program_id:
             program = request.env['loyalty.program'].sudo().browse(program_id)
 
+        pricelist = (
+            request.env['product.pricelist'].sudo().browse(pricelist_id)
+            if pricelist_id else request.env['product.pricelist']
+        )
+        partner = (
+            request.env['res.partner'].sudo().browse(partner_id)
+            if partner_id else request.env['res.partner']
+        )
+
+        def _price_for(product):
+            if pricelist:
+                return pricelist._get_product_price(product, 1.0, partner=partner)
+            return product.list_price
+
         if program and program.rule_ids:
             last_rule = program.rule_ids.sorted(key=lambda r: r.create_date)[-1]
 
             if last_rule.product_ids:
                 for product in last_rule.product_ids:
                     discount_product_ids.append(product.id)
-                    discount_amounts[product.id] = product.list_price
+                    discount_amounts[product.id] = _price_for(product)
             else:
                 all_products = request.env['product.product'].sudo().search([])
                 for product in all_products:
                     discount_product_ids.append(product.id)
-                    discount_amounts[product.id] = product.list_price
+                    discount_amounts[product.id] = _price_for(product)
 
         return {
             'discount_product_ids': discount_product_ids,
