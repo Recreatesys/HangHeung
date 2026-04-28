@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="recreate_HangHeung.TicketScreen" t-inherit="point_of_sale.TicketScreen" t-inherit-mode="extension">
+        <xpath expr="//ActionpadWidget" position="before">
+            <button class="control-button btn btn-warning btn-lg lh-lg w-100 mb-2"
+                    t-att-disabled="!hasFullRefundCandidates()"
+                    t-on-click="() => this.onDoFullRefund()">
+                全單退款
+            </button>
+        </xpath>
+    </t>
+
+</templates>

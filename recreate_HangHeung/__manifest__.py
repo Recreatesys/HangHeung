@@ -3,7 +3,7 @@
 
 {
     'name': 'Hang Heung Customizations',
-    'version': '1.0.12',
+    'version': '1.0.13',
     'summary': 'Includes all Hang Heung customizations',
     'description': """
         This module contains all of Hang Heung customizations.
@@ -34,7 +34,8 @@
     ],
     'assets': {
         'point_of_sale._assets_pos': [
-            'recreate_HangHeung/static/src/js/*'
+            'recreate_HangHeung/static/src/js/*',
+            'recreate_HangHeung/static/src/xml/*',
         ],
     },
 

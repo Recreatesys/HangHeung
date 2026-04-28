@@ -21,4 +21,32 @@ patch(TicketScreen.prototype, {
         }
         await super._setOrder(order);
     },
+
+    onDoFullRefund() {
+        const order = this.getSelectedOrder();
+        if (!order) return;
+
+        for (const line of order.lines) {
+            const refundableQty = line.qty - (line.refunded_qty || 0);
+            if (refundableQty <= 0) continue;
+            const detail = this.getToRefundDetail(line);
+            if (detail.destionation_order_id) continue;
+            detail.qty = refundableQty;
+        }
+        if (this.numberBuffer && this.numberBuffer.reset) {
+            this.numberBuffer.reset();
+        }
+    },
+
+    hasFullRefundCandidates() {
+        const order = this.getSelectedOrder();
+        if (!order) return false;
+        for (const line of order.lines) {
+            if ((line.qty - (line.refunded_qty || 0)) > 0) {
+                const detail = this.getToRefundDetail(line);
+                if (!detail.destionation_order_id) return true;
+            }
+        }
+        return false;
+    },
 });
