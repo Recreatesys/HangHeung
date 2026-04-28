@@ -10,11 +10,22 @@ class PosConfig(models.Model):
 
     def use_coupon_code(self, code, creation_date, partner_id, pricelist_id):
         self.ensure_one()
-        coupon = self.env['loyalty.card'].search([
-            ('program_id', 'in', self._get_program_ids().ids),
-            '|', ('code', '=', code), ('security_code', '=', code),
-            '|', ('partner_id', 'in', (False, partner_id)), ('program_type', '=', 'gift_card'),
-        ], order='partner_id, points desc', limit=1)
+        # Defensive: only OR-match on security_code when the column is
+        # actually provisioned on this DB. Lets the same code run safely
+        # against DBs where -u hasn't added the column yet.
+        if self.env.cr.column_exists('loyalty_card', 'security_code'):
+            domain = [
+                ('program_id', 'in', self._get_program_ids().ids),
+                '|', ('code', '=', code), ('security_code', '=', code),
+                '|', ('partner_id', 'in', (False, partner_id)), ('program_type', '=', 'gift_card'),
+            ]
+        else:
+            domain = [
+                ('program_id', 'in', self._get_program_ids().ids),
+                ('code', '=', code),
+                '|', ('partner_id', 'in', (False, partner_id)), ('program_type', '=', 'gift_card'),
+            ]
+        coupon = self.env['loyalty.card'].search(domain, order='partner_id, points desc', limit=1)
 
         program = coupon.program_id
 

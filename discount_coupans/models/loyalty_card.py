@@ -38,6 +38,11 @@ class LoyaltyCard(models.Model):
 
     @api.constrains('security_code', 'code')
     def _check_security_code(self):
+        # Defensive: if the column hasn't been provisioned on this DB yet
+        # (the module's field declaration is loaded but -u hasn't run here),
+        # skip validation so writes to other fields don't fail.
+        if not self.env.cr.column_exists('loyalty_card', 'security_code'):
+            return
         for card in self:
             if not card.security_code:
                 continue
