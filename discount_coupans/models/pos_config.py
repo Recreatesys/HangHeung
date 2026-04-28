@@ -1,5 +1,6 @@
 from odoo import _, fields, models
 from odoo.exceptions import UserError
+from odoo.tools.sql import column_exists
 from datetime import timedelta
 import logging
 
@@ -13,7 +14,7 @@ class PosConfig(models.Model):
         # Defensive: only OR-match on security_code when the column is
         # actually provisioned on this DB. Lets the same code run safely
         # against DBs where -u hasn't added the column yet.
-        if self.env.cr.column_exists('loyalty_card', 'security_code'):
+        if column_exists(self.env.cr, 'loyalty_card', 'security_code'):
             domain = [
                 ('program_id', 'in', self._get_program_ids().ids),
                 '|', ('code', '=', code), ('security_code', '=', code),
