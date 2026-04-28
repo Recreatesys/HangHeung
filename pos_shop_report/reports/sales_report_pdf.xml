@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="paperformat_sales_report_pdf" model="report.paperformat">
+        <field name="name">Sales Report PDF Format</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="page_width">0</field>
+        <field name="page_height">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">15</field>
+        <field name="margin_bottom">15</field>
+        <field name="margin_left">15</field>
+        <field name="margin_right">15</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_sales_report_pdf" model="ir.actions.report">
+        <field name="name">Sales Report PDF</field>
+        <field name="model">sales.report.excel.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">pos_shop_report.report_sales_report_pdf_template</field>
+        <field name="report_file">pos_shop_report.report_sales_report_pdf_template</field>
+        <field name="paperformat_id" ref="pos_shop_report.paperformat_sales_report_pdf"/>
+    </record>
+
+    <template id="report_sales_report_pdf_template">
+        <t t-call="web.basic_layout">
+            <main class="page" style="font-family: sans-serif; font-size: 10pt;">
+                <t t-set="d" t-value="docs._aggregate_report_data()"/>
+
+                <h2 style="text-align: center; margin: 0 0 12px 0;">Sales Report</h2>
+
+                <table style="width: 70%; max-width: 150mm; margin: 0 auto 14px auto; border-collapse: collapse; font-size: 10pt;">
+                    <tr>
+                        <td style="border: 1px solid #999; padding: 4px 8px; background: #D9E1F2; width: 40%;"><strong>日期:</strong></td>
+                        <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="d.get('start_date') or ''"/></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #999; padding: 4px 8px; background: #D9E1F2;"><strong>(日結)時間:</strong></td>
+                        <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="d.get('end_date') or ''"/></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #999; padding: 4px 8px; background: #D9E1F2;"><strong>分店:</strong></td>
+                        <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="d.get('pos_name') or ''"/></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #999; padding: 4px 8px; background: #D9E1F2;"><strong>總計($):</strong></td>
+                        <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="'%.2f' % (d.get('order_total') or 0.0)"/></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #999; padding: 4px 8px; background: #D9E1F2;"><strong>交易數量:</strong></td>
+                        <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="d.get('total_transcation') or 0"/></td>
+                    </tr>
+                </table>
+
+                <h4 style="margin: 12px auto 4px auto; width: 80%; max-width: 165mm;">支付方式</h4>
+                <table style="width: 80%; max-width: 165mm; margin: 0 auto 14px auto; border-collapse: collapse; font-size: 9pt;">
+                    <colgroup>
+                        <col style="width: 50%;"/>
+                        <col style="width: 25%;"/>
+                        <col style="width: 25%;"/>
+                    </colgroup>
+                    <thead style="background: #D9E1F2;">
+                        <tr>
+                            <th style="border: 1px solid #999; padding: 4px 8px; text-align: left;">支付方式</th>
+                            <th style="border: 1px solid #999; padding: 4px 8px; text-align: left;">Amount</th>
+                            <th style="border: 1px solid #999; padding: 4px 8px; text-align: left;">Transactions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="d.get('payment_summary') or []" t-as="p">
+                            <tr>
+                                <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="p['method']"/></td>
+                                <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="'%.2f' % p['amount']"/></td>
+                                <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="p['transactions']"/></td>
+                            </tr>
+                        </t>
+                        <tr style="font-weight: bold; background: #f4f4f4;">
+                            <td style="border: 1px solid #999; padding: 4px 8px;">淨收入:</td>
+                            <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="'%.2f' % (d.get('total_amount') or 0.0)"/></td>
+                            <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="d.get('total_transcation') or 0"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4 style="margin: 12px auto 4px auto; width: 80%; max-width: 165mm;">Void單</h4>
+                <table style="width: 80%; max-width: 165mm; margin: 0 auto 14px auto; border-collapse: collapse; font-size: 9pt;">
+                    <colgroup>
+                        <col style="width: 50%;"/>
+                        <col style="width: 25%;"/>
+                        <col style="width: 25%;"/>
+                    </colgroup>
+                    <thead style="background: #D9E1F2;">
+                        <tr>
+                            <th style="border: 1px solid #999; padding: 4px 8px; text-align: left;">Payment Method</th>
+                            <th style="border: 1px solid #999; padding: 4px 8px; text-align: left;">Amount</th>
+                            <th style="border: 1px solid #999; padding: 4px 8px; text-align: left;">Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="d.get('void_by_method') or []" t-as="v">
+                            <tr>
+                                <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="v['method']"/></td>
+                                <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="'%.2f' % v['amount']"/></td>
+                                <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="'%.2f' % v['quantity']"/></td>
+                            </tr>
+                        </t>
+                        <tr style="font-weight: bold; background: #f4f4f4;">
+                            <td style="border: 1px solid #999; padding: 4px 8px;">總計:</td>
+                            <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="'%.2f' % (d.get('cancel_order_total') or 0.0)"/></td>
+                            <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="'%.2f' % (d.get('cancel_qty') or 0.0)"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4 style="margin: 12px auto 4px auto; width: 80%; max-width: 165mm;">咭類兌換</h4>
+                <table style="width: 80%; max-width: 165mm; margin: 0 auto 14px auto; border-collapse: collapse; font-size: 9pt;">
+                    <colgroup>
+                        <col style="width: 50%;"/>
+                        <col style="width: 25%;"/>
+                        <col style="width: 25%;"/>
+                    </colgroup>
+                    <thead style="background: #D9E1F2;">
+                        <tr>
+                            <th style="border: 1px solid #999; padding: 4px 8px; text-align: left;">Coupon</th>
+                            <th style="border: 1px solid #999; padding: 4px 8px; text-align: left;">Amount Redeemed</th>
+                            <th style="border: 1px solid #999; padding: 4px 8px; text-align: left;">Quantity Redeemed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-set="coupon_total_amount" t-value="sum([c['amount'] for c in (d.get('coupon_redemption') or [])])"/>
+                        <t t-set="coupon_total_qty" t-value="sum([c['quantity'] for c in (d.get('coupon_redemption') or [])])"/>
+                        <t t-foreach="d.get('coupon_redemption') or []" t-as="c">
+                            <tr>
+                                <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="c['name']"/></td>
+                                <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="'%.2f' % c['amount']"/></td>
+                                <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="c['quantity']"/></td>
+                            </tr>
+                        </t>
+                        <tr style="font-weight: bold; background: #f4f4f4;">
+                            <td style="border: 1px solid #999; padding: 4px 8px;">總計:</td>
+                            <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="'%.2f' % coupon_total_amount"/></td>
+                            <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="coupon_total_qty"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4 style="margin: 12px auto 4px auto; width: 80%; max-width: 165mm;">Discount</h4>
+                <table style="width: 80%; max-width: 165mm; margin: 0 auto 14px auto; border-collapse: collapse; font-size: 9pt;">
+                    <colgroup>
+                        <col style="width: 50%;"/>
+                        <col style="width: 25%;"/>
+                        <col style="width: 25%;"/>
+                    </colgroup>
+                    <thead style="background: #D9E1F2;">
+                        <tr>
+                            <th style="border: 1px solid #999; padding: 4px 8px; text-align: left;">Discount</th>
+                            <th style="border: 1px solid #999; padding: 4px 8px; text-align: left;">Amount</th>
+                            <th style="border: 1px solid #999; padding: 4px 8px; text-align: left;">Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-set="disc_total_amount" t-value="sum([x['amount'] for x in (d.get('discount_summary') or [])])"/>
+                        <t t-set="disc_total_qty" t-value="sum([x['quantity'] for x in (d.get('discount_summary') or [])])"/>
+                        <t t-foreach="d.get('discount_summary') or []" t-as="x">
+                            <tr>
+                                <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="x['name']"/></td>
+                                <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="'%.2f' % x['amount']"/></td>
+                                <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="x['quantity']"/></td>
+                            </tr>
+                        </t>
+                        <tr style="font-weight: bold; background: #f4f4f4;">
+                            <td style="border: 1px solid #999; padding: 4px 8px;">總計:</td>
+                            <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="'%.2f' % disc_total_amount"/></td>
+                            <td style="border: 1px solid #999; padding: 4px 8px;"><t t-esc="disc_total_qty"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </main>
+        </t>
+    </template>
+
+</odoo>

@@ -9,6 +9,11 @@
               parent="point_of_sale.menu_point_rep"
               sequence="90" action="action_sales_report_excel"/>
 
+    <menuitem id="menu_sales_report_pdf"
+              name="Sales Report PDF"
+              parent="point_of_sale.menu_point_rep"
+              sequence="90" action="action_sales_report_pdf_wizard"/>
+
     <menuitem id="menu_product_sales_detail_report_wizard"
               name="Product Sales Detail Report (Individual Store)"
               parent="point_of_sale.menu_point_rep"

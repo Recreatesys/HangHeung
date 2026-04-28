@@ -20,6 +20,102 @@ class SalesReportExcelWizard(models.TransientModel):
     end_date = fields.Date('End Date',default=fields.Date.context_today)
     pos = fields.Many2one('pos.config')
 
+    def _aggregate_report_data(self):
+        self.ensure_one()
+        domain = [('state', 'in', ['paid', 'done', 'invoiced'])]
+        cancel_domain = [('state', 'in', ['cancel'])]
+        if self.start_date:
+            domain.append(('date_order', '>=', self.start_date))
+            cancel_domain.append(('date_order', '>=', self.start_date))
+        if self.end_date:
+            domain.append(('date_order', '<=', self.end_date))
+            cancel_domain.append(('date_order', '<=', self.end_date))
+        if self.pos:
+            domain.append(('config_id', '=', self.pos.id))
+            cancel_domain.append(('config_id', '=', self.pos.id))
+
+        orders = self.env['pos.order'].search(domain)
+        cancel_orders = self.env['pos.order'].search(cancel_domain)
+        if not orders and not cancel_orders:
+            raise ValidationError("No POS orders found for the selected date range and POS.")
+
+        order_total = sum(o.amount_total for o in orders)
+
+        cancel_order_total = 0.0
+        cancel_qty = 0.0
+        void_by_method = defaultdict(lambda: {"amount": 0.0, "quantity": 0.0})
+        for order in cancel_orders:
+            cancel_order_total += order.amount_total
+            order_qty = sum(line.qty for line in order.lines)
+            cancel_qty += order_qty
+            payments = order.payment_ids
+            if not payments:
+                void_by_method["(No Payment)"]["quantity"] += order_qty
+                continue
+            n_payments = len(payments)
+            for payment in payments:
+                method = payment.payment_method_id.name or "Unknown"
+                void_by_method[method]["amount"] += payment.amount
+                void_by_method[method]["quantity"] += order_qty / n_payments
+
+        coupon_program_types = ('coupons', 'gift_card', 'ewallet')
+        coupon_redemption = defaultdict(lambda: {"amount": 0.0, "quantity": 0})
+        discount_summary = defaultdict(lambda: {"amount": 0.0, "quantity": 0})
+        for line in orders.mapped("lines"):
+            if not line.is_reward_line or not line.reward_id:
+                continue
+            program = line.reward_id.program_id
+            name = program.name or "Unknown"
+            if program.program_type in coupon_program_types:
+                coupon_redemption[name]["amount"] += abs(line.price_subtotal_incl)
+                coupon_redemption[name]["quantity"] += 1
+            else:
+                discount_summary[name]["amount"] += abs(line.price_subtotal_incl)
+                discount_summary[name]["quantity"] += 1
+
+        total_amount = 0.0
+        total_transcation = 0
+        payment_summary = defaultdict(lambda: {"total_amount": 0.0, "transactions": 0})
+        for payment in orders.mapped("payment_ids"):
+            method = payment.payment_method_id.name or "Unknown"
+            payment_summary[method]["total_amount"] += payment.amount
+            payment_summary[method]["transactions"] += 1
+            total_amount += payment.amount
+            total_transcation += 1
+
+        return {
+            'start_date': self.start_date.strftime('%Y-%m-%d') if self.start_date else '',
+            'end_date': self.end_date.strftime('%Y-%m-%d') if self.end_date else '',
+            'pos_name': self.pos.name if self.pos else '',
+            'order_total': order_total,
+            'cancel_order_total': cancel_order_total,
+            'cancel_qty': cancel_qty,
+            'total_amount': total_amount,
+            'total_transcation': total_transcation,
+            'payment_summary': [
+                {'method': k, 'amount': v['total_amount'], 'transactions': v['transactions']}
+                for k, v in payment_summary.items()
+            ],
+            'void_by_method': [
+                {'method': k, 'amount': v['amount'], 'quantity': v['quantity']}
+                for k, v in void_by_method.items()
+            ],
+            'coupon_redemption': [
+                {'name': k, 'amount': v['amount'], 'quantity': v['quantity']}
+                for k, v in coupon_redemption.items()
+            ],
+            'discount_summary': [
+                {'name': k, 'amount': v['amount'], 'quantity': v['quantity']}
+                for k, v in discount_summary.items()
+            ],
+        }
+
+    def action_generate_pdf(self):
+        self.ensure_one()
+        # Validate by computing once before handing off to report
+        self._aggregate_report_data()
+        return self.env.ref('pos_shop_report.action_sales_report_pdf').report_action(self)
+
     def action_generate_excel(self):
         """Generate POS Sales Excel and attach"""
         # Fetch POS Orders

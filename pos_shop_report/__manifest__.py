@@ -3,7 +3,7 @@
 
 {
     'name': 'Hang Heung Shop Reports Customizations',
-    'version': '1.0.9',
+    'version': '1.1.0',
     'summary': 'Includes all Hang Heung customizations',
     'description': """
         This module contains all of Hang Heung customizations.
@@ -29,7 +29,8 @@
         "wizards/reason_code_report.xml",
         "views/pos_shop_report.xml",
         "reports/pos_shop_report.xml",
-        "reports/pos_shop_report_format.xml"
+        "reports/pos_shop_report_format.xml",
+        "reports/sales_report_pdf.xml"
     ],
 
     'installable': True,
