@@ -81,15 +81,18 @@ class SalesReportExcelWizard(models.TransientModel):
 
         coupon_program_types = ('coupons', 'gift_card', 'ewallet')
         coupon_redemption = defaultdict(lambda: {"amount": 0.0, "quantity": 0})
+        discount_summary = defaultdict(lambda: {"amount": 0.0, "quantity": 0})
         for line in orders.mapped("lines"):
             if not line.is_reward_line or not line.reward_id:
                 continue
             program = line.reward_id.program_id
-            if program.program_type not in coupon_program_types:
-                continue
             name = program.name or "Unknown"
-            coupon_redemption[name]["amount"] += abs(line.price_subtotal_incl)
-            coupon_redemption[name]["quantity"] += 1
+            if program.program_type in coupon_program_types:
+                coupon_redemption[name]["amount"] += abs(line.price_subtotal_incl)
+                coupon_redemption[name]["quantity"] += 1
+            else:
+                discount_summary[name]["amount"] += abs(line.price_subtotal_incl)
+                discount_summary[name]["quantity"] += 1
 
         total_amount = 0
         total_transcation = 0
@@ -179,6 +182,26 @@ class SalesReportExcelWizard(models.TransientModel):
         sheet.write(row, 0, "總計:", cell_value_format_bold)
         sheet.write_number(row, 1, coupon_total_amount, cell_value_format)
         sheet.write_number(row, 2, coupon_total_qty, cell_value_format)
+        row += 2
+
+        sheet.write(row, 0, "Discount", header_format)
+        sheet.write(row, 1, "Amount", header_format)
+        sheet.write(row, 2, "Qty", header_format)
+        row += 1
+
+        discount_total_amount = 0.0
+        discount_total_qty = 0
+        for name, vals in discount_summary.items():
+            sheet.write(row, 0, name, cell_value_format)
+            sheet.write_number(row, 1, vals["amount"], cell_value_format)
+            sheet.write_number(row, 2, vals["quantity"], cell_value_format)
+            discount_total_amount += vals["amount"]
+            discount_total_qty += vals["quantity"]
+            row += 1
+
+        sheet.write(row, 0, "總計:", cell_value_format_bold)
+        sheet.write_number(row, 1, discount_total_amount, cell_value_format)
+        sheet.write_number(row, 2, discount_total_qty, cell_value_format)
         row += 1
 
         workbook.close()
