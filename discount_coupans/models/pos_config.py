@@ -12,7 +12,7 @@ class PosConfig(models.Model):
         self.ensure_one()
         coupon = self.env['loyalty.card'].search([
             ('program_id', 'in', self._get_program_ids().ids),
-            ('code', '=', code),
+            '|', ('code', '=', code), ('security_code', '=', code),
             '|', ('partner_id', 'in', (False, partner_id)), ('program_type', '=', 'gift_card'),
         ], order='partner_id, points desc', limit=1)
 

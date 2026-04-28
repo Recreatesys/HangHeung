@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_security_code_import_wizard" model="ir.ui.view">
+        <field name="name">loyalty.security.code.import.wizard.form</field>
+        <field name="model">loyalty.security.code.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Import Coupon Security Codes">
+                <sheet>
+                    <group>
+                        <field name="file_name"/>
+                        <field name="file_data" filename="file_name"/>
+                    </group>
+                    <group string="Result" invisible="not result_summary">
+                        <field name="result_summary" nolabel="1" widget="text" readonly="1"/>
+                    </group>
+                    <p>
+                        <strong>Excel format:</strong>
+                        Column A = Coupon Code (e.g. HHC23000001),
+                        Column B = Security Code (coupon code + 2 trailing digits, e.g. HHC2300000122).
+                        Header row is auto-skipped.
+                        Allowed prefixes: HHC, BWC, CWC, EWC, DPC.
+                    </p>
+                </sheet>
+                <footer>
+                    <button name="action_import" string="Import" type="object" class="btn-primary"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_security_code_import_wizard" model="ir.actions.act_window">
+        <field name="name">Import Coupon Security Codes</field>
+        <field name="res_model">loyalty.security.code.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_security_code_import_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_security_code_import"
+              name="Import Coupon Security Codes"
+              parent="point_of_sale.menu_point_config_product"
+              action="action_security_code_import_wizard"
+              sequence="50"/>
+</odoo>

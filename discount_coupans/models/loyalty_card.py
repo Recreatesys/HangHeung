@@ -1,6 +1,13 @@
-from odoo import models, fields, api
+import re
+
+from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from datetime import timedelta
+
+
+SECURITY_CODE_PREFIXES = ('HHC', 'BWC', 'CWC', 'EWC', 'DPC')
+SECURITY_CODE_TRAILING_DIGITS = 2
+
 
 class LoyaltyCard(models.Model):
     _inherit = 'loyalty.card'
@@ -13,7 +20,48 @@ class LoyaltyCard(models.Model):
     store_id = fields.Many2one('pos.config', string='Store')
     allocated_store_id = fields.Many2one('pos.config', string="Allocated Store", readonly=True)
     code = fields.Char(string='Code', readonly=True, required=False, copy=False,default=False)
-    
+    security_code = fields.Char(
+        string='Security Code',
+        copy=False,
+        index=True,
+        help=(
+            "Optional secondary code scanned at redemption time for selected programs "
+            "(prefixes HHC/BWC/CWC/EWC/DPC). Format: coupon code followed by exactly "
+            "2 trailing digits (e.g. coupon HHC23000001 -> security HHC2300000122)."
+        ),
+    )
+
+    _sql_constraints = [
+        ('security_code_unique', 'UNIQUE (security_code)',
+         'Security code must be unique across all loyalty cards.'),
+    ]
+
+    @api.constrains('security_code', 'code')
+    def _check_security_code(self):
+        for card in self:
+            if not card.security_code:
+                continue
+            if not card.code:
+                raise ValidationError(_(
+                    "Security code cannot be set on a card without a coupon code."
+                ))
+            prefix = (card.code[:3] or '').upper()
+            if prefix not in SECURITY_CODE_PREFIXES:
+                raise ValidationError(_(
+                    "Coupon '%(code)s' is not eligible for a security code "
+                    "(prefix '%(prefix)s' not in allowed set: %(allowed)s).",
+                    code=card.code, prefix=prefix,
+                    allowed=', '.join(SECURITY_CODE_PREFIXES),
+                ))
+            pattern = re.escape(card.code) + r'\d{%d}' % SECURITY_CODE_TRAILING_DIGITS
+            if not re.fullmatch(pattern, card.security_code):
+                raise ValidationError(_(
+                    "Security code '%(sec)s' is invalid for coupon '%(code)s'. "
+                    "Expected: coupon code followed by exactly %(n)s digits.",
+                    sec=card.security_code, code=card.code,
+                    n=SECURITY_CODE_TRAILING_DIGITS,
+                ))
+
     status = fields.Selection([
         ('not_activated', 'Not Activated'),
         ('activated', 'Activated'),
