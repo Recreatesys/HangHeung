@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Sales group: hide vendors and children of vendors -->
+    <!-- Sales group: hide vendors and children of vendors,
+         EXCEPT for these 4 entity vendors which are always visible:
+         Hoymay HK Ltd (1), 太古可口可樂有限公司 (7280),
+         That's Ltd (8883), HANG HEUNG CAKE SHOP COMPANY LIMITED (8884) -->
     <record id="group_sales_user" model="res.groups">
         <field name="name">Sales</field>
-        <field name="comment">Users in this group cannot see contacts marked as Vendor, nor contacts whose parent is a Vendor.</field>
+        <field name="comment">Users in this group cannot see contacts marked as Vendor, nor contacts whose parent is a Vendor — except for the 4 whitelisted entity vendors (Hoymay, 太古可口可樂, That's Ltd, Hang Heung Cake Shop) and their children.</field>
     </record>
 
     <record id="rule_partner_sales_no_vendor" model="ir.rule">
@@ -11,7 +14,7 @@
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="global" eval="True"/>
         <field name="active" eval="True"/>
-        <field name="domain_force">['|', ('partner_share', '=', False), '&amp;', ('vendor', '=', False), '|', ('parent_id', '=', False), ('parent_id.vendor', '=', False)] if user.has_group('recreate_HangHeung.group_sales_user') else [(1, '=', 1)]</field>
+        <field name="domain_force">['|', ('id', 'in', [1, 7280, 8883, 8884]), '|', ('parent_id', 'in', [1, 7280, 8883, 8884]), '|', ('partner_share', '=', False), '&amp;', ('vendor', '=', False), '|', ('parent_id', '=', False), ('parent_id.vendor', '=', False)] if user.has_group('recreate_HangHeung.group_sales_user') else [(1, '=', 1)]</field>
         <field name="perm_read" eval="True"/>
         <field name="perm_write" eval="True"/>
         <field name="perm_create" eval="True"/>
