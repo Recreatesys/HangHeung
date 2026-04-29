@@ -7,6 +7,12 @@ function _newRandomRewardCode() {
     return (Math.random() + 1).toString(36).substring(3);
 }
 
+const COUPON_PROGRAM_TYPES = ['coupons', 'gift_card', 'ewallet'];
+
+function _isCouponRewardType(reward) {
+    return !!reward && COUPON_PROGRAM_TYPES.includes(reward.program_id?.program_type);
+}
+
 patch(PosOrder.prototype, {
     /**
      * Override _getDiscountableOnSpecific to customize discount logic.
@@ -17,6 +23,7 @@ patch(PosOrder.prototype, {
         const linesToDiscount = [];
         const discountLinesPerReward = {};
         const orderLines = this.get_orderlines();
+        const isCouponReward = _isCouponRewardType(reward);
 
         const remainingAmountPerLine = {};
 
@@ -24,7 +31,7 @@ patch(PosOrder.prototype, {
             const product = line.get_product();
             if (
                 !product ||
-                product.is_discount ||
+                (product.is_discount && !isCouponReward) ||
                 !line.get_quantity() ||
                 !line.price_unit ||
                 line.price_unit < 0
@@ -72,18 +79,21 @@ patch(PosOrder.prototype, {
             if (lineReward.reward_type !== "discount") {
                 continue;
             }
+            const lineIsCouponReward = _isCouponRewardType(lineReward);
 
             let discountedLines = orderLines.filter((line) => {
                 const product = line.get_product();
-                return product && product.is_discount === false;
+                return product && (!product.is_discount || lineIsCouponReward);
             });
 
             if (lineReward.discount_applicability === "cheapest") {
-                cheapestLine = cheapestLine || this._getCheapestLine();
-                discountedLines = [cheapestLine].filter(l => l && l.get_product()?.is_discount === false);
+                cheapestLine = cheapestLine || this._getCheapestLine(lineIsCouponReward);
+                discountedLines = [cheapestLine].filter(
+                    l => l && (!l.get_product()?.is_discount || lineIsCouponReward)
+                );
             } else if (lineReward.discount_applicability === "specific") {
                 discountedLines = this._getSpecificDiscountableLines(lineReward).filter(
-                    l => l.get_product()?.is_discount === false
+                    l => !l.get_product()?.is_discount || lineIsCouponReward
                 );
             }
 
@@ -123,14 +133,14 @@ patch(PosOrder.prototype, {
     },
 
 
-    _getCheapestLine() {
+    _getCheapestLine(allowFlagged = false) {
         const filtered_lines = this.get_orderlines().filter((line) => {
             const product = line.get_product();
             return (
                 !line.comboParent &&
                 !line.reward_id &&
                 line.get_quantity &&
-                product?.is_discount === false &&
+                (!product?.is_discount || allowFlagged) &&
                 line.price_unit >= 0
             );
         });
@@ -141,13 +151,14 @@ patch(PosOrder.prototype, {
     },
 
     _getDiscountableOnCheapest(reward) {
-        const cheapestLine = this._getCheapestLine();
+        const isCouponReward = _isCouponRewardType(reward);
+        const cheapestLine = this._getCheapestLine(isCouponReward);
         if (!cheapestLine) {
             return { discountable: 0, discountablePerTax: {} };
         }
 
         const product = cheapestLine.get_product();
-        if (product?.is_discount || cheapestLine.price_unit < 0) {
+        if ((product?.is_discount && !isCouponReward) || cheapestLine.price_unit < 0) {
             return { discountable: 0, discountablePerTax: {} };
         }
 
@@ -164,6 +175,7 @@ patch(PosOrder.prototype, {
     _getDiscountableOnOrder(reward) {
         let discountable = 0;
         const discountablePerTax = {};
+        const isCouponReward = _isCouponRewardType(reward);
 
         for (const line of this.get_orderlines()) {
             const product = line.get_product();
@@ -171,7 +183,7 @@ patch(PosOrder.prototype, {
             if (
                 !line.get_quantity() ||
                 !product ||
-                product.is_discount ||
+                (product.is_discount && !isCouponReward) ||
                 line.price_unit < 0
             ) {
                 continue;
