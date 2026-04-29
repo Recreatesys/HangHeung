@@ -1,5 +1,9 @@
+import logging
+
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 
 class StockPicking(models.Model):
@@ -15,6 +19,21 @@ class StockPicking(models.Model):
         domain="[('odoo_function_ids', 'in', picking_type_id)]",
         store=True
     )
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        pickings = super().create(vals_list)
+        if not self.env.context.get('skip_auto_confirm'):
+            for picking in pickings:
+                if picking.state == 'draft' and picking.move_ids:
+                    try:
+                        picking.action_confirm()
+                    except Exception as e:
+                        _logger.warning(
+                            "Auto-confirm skipped for picking %s: %s",
+                            picking.name or '?', e,
+                        )
+        return pickings
 
     @api.onchange('picking_type_id')
     def _onchange_picking_type_id(self):
