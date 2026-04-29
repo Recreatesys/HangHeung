@@ -10,19 +10,25 @@
                         <field name="file_name"/>
                         <field name="file_data" filename="file_name"/>
                     </group>
+
+                    <widget name="security_code_import_progress"/>
+
                     <group string="Result" invisible="not result_summary">
                         <field name="result_summary" nolabel="1" widget="text" readonly="1"/>
                     </group>
+
                     <p>
                         <strong>Excel format:</strong>
                         Column A = Coupon Code (e.g. HHC23000001),
                         Column B = Security Code (coupon code + 2 trailing digits, e.g. HHC2300000122).
-                        Header row is auto-skipped.
-                        Allowed prefixes: HHC, BWC, CWC, EWC, DPC.
+                        Header row is auto-skipped. Allowed prefixes: HHC, BWC, CWC, EWC, DPC.
+                    </p>
+                    <p style="color: #666; font-size: 12px;">
+                        Large files are imported in batches of 2,000 rows.
+                        Each batch runs in its own transaction so the server stays responsive.
                     </p>
                 </sheet>
                 <footer>
-                    <button name="action_import" string="Import" type="object" class="btn-primary"/>
                     <button string="Close" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>
