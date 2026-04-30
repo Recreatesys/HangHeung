@@ -1,20 +1,25 @@
 from odoo import _, fields, models
 from odoo.exceptions import UserError
-from odoo.tools.sql import column_exists
 from datetime import timedelta
 import logging
 
 _logger = logging.getLogger(__name__)
+
+# Programs that use the security-code mechanism. The first 3 letters of a
+# scanned code must be in this set for the security_code OR-branch to fire.
+SECURITY_CODE_PREFIXES = ('HHC', 'BWC', 'CWC', 'EWC', 'DPC')
+
 
 class PosConfig(models.Model):
     _inherit = 'pos.config'
 
     def use_coupon_code(self, code, creation_date, partner_id, pricelist_id):
         self.ensure_one()
-        # Defensive: only OR-match on security_code when the column is
-        # actually provisioned on this DB. Lets the same code run safely
-        # against DBs where -u hasn't added the column yet.
-        if column_exists(self.env.cr, 'loyalty_card', 'security_code'):
+        # Only enable the security_code lookup when the scanned code starts
+        # with one of the eligible 3-letter prefixes. For any other code,
+        # behave exactly like the original lookup-by-code-only path.
+        prefix = (code or '')[:3].upper()
+        if prefix in SECURITY_CODE_PREFIXES:
             domain = [
                 ('program_id', 'in', self._get_program_ids().ids),
                 '|', ('code', '=', code), ('security_code', '=', code),

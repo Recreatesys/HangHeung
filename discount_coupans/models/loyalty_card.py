@@ -2,7 +2,6 @@ import re
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
-from odoo.tools.sql import column_exists
 from datetime import timedelta
 
 
@@ -39,11 +38,6 @@ class LoyaltyCard(models.Model):
 
     @api.constrains('security_code', 'code')
     def _check_security_code(self):
-        # Defensive: if the column hasn't been provisioned on this DB yet
-        # (the module's field declaration is loaded but -u hasn't run here),
-        # skip validation so writes to other fields don't fail.
-        if not column_exists(self.env.cr, 'loyalty_card', 'security_code'):
-            return
         for card in self:
             if not card.security_code:
                 continue
