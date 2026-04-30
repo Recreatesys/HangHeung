@@ -1,5 +1,6 @@
 from . import pos_shop_report_wizard
 from . import sales_report
+from . import sales_report_all_shops
 from . import product_sales_detail_report
 from . import product_sales_detail_report_all
 from . import time_period_sales_report_individual

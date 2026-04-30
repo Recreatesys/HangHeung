@@ -14,6 +14,13 @@
               parent="point_of_sale.menu_point_rep"
               sequence="90" action="action_sales_report_pdf_wizard"/>
 
+    <menuitem id="menu_sales_report_all_shops"
+              name="Sales Report All Shops"
+              parent="point_of_sale.menu_point_rep"
+              sequence="90"
+              action="action_sales_report_all_shops_wizard"
+              groups="base.group_system,recreate_HangHeung.group_sales_user,recreate_HangHeung.group_non_sales_user"/>
+
     <menuitem id="menu_product_sales_detail_report_wizard"
               name="Product Sales Detail Report (Individual Store)"
               parent="point_of_sale.menu_point_rep"

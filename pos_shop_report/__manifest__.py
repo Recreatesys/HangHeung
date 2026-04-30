@@ -3,7 +3,7 @@
 
 {
     'name': 'Hang Heung Shop Reports Customizations',
-    'version': '1.1.0',
+    'version': '1.1.1',
     'summary': 'Includes all Hang Heung customizations',
     'description': """
         This module contains all of Hang Heung customizations.
@@ -15,6 +15,7 @@
         "security/ir.model.access.csv",
         "wizards/pos_shop_report_wizard.xml",
         "wizards/sales_report.xml",
+        "wizards/sales_report_all_shops.xml",
         "wizards/product_sales_detail_report.xml",
         "wizards/product_sales_detail_report_all.xml",
         "wizards/time_period_sales_report_individual.xml",
@@ -30,7 +31,8 @@
         "views/pos_shop_report.xml",
         "reports/pos_shop_report.xml",
         "reports/pos_shop_report_format.xml",
-        "reports/sales_report_pdf.xml"
+        "reports/sales_report_pdf.xml",
+        "reports/sales_report_all_shops_pdf.xml",
     ],
 
     'installable': True,

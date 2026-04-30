@@ -13,3 +13,6 @@ access_internal_transfer_report_wizard,internal.transfer.report.wizard,model_int
 access_delivery_report_wizard,delivery.report.wizard,model_delivery_report_wizard,base.group_user,1,1,1,1
 access_purchase_order_report_wizard,purchase.order.report.wizard,model_purchase_order_report_wizard,base.group_user,1,1,1,1
 access_receipt_reason_report_wizard,receipt.reason.report.wizard,model_receipt_reason_report_wizard,base.group_user,1,1,1,1
+access_sales_report_all_shops_wizard_admin,sales.report.all.shops.wizard admin,model_sales_report_all_shops_wizard,base.group_system,1,1,1,1
+access_sales_report_all_shops_wizard_sales,sales.report.all.shops.wizard sales,model_sales_report_all_shops_wizard,recreate_HangHeung.group_sales_user,1,1,1,1
+access_sales_report_all_shops_wizard_purchase,sales.report.all.shops.wizard purchase,model_sales_report_all_shops_wizard,recreate_HangHeung.group_non_sales_user,1,1,1,1
