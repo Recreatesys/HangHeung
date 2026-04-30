@@ -12,6 +12,16 @@ class ResPartner(models.Model):
 
     customer = fields.Boolean(string='Customer', default=False, stored=True)
     vendor = fields.Boolean(string='Vendor', default=False, stored=True)
+    is_internal_contact = fields.Boolean(
+        string='Internal Contact',
+        default=False, copy=False, index=True,
+        help=(
+            "When ticked, this partner is visible to every user role "
+            "(POS, Sales, Purchase, Warehouse, Internal, Accounting). "
+            "Used for the 4 entity-vendors that are also part of the "
+            "company's own intercompany / key-vendor relationships."
+        ),
+    )
     contact_number = fields.Char(string='Contact No.', stored=True)
     alternative_contact_name = fields.Char(string='Alternative Name', stored=True)
     fax_number = fields.Char(string='Fax No.', stored=True)

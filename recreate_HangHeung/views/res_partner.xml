@@ -31,6 +31,7 @@
                     <field name="terms"/>
                     <field name="customer"/>
                     <field name='vendor'/>
+                    <field name="is_internal_contact" groups="base.group_system"/>
                 </xpath>
 
             </field>

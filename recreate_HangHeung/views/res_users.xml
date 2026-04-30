@@ -10,6 +10,7 @@
                 <xpath expr="//page[@name='access_rights']/group[1]" position="inside">
                     <field name="default_receipt_type"/>
                     <field name="default_dest_address"/>
+                    <field name="partner_access_role"/>
                 </xpath>
 
             </field>

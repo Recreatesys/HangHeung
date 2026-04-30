@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        6-role partner-access model. Each role is a recreate_HangHeung group
+        bound to ONE non-global ir.rule on res.partner with read=True only.
+        OR-semantics: a user in multiple role groups sees the union of what
+        each group's rule grants.
+
+        Internal Contact (res.partner.is_internal_contact) is the universal
+        whitelist — visible to every role. The 4 entity-vendors (Hoymay HK Ltd
+        id=1, 太古可口可樂有限公司 id=7280, That's Ltd id=8883, Hang Heung Cake
+        Shop Company Limited id=8884) are flagged is_internal_contact=True via
+        the post-migrate script.
+    -->
+
+    <!-- ===== New role groups ===== -->
+
+    <record id="group_warehouse_clerk" model="res.groups">
+        <field name="name">Warehouse Clerk</field>
+        <field name="comment">Users in this group can see all contacts: internal contacts, all customers (including B2B), and all vendors.</field>
+    </record>
+
+    <record id="group_internal_user_only" model="res.groups">
+        <field name="name">Internal User</field>
+        <field name="comment">Users in this group can only see contacts flagged as Internal Contact.</field>
+    </record>
+
+    <record id="group_accounting_user" model="res.groups">
+        <field name="name">Accounting User</field>
+        <field name="comment">Users in this group can see all contacts (no restriction).</field>
+    </record>
+
+    <!-- ===== Rule: POS User ===== -->
+    <!-- Sees: Internal Contact + retail (customer=False AND vendor=False).
+         Hides: B2B customer (customer=True), Vendor, and partners whose
+         parent is a non-internal vendor or B2B customer. -->
+    <record id="rule_partner_pos_user_role" model="ir.rule">
+        <field name="name">Partner: POS User role can see retail + internal</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="global" eval="False"/>
+        <field name="active" eval="True"/>
+        <field name="groups" eval="[(4, ref('recreate_HangHeung.group_pos_user'))]"/>
+        <field name="domain_force">['|', ('is_internal_contact', '=', True), '|', ('parent_id.is_internal_contact', '=', True), '|', ('partner_share', '=', False), '&amp;', ('vendor', '=', False), '&amp;', ('customer', '=', False), '|', ('parent_id', '=', False), '&amp;', ('parent_id.vendor', '=', False), ('parent_id.customer', '=', False)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- ===== Rule: Sales User ===== -->
+    <!-- Sees: Internal Contact + everything except vendors.
+         Hides: vendors (and children of non-internal vendors). -->
+    <record id="rule_partner_sales_user_role" model="ir.rule">
+        <field name="name">Partner: Sales User role can see customers + internal</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="global" eval="False"/>
+        <field name="active" eval="True"/>
+        <field name="groups" eval="[(4, ref('recreate_HangHeung.group_sales_user'))]"/>
+        <field name="domain_force">['|', ('is_internal_contact', '=', True), '|', ('parent_id.is_internal_contact', '=', True), '|', ('partner_share', '=', False), '&amp;', ('vendor', '=', False), '|', ('parent_id', '=', False), ('parent_id.vendor', '=', False)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- ===== Rule: Purchase User (existing group_non_sales_user) ===== -->
+    <!-- Sees: Internal Contact + all vendors (including children of vendors).
+         Hides: B2B and retail customers. -->
+    <record id="rule_partner_purchase_user_role" model="ir.rule">
+        <field name="name">Partner: Purchase User role can see vendors + internal</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="global" eval="False"/>
+        <field name="active" eval="True"/>
+        <field name="groups" eval="[(4, ref('recreate_HangHeung.group_non_sales_user'))]"/>
+        <field name="domain_force">['|', ('is_internal_contact', '=', True), '|', ('parent_id.is_internal_contact', '=', True), '|', ('partner_share', '=', False), '|', ('vendor', '=', True), ('parent_id.vendor', '=', True)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- ===== Rule: Warehouse Clerk ===== -->
+    <!-- Sees: everyone. -->
+    <record id="rule_partner_warehouse_clerk_role" model="ir.rule">
+        <field name="name">Partner: Warehouse Clerk role can see all contacts</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="global" eval="False"/>
+        <field name="active" eval="True"/>
+        <field name="groups" eval="[(4, ref('recreate_HangHeung.group_warehouse_clerk'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- ===== Rule: Internal User (only) ===== -->
+    <!-- Sees: ONLY Internal Contact (the 4 entity-vendors and their children). -->
+    <record id="rule_partner_internal_user_role" model="ir.rule">
+        <field name="name">Partner: Internal User role can see internal contacts only</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="global" eval="False"/>
+        <field name="active" eval="True"/>
+        <field name="groups" eval="[(4, ref('recreate_HangHeung.group_internal_user_only'))]"/>
+        <field name="domain_force">['|', ('is_internal_contact', '=', True), '|', ('parent_id.is_internal_contact', '=', True), ('partner_share', '=', False)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- ===== Rule: Accounting User ===== -->
+    <!-- Sees: everyone. -->
+    <record id="rule_partner_accounting_user_role" model="ir.rule">
+        <field name="name">Partner: Accounting User role can see all contacts</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="global" eval="False"/>
+        <field name="active" eval="True"/>
+        <field name="groups" eval="[(4, ref('recreate_HangHeung.group_accounting_user'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+</odoo>

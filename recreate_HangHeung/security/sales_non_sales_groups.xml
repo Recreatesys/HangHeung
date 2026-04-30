@@ -1,41 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Sales group: hide vendors and children of vendors,
-         EXCEPT for these 4 entity vendors which are always visible:
-         Hoymay HK Ltd (1), 太古可口可樂有限公司 (7280),
-         That's Ltd (8883), HANG HEUNG CAKE SHOP COMPANY LIMITED (8884) -->
+    <!--
+        These two groups (Sales / Purchase) date from the original 4-id-whitelist
+        access model. They are still used as the role groups for Sales User and
+        Purchase User in the 6-role partner-access framework (see
+        security/role_groups.xml). The old global ir.rules that they referenced
+        (rules id 332 and 333) are deactivated by the post-migrate script and
+        replaced by group-bound rules in role_groups.xml.
+
+        The "Non-Sales" group is renamed to "Purchase" here; the XML id
+        group_non_sales_user is kept so existing user memberships are preserved.
+    -->
+
     <record id="group_sales_user" model="res.groups">
         <field name="name">Sales</field>
-        <field name="comment">Users in this group cannot see contacts marked as Vendor, nor contacts whose parent is a Vendor — except for the 4 whitelisted entity vendors (Hoymay, 太古可口可樂, That's Ltd, Hang Heung Cake Shop) and their children.</field>
+        <field name="comment">Sales User role: can see customers (including B2B) and internal contacts. Hides vendors and children of non-internal vendors.</field>
     </record>
 
-    <record id="rule_partner_sales_no_vendor" model="ir.rule">
-        <field name="name">Sales: hide Vendor partners (and their children)</field>
-        <field name="model_id" ref="base.model_res_partner"/>
-        <field name="global" eval="True"/>
-        <field name="active" eval="True"/>
-        <field name="domain_force">['|', ('id', 'in', [1, 7280, 8883, 8884]), '|', ('parent_id', 'in', [1, 7280, 8883, 8884]), '|', ('partner_share', '=', False), '&amp;', ('vendor', '=', False), '|', ('parent_id', '=', False), ('parent_id.vendor', '=', False)] if user.has_group('recreate_HangHeung.group_sales_user') else [(1, '=', 1)]</field>
-        <field name="perm_read" eval="True"/>
-        <field name="perm_write" eval="True"/>
-        <field name="perm_create" eval="True"/>
-        <field name="perm_unlink" eval="True"/>
-    </record>
-
-    <!-- Non-Sales group: only show vendors and children of vendors -->
     <record id="group_non_sales_user" model="res.groups">
-        <field name="name">Non-Sales</field>
-        <field name="comment">Users in this group can ONLY see contacts marked as Vendor (or contacts whose parent is a Vendor).</field>
-    </record>
-
-    <record id="rule_partner_non_sales_only_vendor" model="ir.rule">
-        <field name="name">Non-Sales: only show Vendor partners (and their children)</field>
-        <field name="model_id" ref="base.model_res_partner"/>
-        <field name="global" eval="True"/>
-        <field name="active" eval="True"/>
-        <field name="domain_force">['|', ('partner_share', '=', False), '|', ('vendor', '=', True), ('parent_id.vendor', '=', True)] if user.has_group('recreate_HangHeung.group_non_sales_user') else [(1, '=', 1)]</field>
-        <field name="perm_read" eval="True"/>
-        <field name="perm_write" eval="True"/>
-        <field name="perm_create" eval="True"/>
-        <field name="perm_unlink" eval="True"/>
+        <field name="name">Purchase</field>
+        <field name="comment">Purchase User role (was "Non-Sales"): can see all vendors and internal contacts. Hides B2B and retail customers.</field>
     </record>
 </odoo>
