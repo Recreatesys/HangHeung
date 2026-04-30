@@ -1,14 +1,32 @@
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from odoo import models, fields, api, _, SUPERUSER_ID
 from odoo.tools import float_compare, groupby
 import logging
 
 _logger = logging.getLogger(__name__)
 
+# Internal shop partner IDs that may NOT be used as Dropship Address on a PO.
+# Names: AB1, AIR2, AIR3, AIR4, CB1, DP1, KF1, MK1, MS1, NP1, SS1, ST1,
+#        TP1, TLP, TST, WK1, YLF, YMS
+FORBIDDEN_DROPSHIP_PARTNER_IDS = [
+    8885, 8886, 8887, 8888, 8889, 8890, 8891, 8892, 8893,
+    8896, 8897, 8898, 8899, 8901, 8904, 8905, 8919, 8940,
+]
+
+
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
+
+    @api.constrains('dest_address_id')
+    def _check_dest_address_not_internal_shop(self):
+        for po in self:
+            if po.dest_address_id and po.dest_address_id.id in FORBIDDEN_DROPSHIP_PARTNER_IDS:
+                raise ValidationError(_(
+                    "'%(name)s' cannot be selected as the Dropship Address. "
+                    "Internal shop contacts are not valid dropship destinations."
+                ) % {'name': po.dest_address_id.name})
 
 
     @api.model
