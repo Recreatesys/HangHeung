@@ -14,8 +14,8 @@ import { patch } from "@web/core/utils/patch";
 import { PosOrder } from "@point_of_sale/app/models/pos_order";
 
 patch(PosOrder.prototype, {
-    exportForPrinting() {
-        const data = super.exportForPrinting(...arguments);
+    export_for_printing(baseUrl, headerData) {
+        const data = super.export_for_printing(...arguments);
         const lineWithSO = this.lines.find((l) => l.sale_order_origin_id);
         if (lineWithSO && lineWithSO.sale_order_origin_id) {
             const so = lineWithSO.sale_order_origin_id;
