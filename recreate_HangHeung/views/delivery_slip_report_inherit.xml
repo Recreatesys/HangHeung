@@ -130,6 +130,16 @@
                     </td>
                 </tr>
             </tbody>
+            <tbody t-if="o.note">
+                <tr>
+                    <td colspan="99" style="border: 0; padding-top: 10px; padding-bottom: 10px; font-size: 9pt;">
+                        <strong>Remark / 備註：</strong>
+                        <div style="white-space: pre-wrap; margin-top: 2px;">
+                            <span t-out="o.note"/>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
             <tbody style="page-break-before: always;">
                 <tr style="page-break-before: always;">
                     <td colspan="99" style="border: 0; padding-top: 30px;">
@@ -162,6 +172,16 @@
                     </t>
                     <td class="text-center">
                         <t t-esc="sum(o.move_line_ids.mapped('qty_done'))"/>
+                    </td>
+                </tr>
+            </tbody>
+            <tbody t-if="o.note">
+                <tr>
+                    <td colspan="99" style="border: 0; padding-top: 10px; padding-bottom: 10px; font-size: 9pt;">
+                        <strong>Remark / 備註：</strong>
+                        <div style="white-space: pre-wrap; margin-top: 2px;">
+                            <span t-out="o.note"/>
+                        </div>
                     </td>
                 </tr>
             </tbody>
