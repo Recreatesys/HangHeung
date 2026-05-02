@@ -5,9 +5,74 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
+
+            <!-- ========================================================== -->
+            <!-- Existing: Hoymay-side intercompany source PO label          -->
+            <!-- ========================================================== -->
             <xpath expr="//field[@name='client_order_ref']" position="after">
                 <field name="intercompany_source_po_name" readonly="1"
                        invisible="company_id != 2 or not intercompany_source_po_name"/>
+                <field name="is_wedding_order"/>
+                <field name="is_b2b_order"/>
+            </xpath>
+
+            <!-- ========================================================== -->
+            <!-- 1. Block Enter-to-create on partner_id (Customer);          -->
+            <!--    direct Create &amp; Edit popup to a simplified form view;-->
+            <!--    enable phone/mobile match through _name_search override. -->
+            <!-- ========================================================== -->
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="options">{'no_quick_create': True}</attribute>
+                <attribute name="context">{'form_view_ref': 'recreate_HangHeung.view_partner_form_simplified'}</attribute>
+            </xpath>
+
+            <!-- ========================================================== -->
+            <!-- 2. Move "commitment_date" (Delivery Date) below             -->
+            <!--    "payment_term_id" (Payment Terms), and add 備註 below.    -->
+            <!-- ========================================================== -->
+            <xpath expr="//field[@name='commitment_date']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="commitment_date"/>
+                <field name="remark" placeholder="備註"/>
+            </xpath>
+
+            <!-- ========================================================== -->
+            <!-- 3. Block Enter-to-create on the order line product field.   -->
+            <!-- ========================================================== -->
+            <xpath expr="//field[@name='order_line']/list/field[@name='product_template_id']" position="attributes">
+                <attribute name="options">{'no_quick_create': True}</attribute>
+            </xpath>
+
+            <!-- ========================================================== -->
+            <!-- 4. Hide 6 columns on the order_line tree by default.         -->
+            <!--    optional='hide' means the column exists but is off by    -->
+            <!--    default; users can re-toggle via the column-picker.      -->
+            <!-- ========================================================== -->
+            <xpath expr="//field[@name='order_line']/list/field[@name='product_packaging_qty']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/field[@name='product_packaging_id']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/field[@name='tax_id']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/field[@name='discount']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="view_order_line_product_no_quick_create_form" model="ir.ui.view">
+        <field name="name">sale.order.form.line.product.no.quick.create</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/form//field[@name='product_template_id']" position="attributes">
+                <attribute name="options">{'no_quick_create': True}</attribute>
             </xpath>
         </field>
     </record>

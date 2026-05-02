@@ -1,4 +1,7 @@
-from odoo import models, fields, _, SUPERUSER_ID
+from datetime import timedelta
+
+from odoo import models, fields, api, _, SUPERUSER_ID
+from odoo.exceptions import ValidationError
 
 
 class SaleOrder(models.Model):
@@ -9,6 +12,62 @@ class SaleOrder(models.Model):
         readonly=True,
         copy=False,
     )
+
+    remark = fields.Text(
+        string='備註',
+        copy=True,
+        help=(
+            "Free-text remark propagated through the intercompany chain: "
+            "PO of Hoymay, SO/PO of That's, SO of HangHeung. Carried by every "
+            "downstream record automatically."
+        ),
+    )
+
+    is_wedding_order = fields.Boolean(
+        string='嫁囍單',
+        default=False,
+        copy=False,
+        help=(
+            "When ticked, on confirmation this SO and its entire intercompany "
+            "chain are isolated -- never merged with other orders. One dedicated "
+            "PO/SO per flagged record at every chain step."
+        ),
+    )
+
+    is_b2b_order = fields.Boolean(
+        string='B2B單',
+        default=False,
+        copy=False,
+        help=(
+            "When ticked, on confirmation this SO and its entire intercompany "
+            "chain are isolated -- never merged with other orders. One dedicated "
+            "PO/SO per flagged record at every chain step."
+        ),
+    )
+
+    @api.constrains('date_order', 'commitment_date')
+    def _check_commitment_date_min_lead(self):
+        """Delivery Date must be at least 7 days beyond the Order Date."""
+        for order in self:
+            if not order.commitment_date or not order.date_order:
+                continue
+            min_date = order.date_order + timedelta(days=7)
+            if order.commitment_date < min_date:
+                raise ValidationError(_(
+                    "Delivery Date must be at least 7 days after the Order Date.\n"
+                    "Order Date: %(o)s\nMinimum Delivery Date: %(m)s",
+                    o=fields.Datetime.to_string(order.date_order),
+                    m=fields.Datetime.to_string(min_date),
+                ))
+
+    def _prepare_purchase_order_data(self, *args, **kwargs):
+        """Intercompany SO -> PO: carry remark + isolation flags onto the PO."""
+        result = super()._prepare_purchase_order_data(*args, **kwargs)
+        if isinstance(result, dict):
+            result['remark'] = self.remark or False
+            result['is_wedding_order'] = self.is_wedding_order
+            result['is_b2b_order'] = self.is_b2b_order
+        return result
 
     def _action_cancel(self):
         result = super()._action_cancel()

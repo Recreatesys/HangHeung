@@ -19,6 +19,24 @@ FORBIDDEN_DROPSHIP_PARTNER_IDS = [
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
+    remark = fields.Text(
+        string='備註',
+        copy=True,
+        help="Carried from the upstream SO/PO of the intercompany chain.",
+    )
+    is_wedding_order = fields.Boolean(
+        string='嫁囍單',
+        default=False,
+        copy=False,
+        help="Isolation flag carried from the originating SO; this PO will not merge with non-flagged orders.",
+    )
+    is_b2b_order = fields.Boolean(
+        string='B2B單',
+        default=False,
+        copy=False,
+        help="Isolation flag carried from the originating SO; this PO will not merge with non-flagged orders.",
+    )
+
     @api.constrains('dest_address_id')
     def _check_dest_address_not_internal_shop(self):
         for po in self:
@@ -99,6 +117,10 @@ class PurchaseOrder(models.Model):
         if self.origin:
             result['client_order_ref'] = f"{self.origin}-{self.name}"
         result['intercompany_source_po_name'] = self.name
+        # Carry remark + isolation flags downstream onto the created SO.
+        result['remark'] = self.remark or False
+        result['is_wedding_order'] = self.is_wedding_order
+        result['is_b2b_order'] = self.is_b2b_order
         return result
 
     def button_cancel(self):
@@ -120,6 +142,39 @@ class PurchaseOrder(models.Model):
 
 class StockRule(models.Model):
     _inherit = 'stock.rule'
+
+    @api.model
+    def _make_po_get_domain(self, company_id, values, partner):
+        """Per-SO isolation for flagged orders.
+
+        When a procurement comes from a sale.order line whose order has
+        is_wedding_order=True or is_b2b_order=True, restrict the merge-domain
+        to require an existing PO whose `origin` matches THIS SO's name
+        exactly. Within the same flagged SO, all lines roll into one PO;
+        across flagged SOs, no merging.
+        """
+        domain = super()._make_po_get_domain(company_id, values, partner)
+        sale_line_id = values.get('sale_line_id')
+        if sale_line_id:
+            sale_line = self.env['sale.order.line'].sudo().browse(sale_line_id)
+            order = sale_line.order_id
+            if order and (order.is_wedding_order or order.is_b2b_order):
+                domain += (('origin', '=', order.name),)
+        return domain
+
+    @api.model
+    def _prepare_purchase_order(self, company_id, origins, values):
+        """Carry remark + isolation flags onto procurement-created POs."""
+        res = super()._prepare_purchase_order(company_id, origins, values)
+        sale_line_id = values[0].get('sale_line_id') if values else None
+        if sale_line_id:
+            sale_line = self.env['sale.order.line'].sudo().browse(sale_line_id)
+            order = sale_line.order_id
+            if order:
+                res['remark'] = order.remark or False
+                res['is_wedding_order'] = order.is_wedding_order
+                res['is_b2b_order'] = order.is_b2b_order
+        return res
 
     @api.model
     def _run_buy(self, procurements):
