@@ -75,14 +75,50 @@ class SaleOrder(models.Model):
                     m=fields.Datetime.to_string(min_date),
                 ))
 
+    pickup_date_display = fields.Char(
+        string='取貨日期 (display)',
+        compute='_compute_pickup_display',
+        store=False,
+        help="Server-rendered commitment_date string for the POS receipt.",
+    )
+    pickup_address_display = fields.Char(
+        string='取貨地點 (display)',
+        compute='_compute_pickup_display',
+        store=False,
+        help=(
+            "Server-rendered partner_shipping_id summary (name + address) "
+            "for the POS receipt -- avoids relying on the partner record "
+            "being in POS state, which it may not be for internal shop "
+            "partners filtered out by the POS group rules."
+        ),
+    )
+
+    @api.depends('commitment_date', 'partner_shipping_id', 'partner_shipping_id.name', 'partner_shipping_id.street', 'partner_shipping_id.street2', 'partner_shipping_id.city')
+    def _compute_pickup_display(self):
+        for order in self:
+            if order.commitment_date:
+                order.pickup_date_display = fields.Datetime.to_string(order.commitment_date)[:16]
+            else:
+                order.pickup_date_display = False
+            ship = order.partner_shipping_id
+            if ship:
+                parts = [ship.name or '', ship.street or '', ship.street2 or '', ship.city or '']
+                cleaned = [p.strip() for p in parts if p and p.strip()]
+                order.pickup_address_display = ' — '.join(cleaned) if cleaned else False
+            else:
+                order.pickup_address_display = False
+
     @api.model
     def _load_pos_data_fields(self, config_id):
-        """Ensure commitment_date is loaded into POS state so the receipt
-        template can render 取貨日期 from the linked SO."""
-        fields = super()._load_pos_data_fields(config_id)
-        if 'commitment_date' not in fields:
-            fields = list(fields) + ['commitment_date']
-        return fields
+        """Add commitment_date + pre-rendered display strings so the POS
+        receipt can show 取貨日期 / 取貨地點 without depending on
+        partner_shipping_id being in POS state (it may be filtered out by
+        the POS group rule for internal shop partners)."""
+        fields_list = super()._load_pos_data_fields(config_id)
+        for f in ('commitment_date', 'pickup_date_display', 'pickup_address_display'):
+            if f not in fields_list:
+                fields_list = list(fields_list) + [f]
+        return fields_list
 
     def _prepare_purchase_order_data(self, *args, **kwargs):
         """Intercompany SO -> PO: carry remark + isolation flags + dest_address."""
