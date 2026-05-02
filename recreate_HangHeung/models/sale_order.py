@@ -45,6 +45,20 @@ class SaleOrder(models.Model):
         ),
     )
 
+    @api.constrains('partner_shipping_id', 'commitment_date', 'order_line', 'state')
+    def _check_pre_order_required_fields(self):
+        """Once an SO leaves draft, delivery address, delivery date, and at
+        least one line are mandatory."""
+        for order in self:
+            if order.state not in ('sale', 'done', 'sent'):
+                continue
+            if not order.partner_shipping_id:
+                raise ValidationError(_("送貨地址 (Delivery Address) 必須填寫，不能留空。"))
+            if not order.commitment_date:
+                raise ValidationError(_("送貨日期 (Delivery Date) 必須填寫，不能留空。"))
+            if not order.order_line:
+                raise ValidationError(_("訂單必須最少包含一個產品 (Order line cannot be empty)."))
+
     @api.constrains('date_order', 'commitment_date')
     def _check_commitment_date_min_lead(self):
         """Delivery Date must be at least 1 day (24 hours) beyond the Order Date."""
@@ -62,12 +76,32 @@ class SaleOrder(models.Model):
                 ))
 
     def _prepare_purchase_order_data(self, *args, **kwargs):
-        """Intercompany SO -> PO: carry remark + isolation flags onto the PO."""
+        """Intercompany SO -> PO: carry remark + isolation flags + dest_address."""
         result = super()._prepare_purchase_order_data(*args, **kwargs)
         if isinstance(result, dict):
             result['remark'] = self.remark or False
             result['is_wedding_order'] = self.is_wedding_order
             result['is_b2b_order'] = self.is_b2b_order
+            # Auto-set dropship/dest address to the SO's delivery address.
+            if self.partner_shipping_id:
+                result['dest_address_id'] = self.partner_shipping_id.id
+        return result
+
+    def _action_confirm(self):
+        """After confirm, propagate `remark` to the related stock pickings'
+        `note` field on HangHeung-company SOs so the DN List Report's Remark
+        column reflects 備註 from the upstream Hoymay SO."""
+        result = super()._action_confirm()
+        for order in self:
+            if not order.remark:
+                continue
+            if order.company_id.id != 3:  # 3 = HangHeung Cake Shop Co.
+                # Picking-note propagation is only for HangHeung's deliveries
+                # (DN List report reads stock.picking.note for the Remark column).
+                continue
+            pickings = order.picking_ids
+            if pickings:
+                pickings.sudo().write({'note': order.remark})
         return result
 
     def _action_cancel(self):

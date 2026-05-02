@@ -34,6 +34,10 @@
                 <attribute name="context">{'form_view_ref': 'recreate_HangHeung.view_partner_form_simplified'}</attribute>
             </xpath>
 
+            <xpath expr="//field[@name='partner_shipping_id']" position="attributes">
+                <attribute name="required">1</attribute>
+            </xpath>
+
             <!-- ========================================================== -->
             <!-- 2. Move "commitment_date" (Delivery Date) below             -->
             <!--    "payment_term_id" (Payment Terms), and add 備註 below.    -->
@@ -42,7 +46,7 @@
                 <attribute name="invisible">1</attribute>
             </xpath>
             <xpath expr="//field[@name='payment_term_id']" position="after">
-                <field name="commitment_date"/>
+                <field name="commitment_date" required="1"/>
                 <field name="remark" placeholder="備註"/>
             </xpath>
 

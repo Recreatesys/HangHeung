@@ -121,6 +121,11 @@ class PurchaseOrder(models.Model):
         result['remark'] = self.remark or False
         result['is_wedding_order'] = self.is_wedding_order
         result['is_b2b_order'] = self.is_b2b_order
+        # When the downstream SO is being created in HangHeung (company 3) and
+        # carries a remark, also stamp the picking-note vals so the eventual
+        # delivery picking inherits 備註 (used by the DN List Report's Remark
+        # column, which reads stock.picking.note). The actual write happens in
+        # sale.order._action_confirm() once pickings exist.
         return result
 
     def button_cancel(self):
@@ -145,26 +150,31 @@ class StockRule(models.Model):
 
     @api.model
     def _make_po_get_domain(self, company_id, values, partner):
-        """Per-SO isolation for flagged orders.
+        """Per-SO isolation: every SO-driven procurement gets its own PO.
 
-        When a procurement comes from a sale.order line whose order has
-        is_wedding_order=True or is_b2b_order=True, restrict the merge-domain
-        to require an existing PO whose `origin` matches THIS SO's name
-        exactly. Within the same flagged SO, all lines roll into one PO;
-        across flagged SOs, no merging.
+        When a procurement comes from a sale.order line, restrict the
+        merge-domain to require an existing PO whose `origin` matches THIS
+        SO's name exactly. Within the same SO all lines roll into one PO;
+        across SOs, no merging. The 嫁囍單 / B2B單 flags are kept as
+        classification badges; isolation is now uniform for every SO.
         """
         domain = super()._make_po_get_domain(company_id, values, partner)
         sale_line_id = values.get('sale_line_id')
         if sale_line_id:
             sale_line = self.env['sale.order.line'].sudo().browse(sale_line_id)
             order = sale_line.order_id
-            if order and (order.is_wedding_order or order.is_b2b_order):
+            if order:
                 domain += (('origin', '=', order.name),)
         return domain
 
     @api.model
     def _prepare_purchase_order(self, company_id, origins, values):
-        """Carry remark + isolation flags onto procurement-created POs."""
+        """Carry remark + isolation flags + dest_address onto procurement POs.
+
+        dest_address_id is set to the source SO's partner_shipping_id so the
+        PO's dropship/destination address always mirrors the customer's
+        delivery address.
+        """
         res = super()._prepare_purchase_order(company_id, origins, values)
         sale_line_id = values[0].get('sale_line_id') if values else None
         if sale_line_id:
@@ -174,6 +184,8 @@ class StockRule(models.Model):
                 res['remark'] = order.remark or False
                 res['is_wedding_order'] = order.is_wedding_order
                 res['is_b2b_order'] = order.is_b2b_order
+                if order.partner_shipping_id:
+                    res['dest_address_id'] = order.partner_shipping_id.id
         return res
 
     @api.model
@@ -323,6 +335,15 @@ class StockRule(models.Model):
                 if chained_origin != po.origin:
                     po.write({'origin': chained_origin})
 
-            if po.partner_id.purchase_auto_confirm:
+            # Defer auto-confirmation for SO-driven Hoymay POs. These are the
+            # "first hop" POs created when a user-entered SO in Hoymay (company
+            # 1) is confirmed; they must wait for POS payment before confirming
+            # so the chain only fires after settlement. Subsequent intercompany
+            # POs in That's (company 2) etc. continue to auto-confirm normally.
+            has_sale_origin = any(
+                p.values.get('sale_line_id') for p in procurements
+            )
+            defer_auto_confirm = has_sale_origin and po.company_id.id == 1
+            if po.partner_id.purchase_auto_confirm and not defer_auto_confirm:
                 po.button_confirm()
         

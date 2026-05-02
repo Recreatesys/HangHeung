@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="recreate_HangHeung.OrderReceipt"
+       t-inherit="point_of_sale.OrderReceipt"
+       t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('pos-receipt-order-data')]" position="after">
+            <t t-if="props.data.recreate_pickup_date or props.data.recreate_pickup_address">
+                <div class="recreate-pickup-info" style="margin-top: 6px; border-top: 1px dashed #999; padding-top: 4px;">
+                    <t t-if="props.data.recreate_pickup_date">
+                        <div>取貨日期: <t t-esc="props.data.recreate_pickup_date"/></div>
+                    </t>
+                    <t t-if="props.data.recreate_pickup_address">
+                        <div>取貨地點: <t t-esc="props.data.recreate_pickup_address"/></div>
+                    </t>
+                </div>
+            </t>
+        </xpath>
+    </t>
+
+</templates>
