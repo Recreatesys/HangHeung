@@ -7,7 +7,7 @@ _logger = logging.getLogger(__name__)
 
 # Programs that use the security-code mechanism. The first 3 letters of a
 # scanned code must be in this set for the security_code OR-branch to fire.
-SECURITY_CODE_PREFIXES = ('HHC', 'BWC', 'CWC', 'EWC', 'DPC')
+SECURITY_CODE_PREFIXES = ('HHC', 'BWC', 'CWC', 'EWC', 'DPC', 'SWC', 'LWC')
 
 
 class PosConfig(models.Model):

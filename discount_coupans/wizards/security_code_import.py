@@ -8,7 +8,7 @@ from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
-ALLOWED_PREFIXES = ('HHC', 'BWC', 'CWC', 'EWC', 'DPC')
+ALLOWED_PREFIXES = ('HHC', 'BWC', 'CWC', 'EWC', 'DPC', 'SWC', 'LWC')
 TRAILING_DIGITS = 2
 BATCH_SIZE = 2000
 

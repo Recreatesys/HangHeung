@@ -5,7 +5,7 @@ from odoo.exceptions import ValidationError
 from datetime import timedelta
 
 
-SECURITY_CODE_PREFIXES = ('HHC', 'BWC', 'CWC', 'EWC', 'DPC')
+SECURITY_CODE_PREFIXES = ('HHC', 'BWC', 'CWC', 'EWC', 'DPC', 'SWC', 'LWC')
 SECURITY_CODE_TRAILING_DIGITS = 2
 
 
