@@ -51,8 +51,15 @@
                 店铺：<t t-esc='props.data.headerData.storeName' /> <br/>
                 收銀員：<t t-esc='props.data.cashier' /><br/>
                 發票編碼：<t t-esc='props.data.name' /> <br/>
-                <!--取貨日期：<t t-esc='props.data.date' /><br/>-->
-                取貨店鋪：<t t-esc='props.data.headerData.storeName' /><br/>
+                <t t-if="props.data.recreate_pickup_date">
+                    取貨日期：<t t-esc='props.data.recreate_pickup_date' /><br/>
+                </t>
+                <t t-if="props.data.recreate_pickup_address">
+                    取貨地點：<t t-esc='props.data.recreate_pickup_address' /><br/>
+                </t>
+                <t t-else="">
+                    取貨店鋪：<t t-esc='props.data.headerData.storeName' /><br/>
+                </t>
                 會員號碼：<br/>
                 日期:<t t-esc="props.data.date.split(' ')[0]" /> <span style="display:inline-block; width:10px;"></span>
                 列印時間：<t t-esc="props.data.date.split(' ')[1]" />

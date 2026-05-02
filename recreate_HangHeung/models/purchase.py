@@ -240,8 +240,19 @@ class StockRule(models.Model):
 
             # Get the set of procurement origin for the current domain.
             origins = set([p.origin for p in procurements if p.origin])
-            # Check if a PO exists for the current domain.
-            po = self.env['purchase.order'].sudo().search([dom for dom in domain], limit=1)
+            # Force per-SO isolation: when ANY procurement in this group
+            # originates from a sale.order line, skip the merge-search entirely
+            # so a brand-new PO is always created. This guarantees the
+            # one-PO-per-SO contract regardless of how procurement.values are
+            # composed (sale_line_id may not always reach _make_po_get_domain
+            # in time for it to add the origin filter).
+            has_sale_origin = any(
+                p.values.get('sale_line_id') for p in procurements
+            )
+            if has_sale_origin:
+                po = self.env['purchase.order']
+            else:
+                po = self.env['purchase.order'].sudo().search([dom for dom in domain], limit=1)
             company_id = rules[0].company_id or procurements[0].company_id
             if not po:
                 positive_values = [p.values for p in procurements if float_compare(p.product_qty, 0.0, precision_rounding=p.product_uom.rounding) >= 0]
