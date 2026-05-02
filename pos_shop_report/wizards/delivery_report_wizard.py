@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from odoo import models, fields, api
 from io import BytesIO
 import base64
@@ -17,11 +17,15 @@ class DeliveryReportWizard(models.TransientModel):
     file_name = fields.Char('Filename', readonly=True)
 
     def action_generate_report(self):
+        # date_to is a Date but scheduled_date is a Datetime; use exclusive
+        # next-day upper bound so deliveries scheduled at any time on date_to
+        # are still included.
+        date_to_excl = self.date_to + timedelta(days=1)
         pickings = self.env['stock.picking'].search([
             ('picking_type_code', '=', 'outgoing'),
             ('scheduled_date', '>=', self.date_from),
-            ('scheduled_date', '<=', self.date_to),
-            ('state', '=', 'done')
+            ('scheduled_date', '<', date_to_excl),
+            ('state', 'in', ['assigned', 'confirmed', 'waiting', 'done']),
         ])
 
         products = self.env['product.product'].browse(
