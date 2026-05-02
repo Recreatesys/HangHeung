@@ -75,6 +75,15 @@ class SaleOrder(models.Model):
                     m=fields.Datetime.to_string(min_date),
                 ))
 
+    @api.model
+    def _load_pos_data_fields(self, config_id):
+        """Ensure commitment_date is loaded into POS state so the receipt
+        template can render 取貨日期 from the linked SO."""
+        fields = super()._load_pos_data_fields(config_id)
+        if 'commitment_date' not in fields:
+            fields = list(fields) + ['commitment_date']
+        return fields
+
     def _prepare_purchase_order_data(self, *args, **kwargs):
         """Intercompany SO -> PO: carry remark + isolation flags + dest_address."""
         result = super()._prepare_purchase_order_data(*args, **kwargs)
