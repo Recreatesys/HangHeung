@@ -1,7 +1,4 @@
-from datetime import timedelta
-
-from odoo import models, fields, api, _, SUPERUSER_ID
-from odoo.exceptions import ValidationError
+from odoo import models, fields, _, SUPERUSER_ID
 
 
 class SaleOrder(models.Model):
@@ -44,22 +41,6 @@ class SaleOrder(models.Model):
             "PO/SO per flagged record at every chain step."
         ),
     )
-
-    @api.constrains('date_order', 'commitment_date')
-    def _check_commitment_date_min_lead(self):
-        """Delivery Date must be at least 2 days beyond the Order Date."""
-        for order in self:
-            if not order.commitment_date or not order.date_order:
-                continue
-            min_date = order.date_order + timedelta(days=2)
-            if order.commitment_date < min_date:
-                raise ValidationError(_(
-                    "送貨日期必須在訂單日期之後最少 2 天。\n"
-                    "訂單日期：%(o)s\n"
-                    "最早可選送貨日期：%(m)s",
-                    o=fields.Datetime.to_string(order.date_order),
-                    m=fields.Datetime.to_string(min_date),
-                ))
 
     def _prepare_purchase_order_data(self, *args, **kwargs):
         """Intercompany SO -> PO: carry remark + isolation flags onto the PO."""
