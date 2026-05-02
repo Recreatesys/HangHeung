@@ -78,46 +78,6 @@
         </xpath>
 
 
-        <xpath expr="//table[@name='stock_move_table']/thead/tr[1]" position="before">
-            <t t-set="addr_partner" t-value="(o.move_ids and o.move_ids[0].partner_id) or o.partner_id"/>
-            <t t-set="origin_text" t-value="o.full_origin_chain or o.origin"/>
-            <tr t-if="addr_partner or origin_text">
-                <th colspan="99" style="text-align: left; font-weight: normal; font-size: 8pt; padding: 3px 0; border-top: 0; border-bottom: 1px solid #ccc;">
-                    <t t-if="addr_partner">
-                        <strong>Deliver to:</strong>
-                        <span t-esc="addr_partner.name or ''"/>
-                        <t t-if="addr_partner.street">, <t t-esc="addr_partner.street"/></t>
-                        <t t-if="addr_partner.city">, <t t-esc="addr_partner.city"/></t>
-                    </t>
-                    <span t-if="addr_partner and origin_text" style="margin: 0 8px; color: #999;">|</span>
-                    <t t-if="origin_text">
-                        <strong>Origin Chain:</strong>
-                        <span t-esc="origin_text"/>
-                    </t>
-                </th>
-            </tr>
-        </xpath>
-
-        <xpath expr="//table[@name='stock_move_line_table']/thead/tr[1]" position="before">
-            <t t-set="addr_partner" t-value="(o.move_ids and o.move_ids[0].partner_id) or o.partner_id"/>
-            <t t-set="origin_text" t-value="o.full_origin_chain or o.origin"/>
-            <tr t-if="addr_partner or origin_text">
-                <th colspan="99" style="text-align: left; font-weight: normal; font-size: 8pt; padding: 3px 0; border-top: 0; border-bottom: 1px solid #ccc;">
-                    <t t-if="addr_partner">
-                        <strong>Deliver to:</strong>
-                        <span t-esc="addr_partner.name or ''"/>
-                        <t t-if="addr_partner.street">, <t t-esc="addr_partner.street"/></t>
-                        <t t-if="addr_partner.city">, <t t-esc="addr_partner.city"/></t>
-                    </t>
-                    <span t-if="addr_partner and origin_text" style="margin: 0 8px; color: #999;">|</span>
-                    <t t-if="origin_text">
-                        <strong>Origin Chain:</strong>
-                        <span t-esc="origin_text"/>
-                    </t>
-                </th>
-            </tr>
-        </xpath>
-
         <xpath expr="//table[@name='stock_move_table']/tbody" position="after">
             <tbody>
                 <tr style="border-top: 2px solid black; font-weight: bold;">
@@ -132,9 +92,9 @@
             </tbody>
             <tbody t-if="o.note">
                 <tr>
-                    <td colspan="99" style="border: 0; padding-top: 10px; padding-bottom: 10px; font-size: 9pt;">
+                    <td colspan="99" style="border: 0; padding-top: 10px; padding-bottom: 10px; font-size: 15pt;">
                         <strong>Remark / 備註：</strong>
-                        <div style="white-space: pre-wrap; margin-top: 2px;">
+                        <div style="white-space: pre-wrap; margin-top: 4px; font-size: 15pt;">
                             <span t-out="o.note"/>
                         </div>
                     </td>
@@ -177,9 +137,9 @@
             </tbody>
             <tbody t-if="o.note">
                 <tr>
-                    <td colspan="99" style="border: 0; padding-top: 10px; padding-bottom: 10px; font-size: 9pt;">
+                    <td colspan="99" style="border: 0; padding-top: 10px; padding-bottom: 10px; font-size: 15pt;">
                         <strong>Remark / 備註：</strong>
-                        <div style="white-space: pre-wrap; margin-top: 2px;">
+                        <div style="white-space: pre-wrap; margin-top: 4px; font-size: 15pt;">
                             <span t-out="o.note"/>
                         </div>
                     </td>
