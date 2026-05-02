@@ -12,6 +12,14 @@
             <xpath expr="//field[@name='client_order_ref']" position="after">
                 <field name="intercompany_source_po_name" readonly="1"
                        invisible="company_id != 2 or not intercompany_source_po_name"/>
+            </xpath>
+
+            <!-- ========================================================== -->
+            <!-- Place 嫁囍單 / B2B單 directly below Delivery Address         -->
+            <!-- (partner_shipping_id) so they sit on the main form, not in -->
+            <!-- a tab.                                                     -->
+            <!-- ========================================================== -->
+            <xpath expr="//field[@name='partner_shipping_id']" position="after">
                 <field name="is_wedding_order"/>
                 <field name="is_b2b_order"/>
             </xpath>
