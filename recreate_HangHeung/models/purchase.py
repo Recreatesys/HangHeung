@@ -148,23 +148,59 @@ class PurchaseOrder(models.Model):
 class StockRule(models.Model):
     _inherit = 'stock.rule'
 
+    def _hh_find_source_sale_order(self, values_list, origins=None):
+        """Resolve the source sale.order from procurement values + origins.
+
+        Multi-fallback because sale_line_id may not survive the procurement
+        chain reliably (HoyMay's Pop+MTO chain in particular drops it before
+        _prepare_purchase_order is called).
+
+        Tries, in order:
+          1. values[i]['sale_line_id'] -> sale.order.line.order_id
+          2. values[i]['group_id'].name -> sale.order matching that name
+          3. any string in origins that looks like an SO name
+        """
+        SO = self.env['sale.order'].sudo()
+        SOL = self.env['sale.order.line'].sudo()
+        for values in values_list or []:
+            sale_line_id = values.get('sale_line_id') if values else None
+            if sale_line_id:
+                line = SOL.browse(sale_line_id).exists()
+                if line and line.order_id:
+                    return line.order_id
+            group = values.get('group_id') if values else None
+            grp_name = None
+            if group is not None:
+                grp_name = group.name if hasattr(group, 'name') else None
+                if grp_name is None and isinstance(group, int):
+                    grp_rec = self.env['procurement.group'].sudo().browse(group)
+                    grp_name = grp_rec.name if grp_rec.exists() else None
+            if grp_name:
+                so = SO.search([('name', '=', grp_name)], limit=1)
+                if so:
+                    return so
+        for origin in (origins or []):
+            for part in (origin or '').split(', '):
+                candidate = part.split('-')[-1].strip()
+                if candidate:
+                    so = SO.search([('name', '=', candidate)], limit=1)
+                    if so:
+                        return so
+        return SO
+
     @api.model
     def _make_po_get_domain(self, company_id, values, partner):
         """Per-SO isolation: every SO-driven procurement gets its own PO.
 
-        When a procurement comes from a sale.order line, restrict the
+        When a procurement traces back to a sale.order line, restrict the
         merge-domain to require an existing PO whose `origin` matches THIS
-        SO's name exactly. Within the same SO all lines roll into one PO;
-        across SOs, no merging. The 嫁囍單 / B2B單 flags are kept as
-        classification badges; isolation is now uniform for every SO.
+        SO's name exactly. Uses multi-fallback resolution so we don't miss
+        SO origin when sale_line_id is dropped from values mid-chain.
         """
         domain = super()._make_po_get_domain(company_id, values, partner)
-        sale_line_id = values.get('sale_line_id')
-        if sale_line_id:
-            sale_line = self.env['sale.order.line'].sudo().browse(sale_line_id)
-            order = sale_line.order_id
-            if order:
-                domain += (('origin', '=', order.name),)
+        order = self._hh_find_source_sale_order([values])
+        if order:
+            domain += (('origin', '=', order.name),)
         return domain
 
     @api.model
@@ -173,19 +209,18 @@ class StockRule(models.Model):
 
         dest_address_id is set to the source SO's partner_shipping_id so the
         PO's dropship/destination address always mirrors the customer's
-        delivery address.
+        delivery address. Multi-fallback resolution (sale_line_id, group_id,
+        origins) so the propagation lands even when sale_line_id is dropped
+        from values further up the chain.
         """
         res = super()._prepare_purchase_order(company_id, origins, values)
-        sale_line_id = values[0].get('sale_line_id') if values else None
-        if sale_line_id:
-            sale_line = self.env['sale.order.line'].sudo().browse(sale_line_id)
-            order = sale_line.order_id
-            if order:
-                res['remark'] = order.remark or False
-                res['is_wedding_order'] = order.is_wedding_order
-                res['is_b2b_order'] = order.is_b2b_order
-                if order.partner_shipping_id:
-                    res['dest_address_id'] = order.partner_shipping_id.id
+        order = self._hh_find_source_sale_order(values, origins)
+        if order:
+            res['remark'] = order.remark or False
+            res['is_wedding_order'] = order.is_wedding_order
+            res['is_b2b_order'] = order.is_b2b_order
+            if order.partner_shipping_id:
+                res['dest_address_id'] = order.partner_shipping_id.id
         return res
 
     @api.model
@@ -241,15 +276,16 @@ class StockRule(models.Model):
             # Get the set of procurement origin for the current domain.
             origins = set([p.origin for p in procurements if p.origin])
             # Force per-SO isolation: when ANY procurement in this group
-            # originates from a sale.order line, skip the merge-search entirely
-            # so a brand-new PO is always created. This guarantees the
-            # one-PO-per-SO contract regardless of how procurement.values are
-            # composed (sale_line_id may not always reach _make_po_get_domain
-            # in time for it to add the origin filter).
-            has_sale_origin = any(
-                p.values.get('sale_line_id') for p in procurements
+            # traces back to a sale.order, skip the merge-search entirely so
+            # a brand-new PO is always created. Use multi-fallback resolution
+            # (sale_line_id, group_id, origin string) because the simple
+            # sale_line_id check above isn't always populated for the BUY
+            # rule's procurement values in the HoyMay Pop+MTO chain.
+            source_so = self._hh_find_source_sale_order(
+                [p.values for p in procurements],
+                origins,
             )
-            if has_sale_origin:
+            if source_so:
                 po = self.env['purchase.order']
             else:
                 po = self.env['purchase.order'].sudo().search([dom for dom in domain], limit=1)
@@ -351,10 +387,7 @@ class StockRule(models.Model):
             # 1) is confirmed; they must wait for POS payment before confirming
             # so the chain only fires after settlement. Subsequent intercompany
             # POs in That's (company 2) etc. continue to auto-confirm normally.
-            has_sale_origin = any(
-                p.values.get('sale_line_id') for p in procurements
-            )
-            defer_auto_confirm = has_sale_origin and po.company_id.id == 1
+            defer_auto_confirm = bool(source_so) and po.company_id.id == 1
             if po.partner_id.purchase_auto_confirm and not defer_auto_confirm:
                 po.button_confirm()
         
