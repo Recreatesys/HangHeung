@@ -66,14 +66,4 @@
         </field>
     </record>
 
-    <record id="view_order_line_product_no_quick_create_form" model="ir.ui.view">
-        <field name="name">sale.order.form.line.product.no.quick.create</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='order_line']/form//field[@name='product_template_id']" position="attributes">
-                <attribute name="options">{'no_quick_create': True}</attribute>
-            </xpath>
-        </field>
-    </record>
 </odoo>
