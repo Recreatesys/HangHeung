@@ -41,10 +41,49 @@ class PosSession(models.Model):
 
         results = []
 
+        Bom = self.env['mrp.bom'].sudo() if 'mrp.bom' in self.env else None
+
         for pid in (needs_map or {}):
             prod = ProductCtx.browse(int(pid)).exists()
             if not prod:
                 continue
+
+            # HH-CUSTOM: combo products have no own stock -- their real
+            # availability is on the choices. Treat them as effectively
+            # unlimited so the cashier can open the combo popup; the
+            # individual choices' stock is checked when each is added.
+            if prod.product_tmpl_id.type == 'combo':
+                results.append({
+                    "product_id": prod.id,
+                    "display_name": prod.display_name,
+                    "available": 1e9,
+                })
+                continue
+
+            # HH-CUSTOM: phantom-BOM kits also report qty_available = 0.
+            # Compute effective availability as floor(min(component_stock
+            # / component_qty)) across the BOM lines so the cashier sees
+            # the real number of kits sellable from current components.
+            if Bom is not None:
+                phantom = Bom.search([
+                    '|',
+                    ('product_id', '=', prod.id),
+                    '&', ('product_tmpl_id', '=', prod.product_tmpl_id.id), ('product_id', '=', False),
+                    ('type', '=', 'phantom'),
+                ], limit=1)
+                if phantom:
+                    kit_avail = None
+                    for line in phantom.bom_line_ids:
+                        comp = line.product_id.with_context(location=loc_id, compute_child=False)
+                        per_kit = line.product_qty or 1.0
+                        n = int(comp.qty_available // per_kit)
+                        kit_avail = n if kit_avail is None else min(kit_avail, n)
+                    results.append({
+                        "product_id": prod.id,
+                        "display_name": prod.display_name,
+                        "available": float(kit_avail or 0),
+                    })
+                    continue
 
             prod_loc = prod.with_context(location=loc_id, compute_child=False)
             available = float(prod_loc.qty_available)

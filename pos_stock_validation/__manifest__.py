@@ -1,6 +1,6 @@
 {
     'name': 'POS Stock Validation',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.0.1',
     'category': 'Point of Sale',
     'summary': 'Prevents POS orders for products with insufficient stock.',
     'description': """
@@ -13,6 +13,7 @@ feedback to the cashier to prevent overselling.
     'depends': [
         'point_of_sale',
         'stock',
+        'mrp',
     ],
     'assets': {
         'point_of_sale._assets_pos': [
