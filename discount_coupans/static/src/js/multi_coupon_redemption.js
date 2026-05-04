@@ -122,4 +122,121 @@ patch(PosOrder.prototype, {
         }
         return result;
     },
+
+    /**
+     * Override of replace_date_to_datetime's _updateRewardLines.
+     * That patch deduplicates rewards by `reward_identifier_code` alone --
+     * which collapses two coupons of the same program (same reward) into
+     * one line, even though we want each scanned coupon to keep its own
+     * reward orderline. Tighten the dedup to also match coupon_id.
+     *
+     * Logic mirrors the upstream method (HH replace_date_to_datetime
+     * pos_store.js), with the dedup predicate extended.
+     */
+    _updateRewardLines() {
+        if (!this.lines.length) {
+            return;
+        }
+        const rewardLines = this._get_reward_lines();
+        if (!rewardLines.length) {
+            return;
+        }
+
+        const productRewards = [];
+        const otherRewards = [];
+        const paymentRewards = [];
+
+        for (const line of rewardLines) {
+            const couponId = line.coupon_id?.id || line.coupon_id;
+            const productId = line._reward_product_id?.id || line._reward_product_id;
+
+            const claimedReward = {
+                reward: line.reward_id,
+                coupon_id: couponId,
+                args: {
+                    product: productId,
+                    price: line.price_unit,
+                    quantity: line.qty,
+                    cost: line.points_cost,
+                },
+                reward_identifier_code: line.reward_identifier_code,
+            };
+
+            if (
+                claimedReward.reward.program_id.program_type === "gift_card" ||
+                claimedReward.reward.program_id.program_type === "ewallet"
+            ) {
+                paymentRewards.push(claimedReward);
+            } else if (claimedReward.reward.reward_type === "product") {
+                productRewards.push(claimedReward);
+            } else if (
+                // HH-CUSTOM: also key dedup on coupon_id so two distinct
+                // coupons from the same coupon program each keep their
+                // own reward orderline.
+                !otherRewards.some(
+                    (reward) =>
+                        reward.reward_identifier_code === claimedReward.reward_identifier_code &&
+                        reward.coupon_id === claimedReward.coupon_id
+                )
+            ) {
+                otherRewards.push(claimedReward);
+            }
+            line.delete();
+        }
+
+        const allRewards = productRewards.concat(otherRewards).concat(paymentRewards);
+        const allRewardsMerged = [];
+
+        allRewards.forEach((reward) => {
+            if (reward.reward.reward_type === "discount") {
+                allRewardsMerged.push(reward);
+                return;
+            }
+
+            const reward_index = allRewardsMerged.findIndex((item) => {
+                return (
+                    item.reward.id === reward.reward.id &&
+                    item.args.price === reward.args.price &&
+                    item.coupon_id === reward.coupon_id &&
+                    item.args.product === reward.args.product
+                );
+            });
+
+            if (reward_index > -1) {
+                allRewardsMerged[reward_index].args.quantity += reward.args.quantity;
+                allRewardsMerged[reward_index].args.cost += reward.args.cost;
+            } else {
+                allRewardsMerged.push(reward);
+            }
+        });
+
+        for (const claimedReward of allRewardsMerged) {
+            if (
+                !this._code_activated_coupon_ids.find(
+                    (coupon) => coupon.id === claimedReward.coupon_id
+                ) &&
+                !this.uiState.couponPointChanges[claimedReward.coupon_id]
+            ) {
+                continue;
+            }
+
+            if (
+                claimedReward.reward.program_id.program_type === "coupons" &&
+                this.lines.find(
+                    (rewardline) =>
+                        rewardline.reward_id?.id === claimedReward.reward.id &&
+                        (rewardline.coupon_id?.id === claimedReward.coupon_id ||
+                            rewardline.coupon_id === claimedReward.coupon_id)
+                )
+            ) {
+                continue;
+            }
+
+            this._applyReward(
+                claimedReward.reward,
+                claimedReward.coupon_id,
+                claimedReward.args
+            );
+        }
+    },
 });

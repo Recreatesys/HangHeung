@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <!--
+        HH-CUSTOM: surface a 總數量 (Total Qty) row inside the POS order
+        summary, just above the Total amount. Counts product/coupon-purchase
+        lines only -- excludes reward lines (coupon redemptions and
+        discounts), service products, and combo parents -- to match the
+        same definition the receipt uses.
+    -->
+    <t t-name="custom_pos_receipt.OrderWidgetQty"
+       t-inherit="point_of_sale.OrderWidget"
+       t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('order-summary')]//div[hasclass('fs-2')]" position="before">
+            <t t-set="hhTotalQty" t-value="props.lines.filter(l => !l.is_reward_line &amp;&amp; l.product_id.type !== 'service' &amp;&amp; (!l.combo_line_ids || l.combo_line_ids.length === 0)).reduce((s, l) => s + (parseFloat(l.qty) || 0), 0)"/>
+            <div class="d-flex justify-content-between w-100 fs-6 text-muted">
+                總數量
+                <span t-esc="hhTotalQty"/>
+            </div>
+        </xpath>
+    </t>
+</templates>
