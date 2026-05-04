@@ -30,6 +30,13 @@ patch(ProductScreen.prototype, {
     async addProductToOrder(product, options = {}) {
                 var self = this;
 
+                // HH-CUSTOM: bypass the out-of-stock gate for combos and
+                // phantom-BOM kits -- their qty_available is structurally
+                // 0 because real availability is on the choices/components.
+                if (product.pos_stock_skip_check) {
+                    return super.addProductToOrder(...arguments);
+                }
+
                 if(product.qty_available <= 0 && this.env.services.pos.config.restrict_product){
                      product.add_forcefully = true;
 
@@ -51,6 +58,10 @@ patch(PosOrderline.prototype, {
         super.setup(...arguments);
     },
      set_quantity(quantity, keep_price) {
+        // HH-CUSTOM: skip the qty cap for combos / phantom-BOM kits.
+        if (this.product_id.pos_stock_skip_check) {
+            return super.set_quantity(quantity, keep_price);
+        }
         var quantity_product = this.qty + this.product_id.qty_available;
         if(quantity && quantity_product < quantity && !this.product_id.add_forcefully){
           return {
