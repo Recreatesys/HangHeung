@@ -132,6 +132,18 @@ class SaleOrder(models.Model):
                 result['dest_address_id'] = self.partner_shipping_id.id
         return result
 
+    def inter_company_create_purchase_order(self, company):
+        """Skip when target company == source SO company. Standard intercompany
+        rules misfire on customers whose commercial_partner_id resolves to the
+        source company's own partner (e.g. HH retail-outlet partners parented
+        under Hoymay's company partner). Without this guard, those SOs spawn
+        a self-PO in the same company."""
+        same_co = self.filtered(lambda r: r.company_id and r.company_id.id == company.id)
+        cross_co = self - same_co
+        if cross_co:
+            return super(SaleOrder, cross_co).inter_company_create_purchase_order(company)
+        return False
+
     def _action_confirm(self):
         """After confirm, propagate `remark` to the related stock pickings'
         `note` field on HangHeung-company SOs so the DN List Report's Remark

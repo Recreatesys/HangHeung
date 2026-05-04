@@ -37,6 +37,17 @@ class PurchaseOrder(models.Model):
         help="Isolation flag carried from the originating SO; this PO will not merge with non-flagged orders.",
     )
 
+    def inter_company_create_sale_order(self, company):
+        """Skip when target company == source PO company. Mirror of the
+        same-company guard on sale_order.inter_company_create_purchase_order:
+        prevents a self-SO when a vendor's commercial_partner_id resolves to
+        the source company's own partner."""
+        same_co = self.filtered(lambda r: r.company_id and r.company_id.id == company.id)
+        cross_co = self - same_co
+        if cross_co:
+            return super(PurchaseOrder, cross_co).inter_company_create_sale_order(company)
+        return False
+
     @api.constrains('dest_address_id')
     def _check_dest_address_not_internal_shop(self):
         for po in self:
