@@ -19,8 +19,13 @@
 import { patch } from "@web/core/utils/patch";
 import { PosOrder } from "@point_of_sale/app/models/pos_order";
 
+// HH-DEBUG: temporary verbose logging while diagnosing why two coupons
+// from the same coupons-type program collapse into a single reward line.
+const HH_LOG = (...a) => console.log("[HH-COUPON]", ...a);
+
 patch(PosOrder.prototype, {
     getClaimableRewards(coupon_id = false, program_id = false, auto = false) {
+        HH_LOG("getClaimableRewards called", { coupon_id, program_id, auto, lines: this.lines.length });
         const couponPointChanges = this.uiState.couponPointChanges;
         const excludedCouponIds = Object.keys(couponPointChanges)
             .filter((id) => couponPointChanges[id].manual && couponPointChanges[id].existing_code)
@@ -118,8 +123,10 @@ patch(PosOrder.prototype, {
                     reward: reward,
                     potentialQty: unclaimedQty,
                 });
+                HH_LOG("  pushed reward", { reward_id: reward.id, coupon_id: couponProgram.coupon_id });
             }
         }
+        HH_LOG("getClaimableRewards result", result.map(r => ({reward_id: r.reward.id, coupon_id: r.coupon_id})));
         return result;
     },
 
@@ -134,10 +141,19 @@ patch(PosOrder.prototype, {
      * pos_store.js), with the dedup predicate extended.
      */
     _updateRewardLines() {
+        HH_LOG("_updateRewardLines called", { lines: this.lines.length });
         if (!this.lines.length) {
             return;
         }
         const rewardLines = this._get_reward_lines();
+        HH_LOG("  reward lines:", rewardLines.map(l => ({
+            id: l.id,
+            reward_id: l.reward_id?.id,
+            coupon_id: l.coupon_id?.id || l.coupon_id,
+            code: l.reward_identifier_code,
+            qty: l.qty,
+            price: l.price_unit,
+        })));
         if (!rewardLines.length) {
             return;
         }
@@ -180,9 +196,13 @@ patch(PosOrder.prototype, {
                 )
             ) {
                 otherRewards.push(claimedReward);
+                HH_LOG("    pushed to otherRewards", {code: claimedReward.reward_identifier_code, coupon: claimedReward.coupon_id});
+            } else {
+                HH_LOG("    DEDUP-SKIPPED in otherRewards", {code: claimedReward.reward_identifier_code, coupon: claimedReward.coupon_id});
             }
             line.delete();
         }
+        HH_LOG("  after loop: otherRewards count =", otherRewards.length);
 
         const allRewards = productRewards.concat(otherRewards).concat(paymentRewards);
         const allRewardsMerged = [];
@@ -210,6 +230,7 @@ patch(PosOrder.prototype, {
             }
         });
 
+        HH_LOG("  allRewardsMerged", allRewardsMerged.map(r => ({reward: r.reward.id, coupon: r.coupon_id})));
         for (const claimedReward of allRewardsMerged) {
             if (
                 !this._code_activated_coupon_ids.find(
@@ -217,6 +238,7 @@ patch(PosOrder.prototype, {
                 ) &&
                 !this.uiState.couponPointChanges[claimedReward.coupon_id]
             ) {
+                HH_LOG("    SKIP (coupon not in activated set)", claimedReward.coupon_id);
                 continue;
             }
 
@@ -229,14 +251,17 @@ patch(PosOrder.prototype, {
                             rewardline.coupon_id === claimedReward.coupon_id)
                 )
             ) {
+                HH_LOG("    SKIP (already-applied check) reward=", claimedReward.reward.id, "coupon=", claimedReward.coupon_id);
                 continue;
             }
 
-            this._applyReward(
+            HH_LOG("    APPLY reward=", claimedReward.reward.id, "coupon=", claimedReward.coupon_id);
+            const r = this._applyReward(
                 claimedReward.reward,
                 claimedReward.coupon_id,
                 claimedReward.args
             );
+            HH_LOG("      _applyReward returned:", r === true ? "OK" : r);
         }
     },
 });
