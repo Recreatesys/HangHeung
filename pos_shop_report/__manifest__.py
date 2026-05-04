@@ -3,7 +3,7 @@
 
 {
     'name': 'Hang Heung Shop Reports Customizations',
-    'version': '1.1.3',
+    'version': '1.1.4',
     'summary': 'Includes all Hang Heung customizations',
     'description': """
         This module contains all of Hang Heung customizations.

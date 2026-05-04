@@ -120,7 +120,7 @@
                         </thead>
                         <tbody>
                             <t t-foreach="rows" t-as="r">
-                                <tr>
+                                <tr t-att-class="r.get('is_subtotal') and 'total' or ''">
                                     <td class="label"><t t-esc="r['label'] or ''"/></td>
                                     <t t-foreach="r['cells']" t-as="v">
                                         <td class="num">

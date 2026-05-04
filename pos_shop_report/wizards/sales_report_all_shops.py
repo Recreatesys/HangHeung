@@ -138,6 +138,27 @@ class SalesReportAllShopsWizard(models.TransientModel):
         coupon = to_section(coupon_amount, coupon_qty)
         discount = to_section(discount_amount, discount_qty)
 
+        # Insert a "Cash" subtotal row that sums every "Cash - <shop>" row,
+        # placed right after the last Cash- row so the grouping is clear in
+        # the rendered table. Same treatment for amount and qty.
+        def insert_cash_subtotal(rows):
+            cash_rows = [r for r in rows if (r['label'] or '').startswith('Cash - ')]
+            if len(cash_rows) <= 1:
+                return rows
+            n_cells = len(cash_rows[0]['cells'])
+            cells = [sum(r['cells'][i] for r in cash_rows) for i in range(n_cells)]
+            subtotal_row = {
+                'label': 'Cash',
+                'cells': cells,
+                'subtotal': sum(cells),
+                'is_subtotal': True,
+            }
+            insert_at = max(rows.index(r) for r in cash_rows) + 1
+            return rows[:insert_at] + [subtotal_row] + rows[insert_at:]
+
+        payment['amount_rows'] = insert_cash_subtotal(payment['amount_rows'])
+        payment['qty_rows'] = insert_cash_subtotal(payment['qty_rows'])
+
         header_metrics = [
             {
                 'label': '總計($)',
@@ -220,12 +241,16 @@ class SalesReportAllShopsWizard(models.TransientModel):
             col_totals = [0] * len(shops)
             grand = 0
             for r in rows_data:
-                sheet.write(row, 0, r['label'] or '', label_fmt)
+                row_label_fmt = total_fmt if r.get('is_subtotal') else label_fmt
+                row_value_fmt = total_fmt if r.get('is_subtotal') else value_fmt
+                sheet.write(row, 0, r['label'] or '', row_label_fmt)
                 for i, val in enumerate(r['cells']):
-                    sheet.write_number(row, 1 + i, val or 0, value_fmt)
-                    col_totals[i] += val or 0
+                    sheet.write_number(row, 1 + i, val or 0, row_value_fmt)
+                    if not r.get('is_subtotal'):
+                        col_totals[i] += val or 0
                 sheet.write_number(row, len(shops) + 1, r['subtotal'] or 0, total_fmt)
-                grand += r['subtotal'] or 0
+                if not r.get('is_subtotal'):
+                    grand += r['subtotal'] or 0
                 row += 1
             # 總計 row
             sheet.write(row, 0, "總計", label_fmt)
