@@ -138,26 +138,29 @@ class SalesReportAllShopsWizard(models.TransientModel):
         coupon = to_section(coupon_amount, coupon_qty)
         discount = to_section(discount_amount, discount_qty)
 
-        # Insert a "Cash" subtotal row that sums every "Cash - <shop>" row,
-        # placed right after the last Cash- row so the grouping is clear in
-        # the rendered table. Same treatment for amount and qty.
-        def insert_cash_subtotal(rows):
+        # Hoist the "Cash - <shop>" rows to the TOP of the payment-method
+        # table and append a "Cash" subtotal row right under them, so the
+        # grouped block appears above the rest of the payment methods
+        # (e.g. above the AE row). Same treatment for amount and qty.
+        def hoist_cash_with_subtotal(rows):
             cash_rows = [r for r in rows if (r['label'] or '').startswith('Cash - ')]
-            if len(cash_rows) <= 1:
+            other_rows = [r for r in rows if not (r['label'] or '').startswith('Cash - ')]
+            if not cash_rows:
                 return rows
-            n_cells = len(cash_rows[0]['cells'])
-            cells = [sum(r['cells'][i] for r in cash_rows) for i in range(n_cells)]
-            subtotal_row = {
-                'label': 'Cash',
-                'cells': cells,
-                'subtotal': sum(cells),
-                'is_subtotal': True,
-            }
-            insert_at = max(rows.index(r) for r in cash_rows) + 1
-            return rows[:insert_at] + [subtotal_row] + rows[insert_at:]
+            block = list(cash_rows)
+            if len(cash_rows) > 1:
+                n_cells = len(cash_rows[0]['cells'])
+                cells = [sum(r['cells'][i] for r in cash_rows) for i in range(n_cells)]
+                block.append({
+                    'label': 'Cash',
+                    'cells': cells,
+                    'subtotal': sum(cells),
+                    'is_subtotal': True,
+                })
+            return block + other_rows
 
-        payment['amount_rows'] = insert_cash_subtotal(payment['amount_rows'])
-        payment['qty_rows'] = insert_cash_subtotal(payment['qty_rows'])
+        payment['amount_rows'] = hoist_cash_with_subtotal(payment['amount_rows'])
+        payment['qty_rows'] = hoist_cash_with_subtotal(payment['qty_rows'])
 
         header_metrics = [
             {
