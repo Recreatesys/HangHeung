@@ -281,9 +281,13 @@ patch(PosOrder.prototype, {
             let taxIds = entry[0] === "" ? [] : entry[0].split(",").map((str) => parseInt(str));
             taxIds = this.models["account.tax"].filter((tax) => taxIds.includes(tax.id));
 
+            // HH-FIX: cap entry[1] at the current order total -- mirrors
+            // core pos_loyalty._getRewardLineValuesDiscount and prevents
+            // over-discounting when a prior reward has already reduced the
+            // order (e.g. a second cash coupon stacking on the first).
             lst.push({
                 product_id: discountProduct,
-                price_unit: -(entry[1] * discountFactor),
+                price_unit: -(Math.min(this.get_total_with_tax(), entry[1]) * discountFactor),
                 qty: 1,
                 reward_id: reward,
                 is_reward_line: true,

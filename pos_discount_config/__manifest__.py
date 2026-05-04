@@ -11,7 +11,7 @@
     """,
     'author': "Codetrade",
     'website': "https://www.codetrade.io",
-    'version': '0.2',
+    'version': '0.3',
     'depends': ['point_of_sale','pos_loyalty'],
     'data': [
         'security/ir.model.access.csv',
