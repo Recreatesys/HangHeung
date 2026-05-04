@@ -75,11 +75,8 @@
         <xpath expr="//div[@class='pos-receipt-amount receipt-total']/preceding-sibling::div[@class='text-center'][1]" position="replace">
             <hr style="border: none; border-top: 1px solid #000000; margin: 2px 0;" />
         </xpath>
-        <xpath expr="//div[@class='pos-receipt-amount receipt-total']" position="before">
-            <div class="pos-receipt-amount receipt-quantity">
-                <span>總數量：</span>
-                <span t-esc="props.data.headerData.totalQty" class="pos-receipt-right-align"/>
-            </div>
+        <xpath expr="//div[@class='pos-receipt-amount receipt-total']/span[1]" position="after">
+            <span style="margin-left: 8px; font-size: 10pt;">(總數量：<t t-esc="props.data.headerData.totalQty"/>)</span>
         </xpath>
         <xpath expr="//div[@t-if='props.data.footer']" position="before">
             <t t-if="props.data.recreate_used_coupons and props.data.recreate_used_coupons.length">
