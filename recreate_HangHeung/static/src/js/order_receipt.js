@@ -26,6 +26,26 @@ patch(PosOrder.prototype, {
                 data.recreate_pickup_address = so.pickup_address_display;
             }
         }
+        // Collect distinct coupon codes redeemed in this order so the
+        // receipt can list them under "已用優惠券". Reward orderlines carry
+        // coupon_id (a loyalty.card) whose `code` is loaded into POS state
+        // when the code is scanned via use_coupon_code.
+        const seen = new Set();
+        const usedCoupons = [];
+        for (const line of this.lines) {
+            const card = line.coupon_id;
+            if (!card || !card.code || seen.has(card.id)) {
+                continue;
+            }
+            seen.add(card.id);
+            usedCoupons.push({
+                code: card.code,
+                program: (card.program_id && card.program_id.name) || "",
+            });
+        }
+        if (usedCoupons.length) {
+            data.recreate_used_coupons = usedCoupons;
+        }
         return data;
     },
 });

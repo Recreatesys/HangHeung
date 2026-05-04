@@ -82,6 +82,15 @@
             </div>
         </xpath>
         <xpath expr="//div[@t-if='props.data.footer']" position="before">
+            <t t-if="props.data.recreate_used_coupons and props.data.recreate_used_coupons.length">
+                <hr style="border: none; border-top: 1px dashed #000000; margin: 4px 0;" />
+                <div style="text-align: left; font-size: 9pt;">
+                    <strong>已用優惠券 / Coupons Used:</strong>
+                    <t t-foreach="props.data.recreate_used_coupons" t-as="c" t-key="c_index">
+                        <div>- <t t-esc="c.code"/><t t-if="c.program"> (<t t-esc="c.program"/>)</t></div>
+                    </t>
+                </div>
+            </t>
             <div style="text-align: center; font-size: 16pt;">
                 多謝惠顧！
             </div>
