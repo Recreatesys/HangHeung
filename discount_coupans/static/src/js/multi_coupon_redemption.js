@@ -3,29 +3,36 @@
  * Allow multiple coupon codes from the SAME coupon-type program to each
  * claim their reward in one POS transaction.
  *
- * Core pos_loyalty's getClaimableRewards skips a reward if any existing
- * orderline already references that reward.id when the program is of type
- * 'coupons' -- which blocks the second coupon scan from earning anything.
+ * Core pos_loyalty enforces three anti-stacking guards that, in
+ * combination, collapse two same-program coupon redemptions into one
+ * line. We override each one for coupons-type programs only:
  *
- * We override the method and tighten the duplicate guard to also match
- * coupon_id, so different coupons from the same program each get their
- * reward, while the same coupon code re-scanned is still rejected upstream
- * at scan time (pos_store.js: "That coupon code has already been scanned").
+ * 1. getClaimableRewards: skips a reward if any existing orderline
+ *    references reward.id when program_type === 'coupons'. Tighten the
+ *    duplicate guard to also require the SAME coupon_id, so different
+ *    coupon codes from one program each get their reward.
  *
- * Source: pos_loyalty/static/src/overrides/models/pos_order.js (Odoo 18.0)
- *         method getClaimableRewards
+ * 2. getClaimableRewards: skips an is_global_discount reward if its
+ *    discount value is <= an already-applied global-discount line.
+ *    This is the "best-of-N percent discounts" rule and is wrong for
+ *    fixed-amount cash coupons -- bypass it for coupons-type programs.
+ *
+ * 3. _applyReward: deletes existing global-discount lines before adding
+ *    a new is_global_discount reward. Same wrong assumption as (2).
+ *    Skip the deletion when the new reward is from a coupons-type
+ *    program.
+ *
+ * Plus: replace_date_to_datetime's _updateRewardLines deduplicates
+ * existing reward lines by reward_identifier_code alone -- collapses
+ * two same-program coupons into one. Tighten the dedup to also match
+ * coupon_id.
  */
 
 import { patch } from "@web/core/utils/patch";
 import { PosOrder } from "@point_of_sale/app/models/pos_order";
 
-// HH-DEBUG: temporary verbose logging while diagnosing why two coupons
-// from the same coupons-type program collapse into a single reward line.
-const HH_LOG = (...a) => console.log("[HH-COUPON]", ...a);
-
 patch(PosOrder.prototype, {
     getClaimableRewards(coupon_id = false, program_id = false, auto = false) {
-        HH_LOG("getClaimableRewards called", { coupon_id, program_id, auto, lines: this.lines.length });
         const couponPointChanges = this.uiState.couponPointChanges;
         const excludedCouponIds = Object.keys(couponPointChanges)
             .filter((id) => couponPointChanges[id].manual && couponPointChanges[id].existing_code)
@@ -43,7 +50,6 @@ patch(PosOrder.prototype, {
                     coupon_id: coupon.id,
                 }))
             );
-        HH_LOG("  allCouponPrograms", allCouponPrograms, "filterCouponId=", coupon_id, "code_activated_ids=", this._code_activated_coupon_ids.map(c => c.id), "couponPointChanges keys=", Object.keys(couponPointChanges));
         const result = [];
         const totalWithTax = this.get_total_with_tax();
         const totalWithoutTax = this.get_total_without_tax();
@@ -54,18 +60,15 @@ patch(PosOrder.prototype, {
             : 0;
         for (const couponProgram of allCouponPrograms) {
             const program = this.models["loyalty.program"].get(couponProgram.program_id);
-            HH_LOG("  loop iter", {prog: couponProgram.program_id, coupon: couponProgram.coupon_id, trigger: program?.trigger, type: program?.program_type});
             if (
                 program.pricelist_ids.length > 0 &&
                 (!this.pricelist_id ||
                     !program.pricelist_ids.some((pl) => pl.id === this.pricelist_id.id))
             ) {
-                HH_LOG("    SKIP pricelist mismatch");
                 continue;
             }
             if (program.trigger == "with_code") {
                 if (!this._canGenerateRewards(program, totalWithTax, totalWithoutTax)) {
-                    HH_LOG("    SKIP _canGenerateRewards=false");
                     continue;
                 }
             }
@@ -73,21 +76,16 @@ patch(PosOrder.prototype, {
                 (coupon_id && couponProgram.coupon_id !== coupon_id) ||
                 (program_id && couponProgram.program_id !== program_id)
             ) {
-                HH_LOG("    SKIP coupon/program filter mismatch", {filterCoupon: coupon_id, hasCoupon: couponProgram.coupon_id});
                 continue;
             }
             const points = this._getRealCouponPoints(couponProgram.coupon_id);
-            HH_LOG("    points=", points, "rewards=", program.reward_ids.map(r => ({id: r.id, req: r.required_points})));
             for (const reward of program.reward_ids) {
                 if (points < reward.required_points) {
-                    HH_LOG("      SKIP not enough points", points, "<", reward.required_points);
                     continue;
                 }
-                // HH-CUSTOM: tighten core's "skip if reward already applied"
-                // guard for coupon-type programs to also require the SAME
-                // coupon_id. This lets two distinct codes from one program
-                // each yield their reward in a single order; the same code
-                // re-scanned is still rejected at scan-time upstream.
+                // HH-CUSTOM (1): for coupons-type, only skip if THIS exact
+                // coupon already has its reward applied -- not just any
+                // coupon from the program.
                 if (
                     reward.program_id.program_type === "coupons" &&
                     this.lines.find(
@@ -96,19 +94,23 @@ patch(PosOrder.prototype, {
                             rewardline.coupon_id?.id === couponProgram.coupon_id
                     )
                 ) {
-                    HH_LOG("      SKIP already-applied reward+coupon");
                     continue;
                 }
                 if (auto && this.uiState.disabledRewards.has(reward.id)) {
-                    HH_LOG("      SKIP auto+disabled");
                     continue;
                 }
-                if (reward.is_global_discount && reward.discount <= globalDiscountPercent) {
-                    HH_LOG("      SKIP weaker global discount");
+                // HH-CUSTOM (2): bypass the "best-of-N global discount"
+                // anti-stacking guard for coupons-type programs. Each
+                // physical cash coupon must contribute its own reward
+                // line regardless of an already-applied one.
+                if (
+                    reward.is_global_discount &&
+                    reward.discount <= globalDiscountPercent &&
+                    reward.program_id.program_type !== "coupons"
+                ) {
                     continue;
                 }
                 if (reward.reward_type === "discount" && totalIsZero) {
-                    HH_LOG("      SKIP discount on zero-total order");
                     continue;
                 }
                 let unclaimedQty;
@@ -134,37 +136,73 @@ patch(PosOrder.prototype, {
                     reward: reward,
                     potentialQty: unclaimedQty,
                 });
-                HH_LOG("  pushed reward", { reward_id: reward.id, coupon_id: couponProgram.coupon_id });
             }
         }
-        HH_LOG("getClaimableRewards result", result.map(r => ({reward_id: r.reward.id, coupon_id: r.coupon_id})));
         return result;
     },
 
     /**
+     * HH-CUSTOM (3): override _applyReward to skip core's "delete
+     * existing global-discount lines before adding new one" behaviour
+     * when the new reward is from a coupons-type program. Otherwise
+     * applying coupon B wipes out coupon A's already-applied line.
+     */
+    _applyReward(reward, coupon_id, args) {
+        if (
+            reward.is_global_discount &&
+            reward.program_id.program_type === "coupons"
+        ) {
+            // Inline a stripped-down version of core's _applyReward that
+            // omits the global-discount-line deletion. Mirrors
+            // pos_loyalty/static/src/overrides/models/pos_order.js
+            // (Odoo 18.0).
+            if (this._getRealCouponPoints(coupon_id) < reward.required_points) {
+                return false;
+            }
+            args = args || {};
+            const rewardLines = this._getRewardLineValues({
+                reward: reward,
+                coupon_id: coupon_id,
+                product: args["product"] || null,
+                price: args["price"] || null,
+                quantity: args["quantity"] || null,
+                cost: args["cost"] || null,
+            });
+            if (!Array.isArray(rewardLines)) {
+                return rewardLines;
+            }
+            if (!rewardLines.length) {
+                return false;
+            }
+            for (const rewardLine of rewardLines) {
+                const prepareRewards = {
+                    ...rewardLine,
+                    reward_id: rewardLine.reward_id,
+                    coupon_id: this.models["loyalty.card"].get(rewardLine.coupon_id),
+                    tax_ids: rewardLine.tax_ids.map((tax) => ["link", tax]),
+                };
+                this.models["pos.order.line"].create({
+                    ...prepareRewards,
+                    order_id: this,
+                    price_type: "manual",
+                });
+            }
+            return true;
+        }
+        return super._applyReward(reward, coupon_id, args);
+    },
+
+    /**
      * Override of replace_date_to_datetime's _updateRewardLines.
-     * That patch deduplicates rewards by `reward_identifier_code` alone --
-     * which collapses two coupons of the same program (same reward) into
-     * one line, even though we want each scanned coupon to keep its own
-     * reward orderline. Tighten the dedup to also match coupon_id.
-     *
-     * Logic mirrors the upstream method (HH replace_date_to_datetime
-     * pos_store.js), with the dedup predicate extended.
+     * That patch deduplicates rewards by reward_identifier_code alone --
+     * which collapses two coupons of the same program into one line.
+     * Tighten the dedup to also match coupon_id.
      */
     _updateRewardLines() {
-        HH_LOG("_updateRewardLines called", { lines: this.lines.length });
         if (!this.lines.length) {
             return;
         }
         const rewardLines = this._get_reward_lines();
-        HH_LOG("  reward lines:", rewardLines.map(l => ({
-            id: l.id,
-            reward_id: l.reward_id?.id,
-            coupon_id: l.coupon_id?.id || l.coupon_id,
-            code: l.reward_identifier_code,
-            qty: l.qty,
-            price: l.price_unit,
-        })));
         if (!rewardLines.length) {
             return;
         }
@@ -197,9 +235,6 @@ patch(PosOrder.prototype, {
             } else if (claimedReward.reward.reward_type === "product") {
                 productRewards.push(claimedReward);
             } else if (
-                // HH-CUSTOM: also key dedup on coupon_id so two distinct
-                // coupons from the same coupon program each keep their
-                // own reward orderline.
                 !otherRewards.some(
                     (reward) =>
                         reward.reward_identifier_code === claimedReward.reward_identifier_code &&
@@ -207,13 +242,9 @@ patch(PosOrder.prototype, {
                 )
             ) {
                 otherRewards.push(claimedReward);
-                HH_LOG("    pushed to otherRewards", {code: claimedReward.reward_identifier_code, coupon: claimedReward.coupon_id});
-            } else {
-                HH_LOG("    DEDUP-SKIPPED in otherRewards", {code: claimedReward.reward_identifier_code, coupon: claimedReward.coupon_id});
             }
             line.delete();
         }
-        HH_LOG("  after loop: otherRewards count =", otherRewards.length);
 
         const allRewards = productRewards.concat(otherRewards).concat(paymentRewards);
         const allRewardsMerged = [];
@@ -223,7 +254,6 @@ patch(PosOrder.prototype, {
                 allRewardsMerged.push(reward);
                 return;
             }
-
             const reward_index = allRewardsMerged.findIndex((item) => {
                 return (
                     item.reward.id === reward.reward.id &&
@@ -232,7 +262,6 @@ patch(PosOrder.prototype, {
                     item.args.product === reward.args.product
                 );
             });
-
             if (reward_index > -1) {
                 allRewardsMerged[reward_index].args.quantity += reward.args.quantity;
                 allRewardsMerged[reward_index].args.cost += reward.args.cost;
@@ -241,7 +270,6 @@ patch(PosOrder.prototype, {
             }
         });
 
-        HH_LOG("  allRewardsMerged", allRewardsMerged.map(r => ({reward: r.reward.id, coupon: r.coupon_id})));
         for (const claimedReward of allRewardsMerged) {
             if (
                 !this._code_activated_coupon_ids.find(
@@ -249,10 +277,8 @@ patch(PosOrder.prototype, {
                 ) &&
                 !this.uiState.couponPointChanges[claimedReward.coupon_id]
             ) {
-                HH_LOG("    SKIP (coupon not in activated set)", claimedReward.coupon_id);
                 continue;
             }
-
             if (
                 claimedReward.reward.program_id.program_type === "coupons" &&
                 this.lines.find(
@@ -262,17 +288,13 @@ patch(PosOrder.prototype, {
                             rewardline.coupon_id === claimedReward.coupon_id)
                 )
             ) {
-                HH_LOG("    SKIP (already-applied check) reward=", claimedReward.reward.id, "coupon=", claimedReward.coupon_id);
                 continue;
             }
-
-            HH_LOG("    APPLY reward=", claimedReward.reward.id, "coupon=", claimedReward.coupon_id);
-            const r = this._applyReward(
+            this._applyReward(
                 claimedReward.reward,
                 claimedReward.coupon_id,
                 claimedReward.args
             );
-            HH_LOG("      _applyReward returned:", r === true ? "OK" : r);
         }
     },
 });
