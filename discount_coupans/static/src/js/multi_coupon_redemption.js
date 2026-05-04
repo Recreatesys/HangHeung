@@ -43,6 +43,7 @@ patch(PosOrder.prototype, {
                     coupon_id: coupon.id,
                 }))
             );
+        HH_LOG("  allCouponPrograms", allCouponPrograms, "filterCouponId=", coupon_id, "code_activated_ids=", this._code_activated_coupon_ids.map(c => c.id), "couponPointChanges keys=", Object.keys(couponPointChanges));
         const result = [];
         const totalWithTax = this.get_total_with_tax();
         const totalWithoutTax = this.get_total_without_tax();
@@ -53,15 +54,18 @@ patch(PosOrder.prototype, {
             : 0;
         for (const couponProgram of allCouponPrograms) {
             const program = this.models["loyalty.program"].get(couponProgram.program_id);
+            HH_LOG("  loop iter", {prog: couponProgram.program_id, coupon: couponProgram.coupon_id, trigger: program?.trigger, type: program?.program_type});
             if (
                 program.pricelist_ids.length > 0 &&
                 (!this.pricelist_id ||
                     !program.pricelist_ids.some((pl) => pl.id === this.pricelist_id.id))
             ) {
+                HH_LOG("    SKIP pricelist mismatch");
                 continue;
             }
             if (program.trigger == "with_code") {
                 if (!this._canGenerateRewards(program, totalWithTax, totalWithoutTax)) {
+                    HH_LOG("    SKIP _canGenerateRewards=false");
                     continue;
                 }
             }
@@ -69,11 +73,14 @@ patch(PosOrder.prototype, {
                 (coupon_id && couponProgram.coupon_id !== coupon_id) ||
                 (program_id && couponProgram.program_id !== program_id)
             ) {
+                HH_LOG("    SKIP coupon/program filter mismatch", {filterCoupon: coupon_id, hasCoupon: couponProgram.coupon_id});
                 continue;
             }
             const points = this._getRealCouponPoints(couponProgram.coupon_id);
+            HH_LOG("    points=", points, "rewards=", program.reward_ids.map(r => ({id: r.id, req: r.required_points})));
             for (const reward of program.reward_ids) {
                 if (points < reward.required_points) {
+                    HH_LOG("      SKIP not enough points", points, "<", reward.required_points);
                     continue;
                 }
                 // HH-CUSTOM: tighten core's "skip if reward already applied"
@@ -89,15 +96,19 @@ patch(PosOrder.prototype, {
                             rewardline.coupon_id?.id === couponProgram.coupon_id
                     )
                 ) {
+                    HH_LOG("      SKIP already-applied reward+coupon");
                     continue;
                 }
                 if (auto && this.uiState.disabledRewards.has(reward.id)) {
+                    HH_LOG("      SKIP auto+disabled");
                     continue;
                 }
                 if (reward.is_global_discount && reward.discount <= globalDiscountPercent) {
+                    HH_LOG("      SKIP weaker global discount");
                     continue;
                 }
                 if (reward.reward_type === "discount" && totalIsZero) {
+                    HH_LOG("      SKIP discount on zero-total order");
                     continue;
                 }
                 let unclaimedQty;
